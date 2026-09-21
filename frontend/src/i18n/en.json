@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Food Match",
+    "subtitle": "Find food & dining buddies"
+  },
+  "nav": {
+    "home": "Home",
+    "random": "Random Food",
+    "suggest": "Suggest Food",
+    "map": "Map",
+    "profile": "Profile",
+    "findBuddy": "Find Dining Buddy"
+  },
+  "food": {
+    "spinButton": "Spin Now!",
+    "category": {
+      "all": "All",
+      "kho": "Dry Dishes",
+      "nuoc": "Soup/Noodle"
+    },
+    "price": {
+      "re": "Budget (<30k)",
+      "vua": "Medium (30-80k)",
+      "cao": "Premium (>80k)"
+    },
+    "mealTime": {
+      "sang": "Breakfast",
+      "trua": "Lunch",
+      "toi": "Dinner",
+      "khuya": "Late Night"
+    }
+  },
+  "profile": {
+    "title": "Create Temporary Profile",
+    "displayName": "Display Name",
+    "gender": "Gender",
+    "preferences": "Food Preferences",
+    "desiredFood": "What do you want to eat today?",
+    "create": "Create Profile",
+    "expiryNote": "Profile auto-expires after 3 hours"
+  },
+  "match": {
+    "invite": "Invite to Dine",
+    "accept": "Accept",
+    "decline": "Decline",
+    "pending": "Pending...",
+    "matched": "Matched!"
+  },
+  "chat": {
+    "placeholder": "Type a message...",
+    "send": "Send"
+  },
+  "map": {
+    "findRestaurants": "Find Nearby Restaurants",
+    "randomRestaurant": "Random Restaurant",
+    "showBuffet": "Buffet in Malls",
+    "getDirections": "Get Directions",
+    "radius": "Radius: {{km}}km"
+  },
+  "report": {
+    "title": "Report User",
+    "reason": "Reason",
+    "submit": "Submit Report",
+    "block": "Block User"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "language": "Language"
+  }
+}

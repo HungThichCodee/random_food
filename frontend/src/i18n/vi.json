@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Food Match",
+    "subtitle": "Tìm món ăn & bạn ăn cùng"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "random": "Random món",
+    "suggest": "Gợi ý món",
+    "map": "Bản đồ",
+    "profile": "Hồ sơ",
+    "findBuddy": "Tìm bạn ăn cùng"
+  },
+  "food": {
+    "spinButton": "Quay ngay!",
+    "category": {
+      "all": "Tất cả",
+      "kho": "Món khô",
+      "nuoc": "Món nước"
+    },
+    "price": {
+      "re": "Rẻ (<30k)",
+      "vua": "Vừa (30-80k)",
+      "cao": "Cao (>80k)"
+    },
+    "mealTime": {
+      "sang": "Sáng",
+      "trua": "Trưa",
+      "toi": "Tối",
+      "khuya": "Khuya"
+    }
+  },
+  "profile": {
+    "title": "Tạo hồ sơ tạm",
+    "displayName": "Tên hiển thị",
+    "gender": "Giới tính",
+    "preferences": "Sở thích ẩm thực",
+    "desiredFood": "Hôm nay muốn ăn gì?",
+    "create": "Tạo hồ sơ",
+    "expiryNote": "Hồ sơ tự hết hạn sau 3 giờ"
+  },
+  "match": {
+    "invite": "Rủ ăn cùng",
+    "accept": "Đồng ý",
+    "decline": "Từ chối",
+    "pending": "Đang chờ...",
+    "matched": "Đã ghép cặp!"
+  },
+  "chat": {
+    "placeholder": "Nhập tin nhắn...",
+    "send": "Gửi"
+  },
+  "map": {
+    "findRestaurants": "Tìm quán ăn gần đây",
+    "randomRestaurant": "Random 1 quán",
+    "showBuffet": "Buffet trong TTTM",
+    "getDirections": "Chỉ đường",
+    "radius": "Bán kính: {{km}}km"
+  },
+  "report": {
+    "title": "Báo cáo người dùng",
+    "reason": "Lý do",
+    "submit": "Gửi báo cáo",
+    "block": "Chặn người dùng"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "retry": "Thử lại",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "language": "Ngôn ngữ"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow_file_creation": true,
+    "allow_commands": ["dotnet.exe *", "npm.exe *", "node.exe *", "git.exe *"],
+    "deny_commands": ["rm -rf /", "del /s /q C:\\*"]
+  },
+  "hooks": {
+    "pre_commit": "dotnet.exe build backend/FoodMatch/FoodMatch.sln",
+    "pre_push": "dotnet.exe test backend/FoodMatch/tests/FoodMatch.Tests/FoodMatch.Tests.csproj"
+  }
+}
