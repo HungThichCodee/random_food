@@ -1,5 +1,9 @@
 # Workflow Rules
 
+## Initialization (MANDATORY)
+- **CRITICAL**: Bất cứ khi nào nhận được prompt (yêu cầu) từ người dùng, BƯỚC ĐẦU TIÊN BẮT BUỘC là phải dùng công cụ để đọc lại nội dung các file `doc.md`, `.claude/memory.md` và `.claude/implementation_plan.md`. 
+- Tinh chỉnh hoặc cập nhật ngữ cảnh (context) từ các file này TRƯỚC KHI thực hiện viết code, sửa file hay chạy lệnh.
+
 ## Terminal Commands (CRITICAL)
 - ALWAYS append `.exe` to CLI tools when executing terminal commands (e.g., `node.exe`, `npm.exe`, `git.exe`, `dotnet.exe`, `docker.exe`, `docker-compose.exe`).
 - This is required to bypass sandbox restrictions and match the `settings.json` allowlist.

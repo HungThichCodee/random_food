@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:postgres@localhost:5432/foodmatch"
+      ]
+    },
+    "github": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<ĐIỀN_TOKEN_GITHUB_CỦA_BẠN_VÀO_ĐÂY>"
+      }
+    },
+    "docker": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "@docker/mcp-server"
+      ]
+    },
+    "vercel": {
+      "command": "npx.cmd",
+      "args": [
+        "-y",
+        "vercel-mcp-server"
+      ],
+      "env": {
+        "VERCEL_API_TOKEN": "<ĐIỀN_TOKEN_VERCEL_CỦA_BẠN_VÀO_ĐÂY>"
+      }
+    }
+  }
+}
