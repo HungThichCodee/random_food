@@ -1,3 +1,5 @@
+using FoodMatch.Domain.Enums;
+
 namespace FoodMatch.Domain.Entities;
 
 /// <summary>
@@ -16,7 +18,7 @@ public class TempUser
     public double? CurrentLat { get; set; }
     public double? CurrentLng { get; set; }
     public bool LocationVisible { get; set; }
-    public string Status { get; set; } = "available";  // available / matched / hidden
+    public UserStatus Status { get; set; } = UserStatus.Available;  // available / matched / hidden
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime ExpiresAt { get; set; }
 

@@ -1,3 +1,5 @@
+using FoodMatch.Domain.Enums;
+
 namespace FoodMatch.Domain.Entities;
 
 /// <summary>
@@ -8,11 +10,11 @@ public class Food
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string? Category { get; set; }           // kho / nuoc
+    public FoodCategory? Category { get; set; }
     public string? CuisineType { get; set; }
     public string? ImageUrl { get; set; }
-    public string? AvgPriceRange { get; set; }       // re / vua / cao
-    public string? MealTime { get; set; }             // sang / trua / toi / khuya
+    public PriceRange? AvgPriceRange { get; set; }
+    public MealTime? MealTime { get; set; }
     public bool IsActive { get; set; } = true;
 
     // Navigation properties

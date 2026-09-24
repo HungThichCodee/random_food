@@ -26,12 +26,13 @@ Food Match là một ứng dụng Web (Web App) kết hợp giữa "khám phá �
 
 ## 💻 Công Nghệ Sử Dụng
 
-### 🎨 Frontend
+### 🎨 Frontend & UI/UX
 - **Framework:** React 19 + TypeScript + Vite 6
-- **UI Library:** Ant Design 5
+- **UI Library:** Ant Design Mobile (antd-mobile)
 - **State Management:** Zustand 5
 - **Maps & Routing:** Leaflet.js, React-Leaflet, OSRM
 - **Real-time:** `@microsoft/signalr`
+- **Design System & AI Tools:** [Google Stitch](https://stitch.withgoogle.com) kết hợp **Model Context Protocol (MCP)** để đồng bộ thiết kế từ AI tạo sinh (Text-to-UI) trực tiếp vào IDE.
 
 ### ⚙️ Backend
 - **Framework:** ASP.NET Core Web API (.NET 10), C# 12
@@ -90,6 +91,20 @@ Food Match là một ứng dụng Web (Web App) kết hợp giữa "khám phá �
    npm run dev
    ```
    *Frontend sẽ chạy tại: `http://localhost:5173`*
+
+## 🎨 Tích hợp Giao diện (Google Stitch MCP)
+
+Dự án này sử dụng **Google Stitch** để thiết kế giao diện Mobile-First. Trợ lý AI (Antigravity IDE) được kết nối trực tiếp với bản thiết kế qua giao thức MCP (Model Context Protocol).
+
+**Cách kết nối (Dành cho Developer):**
+1. Lấy **API Key** từ giao diện Settings của Stitch (chọn đúng khóa đang hoạt động trong dropdown).
+2. Tạo file `.env` ở thư mục gốc của dự án và thêm dòng:
+   ```env
+   STITCH_API_KEY=mã_của_bạn
+   ```
+3. IDE sẽ tự động đọc khóa này thông qua file cấu hình `.agents/mcp_config.json`.
+4. Mở Command Palette -> chọn **Reload Window** để tải lại máy chủ MCP.
+5. Lúc này, AI có thể tự động đọc Design System, mã màu, và các màn hình (screens) từ Stitch để lập trình giao diện.
 
 ---
 *Dự án đang trong quá trình phát triển.*

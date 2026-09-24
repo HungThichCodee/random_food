@@ -1,3 +1,5 @@
+using FoodMatch.Domain.Enums;
+
 namespace FoodMatch.Domain.Entities;
 
 /// <summary>
@@ -11,6 +13,6 @@ public class FoodSuggestionLog
     public TempUser? TempUser { get; set; }
     public int FoodId { get; set; }
     public Food Food { get; set; } = null!;
-    public string? SuggestionType { get; set; }  // random_all / random_by_type / by_criteria
+    public SuggestionType? SuggestionType { get; set; }  // random_all / random_by_type / by_criteria
     public DateTime SuggestedAt { get; set; } = DateTime.UtcNow;
 }

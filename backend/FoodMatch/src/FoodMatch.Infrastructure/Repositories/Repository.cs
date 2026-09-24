@@ -19,12 +19,35 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet = context.Set<T>();
     }
 
-    // TODO: Implement all IRepository<T> methods
-    public Task<T?> GetByIdAsync(object id) => throw new NotImplementedException();
-    public Task<IEnumerable<T>> GetAllAsync() => throw new NotImplementedException();
-    public Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate) => throw new NotImplementedException();
-    public Task<T> AddAsync(T entity) => throw new NotImplementedException();
-    public Task UpdateAsync(T entity) => throw new NotImplementedException();
-    public Task DeleteAsync(T entity) => throw new NotImplementedException();
-    public Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null) => throw new NotImplementedException();
+    public async Task<T?> GetByIdAsync(object id) => await _dbSet.FindAsync(id);
+    
+    public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
+    
+    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate) 
+        => await _dbSet.Where(predicate).ToListAsync();
+    
+    public async Task<T> AddAsync(T entity)
+    {
+        await _dbSet.AddAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    }
+    
+    public async Task UpdateAsync(T entity)
+    {
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task DeleteAsync(T entity)
+    {
+        _dbSet.Remove(entity);
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
+    {
+        if (predicate == null) return await _dbSet.CountAsync();
+        return await _dbSet.CountAsync(predicate);
+    }
 }

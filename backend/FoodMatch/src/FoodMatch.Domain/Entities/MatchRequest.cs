@@ -1,3 +1,5 @@
+using FoodMatch.Domain.Enums;
+
 namespace FoodMatch.Domain.Entities;
 
 /// <summary>
@@ -11,7 +13,7 @@ public class MatchRequest
     public TempUser FromTempUser { get; set; } = null!;
     public Guid ToTempUserId { get; set; }
     public TempUser ToTempUser { get; set; } = null!;
-    public string Status { get; set; } = "pending";  // pending / accepted / declined / expired
+    public MatchStatus Status { get; set; } = MatchStatus.Pending;  // pending / accepted / declined / expired
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation

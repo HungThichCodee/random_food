@@ -10,6 +10,7 @@ public class MatchRequestConfiguration : IEntityTypeConfiguration<MatchRequest>
     {
         builder.ToTable("match_requests");
         builder.HasKey(m => m.Id);
+        builder.Property(m => m.Status).HasConversion<string>();
 
         builder.HasOne(m => m.FromTempUser)
                .WithMany(u => u.SentMatchRequests)

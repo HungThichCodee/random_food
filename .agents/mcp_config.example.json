@@ -1,5 +1,11 @@
 {
   "mcpServers": {
+    "stitch": {
+      "serverUrl": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "your_stitch_api_key_here"
+      }
+    },
     "postgres": {
       "command": "npx.cmd",
       "args": [

@@ -16,7 +16,7 @@
 - [x] P0.8 — Docker compose up PostgreSQL local (container running) ✅
 - [x] P0.9 — Cài .NET 10 SDK (v10.0.401) ✅
 - [x] P0.10 — Verify `dotnet.exe build` passes (0 errors, 9 warnings — stubs) ✅
-- [ ] P0.11 — Verify `npm.cmd run dev` starts Vite dev server
+- [x] P0.11 — Verify `npm.cmd run dev` starts Vite dev server ✅
 
 ---
 
@@ -24,33 +24,33 @@
 > **Lưu ý Phase 2:** EF Configs có file nhưng thiếu enum conversion, geo indexes. Repository.cs là stub (throw NotImplementedException). Services cũng là stub.
 
 ## Phase 1 — Domain Layer (Entities + Enums)
-- [ ] P1.1 — Review/hoàn thiện entity `Food.cs` (properties, navigation props)
-- [ ] P1.2 — Review/hoàn thiện entity `FoodTag.cs` + `FoodFoodTag.cs` (many-to-many)
-- [ ] P1.3 — Review/hoàn thiện entity `Restaurant.cs`
-- [ ] P1.4 — Review/hoàn thiện entity `TempUser.cs` (UUID PK, expires_at, status)
-- [ ] P1.5 — Review/hoàn thiện entity `MatchRequest.cs`
-- [ ] P1.6 — Review/hoàn thiện entity `ChatMessage.cs`
-- [ ] P1.7 — Review/hoàn thiện entity `FoodSuggestionLog.cs`
-- [ ] P1.8 — Review/hoàn thiện entity `UserReport.cs`
-- [ ] P1.9 — Review/hoàn thiện tất cả Enums (FoodCategory, MealTime, PriceRange, UserStatus, MatchStatus)
-- [ ] P1.10 — ✅ BUILD CHECK: `dotnet.exe build` → 0 errors
+- [x] P1.1 — Review/hoàn thiện entity `Food.cs` (properties, navigation props) ✅
+- [x] P1.2 — Review/hoàn thiện entity `FoodTag.cs` + `FoodFoodTag.cs` (many-to-many) ✅
+- [x] P1.3 — Review/hoàn thiện entity `Restaurant.cs` ✅
+- [x] P1.4 — Review/hoàn thiện entity `TempUser.cs` (UUID PK, expires_at, status) ✅
+- [x] P1.5 — Review/hoàn thiện entity `MatchRequest.cs` ✅
+- [x] P1.6 — Review/hoàn thiện entity `ChatMessage.cs` ✅
+- [x] P1.7 — Review/hoàn thiện entity `FoodSuggestionLog.cs` ✅
+- [x] P1.8 — Review/hoàn thiện entity `UserReport.cs` ✅
+- [x] P1.9 — Review/hoàn thiện tất cả Enums (FoodCategory, MealTime, PriceRange, UserStatus, MatchStatus) ✅
+- [x] P1.10 — ✅ BUILD CHECK: `dotnet.exe build` → 0 errors ✅
 
 ---
 
 ## Phase 2 — Infrastructure Layer (Database + EF Core)
-- [ ] P2.1 — Hoàn thiện `FoodMatchDbContext.cs` (DbSets, OnModelCreating)
-- [ ] P2.2 — Hoàn thiện EF Config: `FoodConfiguration.cs` (indexes, constraints, enum conversion)
-- [ ] P2.3 — Hoàn thiện EF Config: `FoodTagConfiguration.cs` + `FoodFoodTagConfiguration.cs`
-- [ ] P2.4 — Hoàn thiện EF Config: `RestaurantConfiguration.cs` (geo indexes)
-- [ ] P2.5 — Hoàn thiện EF Config: `TempUserConfiguration.cs` (UUID, geo indexes, status)
-- [ ] P2.6 — Hoàn thiện EF Config: `MatchRequestConfiguration.cs`
-- [ ] P2.7 — Hoàn thiện EF Config: `ChatMessageConfiguration.cs`
-- [ ] P2.8 — Hoàn thiện EF Config: `FoodSuggestionLogConfiguration.cs` + `UserReportConfiguration.cs`
-- [ ] P2.9 — Tạo EF Migration: `dotnet.exe ef migrations add InitialCreate`
-- [ ] P2.10 — Apply Migration: `dotnet.exe ef database update`
-- [ ] P2.11 — Hoàn thiện `Repository.cs` (Generic CRUD: GetAll, GetById, Add, Update, Delete)
-- [ ] P2.12 — Register DbContext + Repository trong DI (Program.cs hoặc extension method)
-- [ ] P2.13 — ✅ BUILD CHECK + DB CHECK: build passes, database created with tables
+- [x] P2.1 — Hoàn thiện `FoodMatchDbContext.cs` (DbSets, OnModelCreating)
+- [x] P2.2 — Hoàn thiện EF Config: `FoodConfiguration.cs` (indexes, constraints, enum conversion)
+- [x] P2.3 — Hoàn thiện EF Config: `FoodTagConfiguration.cs` + `FoodFoodTagConfiguration.cs`
+- [x] P2.4 — Hoàn thiện EF Config: `RestaurantConfiguration.cs` (geo indexes)
+- [x] P2.5 — Hoàn thiện EF Config: `TempUserConfiguration.cs` (UUID, geo indexes, status)
+- [x] P2.6 — Hoàn thiện EF Config: `MatchRequestConfiguration.cs`
+- [x] P2.7 — Hoàn thiện EF Config: `ChatMessageConfiguration.cs`
+- [x] P2.8 — Hoàn thiện EF Config: `FoodSuggestionLogConfiguration.cs` + `UserReportConfiguration.cs`
+- [x] P2.9 — Tạo EF Migration: `dotnet.exe ef migrations add InitialCreate`
+- [x] P2.10 — Apply Migration: `dotnet.exe ef database update`
+- [x] P2.11 — Hoàn thiện `Repository.cs` (Generic CRUD: GetAll, GetById, Add, Update, Delete)
+- [x] P2.12 — Register DbContext + Repository trong DI (Program.cs hoặc extension method)
+- [x] P2.13 — ✅ BUILD CHECK + DB CHECK: build passes, database created with tables
 
 ---
 
@@ -88,10 +88,11 @@
 - [ ] P6.1 — Code `axiosClient.ts` — base URL, interceptors, error handling
 - [ ] P6.2 — Code `foodApi.ts` — gọi 3 API endpoints food
 - [ ] P6.3 — Code `useFoodStore.ts` — Zustand store cho food state
-- [ ] P6.4 — Code `AppLayout.tsx` — layout chung, navbar, footer
-- [ ] P6.5 — Code `HomePage.tsx` — landing page, navigation cards
-- [ ] P6.6 — Code `RandomFoodPage.tsx` — spin wheel animation, hiển thị kết quả
-- [ ] P6.7 — Code `SuggestFoodPage.tsx` — form chọn tiêu chí, hiển thị gợi ý
+- [ ] P6.4 — Tích hợp **Stitch MCP Design System** — cài đặt mã màu, font, CSS variables theo chuẩn Mobile-First (Glassmorphism, Neon).
+- [ ] P6.5 — Code `AppLayout.tsx` — layout chung, TabBar (Bottom Navigation) dùng antd-mobile
+- [ ] P6.6 — Code `HomePage.tsx` — landing page, navigation cards (tuân thủ UI/UX từ Stitch)
+- [ ] P6.7 — Code `RandomFoodPage.tsx` — spin wheel animation, hiển thị kết quả dạng Card (antd-mobile)
+- [ ] P6.8 — Code `SuggestFoodPage.tsx` — form chọn tiêu chí, hiển thị gợi ý (dùng Form, Button, Selector của antd-mobile)
 - [ ] P6.8 — Setup i18n config (`i18n/index.ts`)
 - [ ] P6.9 — Thêm translation keys cho pages đã code (vi.json + en.json)
 - [ ] P6.10 — ✅ BUILD CHECK: `npx.cmd tsc --noEmit` passes
@@ -215,7 +216,7 @@
 ---
 
 ## Phase 18 — Polish + Final Check
-- [ ] P18.1 — Review responsive UI trên mobile (AntD breakpoints)
+- [ ] P18.1 — Review responsive UI và UX trên mobile (đảm bảo chuẩn antd-mobile và Stitch UI)
 - [ ] P18.2 — Hoàn thiện tất cả translation keys (vi + en)
 - [x] P18.3 — Code README.md — kiến trúc, hướng dẫn chạy local, tech stack
 - [ ] P18.4 — Final build: backend `dotnet.exe build -c Release` + frontend `npm.cmd run build`

@@ -36,6 +36,7 @@ appsettings.Production.json
 .claude/CLAUDE.local.md
 .claude/settings.local.json
 .agents/mcp_config.json
+CodeReview/
 
 ## IDE & Editors
 .idea/

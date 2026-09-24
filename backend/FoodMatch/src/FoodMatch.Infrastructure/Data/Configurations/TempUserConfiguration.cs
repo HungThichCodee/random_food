@@ -12,6 +12,7 @@ public class TempUserConfiguration : IEntityTypeConfiguration<TempUser>
         builder.HasKey(u => u.Id);
         builder.Property(u => u.SessionToken).IsRequired().HasMaxLength(255);
         builder.Property(u => u.DisplayName).IsRequired().HasMaxLength(100);
+        builder.Property(u => u.Status).HasConversion<string>();
 
         builder.HasIndex(u => new { u.CurrentLat, u.CurrentLng });
         builder.HasIndex(u => u.SessionToken);

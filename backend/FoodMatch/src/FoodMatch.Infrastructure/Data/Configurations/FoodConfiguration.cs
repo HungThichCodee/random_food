@@ -11,6 +11,9 @@ public class FoodConfiguration : IEntityTypeConfiguration<Food>
         builder.ToTable("foods");
         builder.HasKey(f => f.Id);
         builder.Property(f => f.Name).IsRequired().HasMaxLength(200);
+        builder.Property(f => f.Category).HasConversion<string>();
+        builder.Property(f => f.AvgPriceRange).HasConversion<string>();
+        builder.Property(f => f.MealTime).HasConversion<string>();
 
         // Relationships
         builder.HasMany(f => f.FoodFoodTags)
