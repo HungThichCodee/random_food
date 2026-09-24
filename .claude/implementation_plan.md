@@ -38,29 +38,29 @@
 ---
 
 ## Phase 2 — Infrastructure Layer (Database + EF Core)
-- [x] P2.1 — Hoàn thiện `FoodMatchDbContext.cs` (DbSets, OnModelCreating)
-- [x] P2.2 — Hoàn thiện EF Config: `FoodConfiguration.cs` (indexes, constraints, enum conversion)
-- [x] P2.3 — Hoàn thiện EF Config: `FoodTagConfiguration.cs` + `FoodFoodTagConfiguration.cs`
-- [x] P2.4 — Hoàn thiện EF Config: `RestaurantConfiguration.cs` (geo indexes)
-- [x] P2.5 — Hoàn thiện EF Config: `TempUserConfiguration.cs` (UUID, geo indexes, status)
-- [x] P2.6 — Hoàn thiện EF Config: `MatchRequestConfiguration.cs`
-- [x] P2.7 — Hoàn thiện EF Config: `ChatMessageConfiguration.cs`
-- [x] P2.8 — Hoàn thiện EF Config: `FoodSuggestionLogConfiguration.cs` + `UserReportConfiguration.cs`
-- [x] P2.9 — Tạo EF Migration: `dotnet.exe ef migrations add InitialCreate`
-- [x] P2.10 — Apply Migration: `dotnet.exe ef database update`
-- [x] P2.11 — Hoàn thiện `Repository.cs` (Generic CRUD: GetAll, GetById, Add, Update, Delete)
-- [x] P2.12 — Register DbContext + Repository trong DI (Program.cs hoặc extension method)
-- [x] P2.13 — ✅ BUILD CHECK + DB CHECK: build passes, database created with tables
+- [x] P2.1 — Hoàn thiện `FoodMatchDbContext.cs` (DbSets, OnModelCreating) ✅
+- [x] P2.2 — Hoàn thiện EF Config: `FoodConfiguration.cs` (indexes, constraints, enum conversion) ✅
+- [x] P2.3 — Hoàn thiện EF Config: `FoodTagConfiguration.cs` + `FoodFoodTagConfiguration.cs` ✅
+- [x] P2.4 — Hoàn thiện EF Config: `RestaurantConfiguration.cs` (geo indexes) ✅
+- [x] P2.5 — Hoàn thiện EF Config: `TempUserConfiguration.cs` (UUID, geo indexes, status) ✅
+- [x] P2.6 — Hoàn thiện EF Config: `MatchRequestConfiguration.cs` ✅
+- [x] P2.7 — Hoàn thiện EF Config: `ChatMessageConfiguration.cs` ✅
+- [x] P2.8 — Hoàn thiện EF Config: `FoodSuggestionLogConfiguration.cs` + `UserReportConfiguration.cs` ✅
+- [x] P2.9 — Tạo EF Migration: `dotnet.exe ef migrations add InitialCreate` ✅
+- [x] P2.10 — Apply Migration: `dotnet.exe ef database update` ✅
+- [x] P2.11 — Hoàn thiện `Repository.cs` (Generic CRUD: GetAll, GetById, Add, Update, Delete) ✅
+- [x] P2.12 — Register DbContext + Repository trong DI (Program.cs hoặc extension method) ✅
+- [x] P2.13 — ✅ BUILD CHECK + DB CHECK: build passes, database created with tables ✅
 
 ---
 
 ## Phase 3 — Seed Data (50 Món Ăn Việt Nam)
-- [ ] P3.1 — Code seed food tags: cay, chay, healthy, ngot, man, chien, hap, nuong, hai_san, thit, rau, do_uong
-- [ ] P3.2 — Code seed 25 món ăn đầu tiên (phở, bún bò, cơm tấm, bánh mì...)
-- [ ] P3.3 — Code seed 25 món ăn còn lại
-- [ ] P3.4 — Code seed food-tag relationships (mỗi món gắn 2-4 tags)
-- [ ] P3.5 — Gọi DataSeeder.SeedAsync() trong Program.cs khi startup
-- [ ] P3.6 — ✅ BUILD CHECK + SEED CHECK: verify database có 50 foods + tags
+- [x] P3.1 — Code seed food tags: cay, chay, healthy, ngot, man, chien, hap, nuong, hai_san, thit, rau, do_uong ✅
+- [x] P3.2 — Code seed 25 món ăn đầu tiên (phở, bún bò, cơm tấm, bánh mì...) ✅
+- [x] P3.3 — Code seed 25 món ăn còn lại ✅
+- [x] P3.4 — Code seed food-tag relationships (mỗi món gắn 2-4 tags) ✅
+- [x] P3.5 — Gọi DataSeeder.SeedAsync() trong Program.cs khi startup ✅
+- [x] P3.6 — ✅ BUILD CHECK + SEED CHECK: verify database có 50 foods + tags ✅
 
 ---
 

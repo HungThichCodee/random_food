@@ -54,6 +54,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Auto-migrate and Seed Data on startup
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<FoodMatchDbContext>();
+    await context.Database.MigrateAsync();
+    await FoodMatch.Infrastructure.Data.Seed.DataSeeder.SeedAsync(context);
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
