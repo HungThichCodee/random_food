@@ -14,6 +14,7 @@ builder.Services.AddDbContext<FoodMatchDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // 3. Service registrations
+builder.Services.AddScoped<IFoodService, FoodMatch.Application.Services.FoodService>();
 // 4. SignalR
 // 5. CORS
 // 6. Swagger

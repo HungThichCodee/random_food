@@ -76,11 +76,11 @@
 ---
 
 ## Phase 5 — API Layer Controllers (Group A — Food)
-- [ ] P5.1 — Code `FoodsController.GetRandom()` — `GET /api/foods/random`
-- [ ] P5.2 — Code `FoodsController.GetRandomByCategory()` — `GET /api/foods/random?category=kho|nuoc`
-- [ ] P5.3 — Code `FoodsController.Suggest()` — `POST /api/foods/suggest`
-- [ ] P5.4 — Register FoodService trong DI
-- [ ] P5.5 — ✅ BUILD CHECK + SWAGGER TEST: verify 3 endpoints hoạt động qua Swagger
+- [x] P5.1 — Code `FoodsController.GetRandom()` — `GET /api/foods/random` ✅
+- [x] P5.2 — Code `FoodsController.GetRandomByCategory()` — `GET /api/foods/random?category=kho|nuoc` ✅
+- [x] P5.3 — Code `FoodsController.Suggest()` — `POST /api/foods/suggest` ✅
+- [x] P5.4 — Register FoodService trong DI ✅
+- [x] P5.5 — ✅ BUILD CHECK + SWAGGER TEST: verify 3 endpoints hoạt động qua Swagger ✅
 
 ---
 

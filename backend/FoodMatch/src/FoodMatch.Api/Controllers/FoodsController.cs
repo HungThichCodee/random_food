@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FoodMatch.Application.Interfaces;
 using FoodMatch.Application.DTOs.Food;
+using System.ComponentModel.DataAnnotations;
 
 namespace FoodMatch.Api.Controllers;
 
@@ -19,23 +20,52 @@ public class FoodsController : ControllerBase
     }
 
     [HttpGet("random")]
-    public async Task<ActionResult<FoodDto>> GetRandomFood([FromQuery] string? category = null)
+    public async Task<ActionResult<FoodResponseDto>> GetRandomFood([FromQuery] FoodRandomRequestDto request)
     {
-        // TODO: Call _foodService.GetRandomFoodAsync or GetRandomFoodByCategoryAsync
-        throw new NotImplementedException();
+        try
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            FoodResponseDto result;
+            if (!string.IsNullOrWhiteSpace(request.Category))
+            {
+                result = await _foodService.GetRandomByCategoryAsync(request.Category, request.SessionId);
+            }
+            else
+            {
+                result = await _foodService.GetRandomFoodAsync(request.SessionId);
+            }
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Error = $"Internal server error while fetching random food: {ex.Message}" });
+        }
     }
 
     [HttpPost("suggest")]
-    public async Task<ActionResult<List<FoodDto>>> SuggestByCriteria([FromBody] FoodCriteriaDto criteria)
+    public async Task<ActionResult<FoodResponseDto>> SuggestFoods([FromBody] FoodSuggestRequestDto request)
     {
-        // TODO: Call _foodService.SuggestByCriteriaAsync
-        throw new NotImplementedException();
-    }
+        try
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-    [HttpGet("tags")]
-    public async Task<ActionResult<List<string>>> GetAllTags()
-    {
-        // TODO: Call _foodService.GetAllTagsAsync
-        throw new NotImplementedException();
+            var result = await _foodService.SuggestFoodsAsync(request);
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Error = $"Internal server error while suggesting foods: {ex.Message}" });
+        }
     }
 }
