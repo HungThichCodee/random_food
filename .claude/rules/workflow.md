@@ -17,6 +17,7 @@
 
 ## Self-Check After Every Step (MANDATORY)
 After completing EACH step in the implementation plan:
+0. **Rule Check**: Đảm bảo mọi method vừa viết đã có BỌC `try-catch` và các DTO/tham số đầu vào đã có VALIDATION (Data Annotations / Guard Clauses). Nếu thiếu, PHẢI SỬA NGAY.
 1. **Backend**: Run `dotnet.exe build backend/FoodMatch/FoodMatch.sln` — MUST pass with 0 errors
 2. **Frontend**: Run `npx.cmd tsc --noEmit` in `frontend/` — MUST pass with 0 type errors
 3. **If tests exist**: Run `dotnet.exe test` — MUST pass

@@ -65,13 +65,13 @@
 ---
 
 ## Phase 4 — Application Layer Services (Group A — Food)
-- [ ] P4.1 — Code DTOs: `FoodResponseDto`, `FoodRandomRequestDto`, `FoodSuggestRequestDto`
-- [ ] P4.2 — Code `IFoodService` interface (nếu cần update)
-- [ ] P4.3 — Code `FoodService.GetRandomFoodAsync()` — random toàn bộ, tránh trùng trong phiên
-- [ ] P4.4 — Code `FoodService.GetRandomByCategoryAsync(category)` — random theo khô/nước
-- [ ] P4.5 — Code `FoodService.SuggestFoodsAsync(criteria)` — lọc theo tag, giá, giờ ăn
-- [ ] P4.6 — Code `FoodSuggestionLog` logging — lưu lịch sử random tránh trùng
-- [ ] P4.7 — ✅ BUILD CHECK
+- [x] P4.1 — Code DTOs: `FoodResponseDto`, `FoodRandomRequestDto`, `FoodSuggestRequestDto` ✅
+- [x] P4.2 — Code `IFoodService` interface (nếu cần update) ✅
+- [x] P4.3 — Code `FoodService.GetRandomFoodAsync()` — random toàn bộ, tránh trùng trong phiên ✅
+- [x] P4.4 — Code `FoodService.GetRandomByCategoryAsync(category)` — random theo khô/nước ✅
+- [x] P4.5 — Code `FoodService.SuggestFoodsAsync(criteria)` — lọc theo tag, giá, giờ ăn ✅
+- [x] P4.6 — Code `FoodSuggestionLog` logging — lưu lịch sử random tránh trùng ✅
+- [x] P4.7 — ✅ BUILD CHECK ✅
 
 ---
 

@@ -7,9 +7,7 @@ namespace FoodMatch.Application.Interfaces;
 /// </summary>
 public interface IFoodService
 {
-    Task<FoodDto> GetRandomFoodAsync();
-    Task<FoodDto> GetRandomFoodByCategoryAsync(string category);
-    Task<List<FoodDto>> SuggestByCriteriaAsync(FoodCriteriaDto criteria);
-    Task<List<string>> GetAllTagsAsync();
-    Task LogSuggestionAsync(Guid? tempUserId, int foodId, string suggestionType);
+    Task<FoodResponseDto> GetRandomFoodAsync(string sessionId);
+    Task<FoodResponseDto> GetRandomByCategoryAsync(string category, string sessionId);
+    Task<FoodResponseDto> SuggestFoodsAsync(FoodSuggestRequestDto request);
 }
