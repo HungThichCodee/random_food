@@ -15,11 +15,16 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // 3. Service registrations
 builder.Services.AddScoped<IFoodService, FoodMatch.Application.Services.FoodService>();
+builder.Services.AddScoped<IRestaurantService, FoodMatch.Application.Services.RestaurantService>();
+
 // 4. SignalR
 // 5. CORS
 // 6. Swagger
 // 7. Background services
+
 // 8. HttpClient for external APIs
+builder.Services.AddHttpClient<IOverpassApiService, FoodMatch.Infrastructure.Services.OverpassApiService>();
+
 
 // Rate Limiting (Anti-spam)
 builder.Services.AddRateLimiter(options =>

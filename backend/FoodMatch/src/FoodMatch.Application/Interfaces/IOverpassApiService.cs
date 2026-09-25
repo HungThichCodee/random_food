@@ -1,11 +1,11 @@
-using FoodMatch.Application.DTOs.Restaurant;
+using FoodMatch.Domain.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace FoodMatch.Application.Interfaces;
-
-/// <summary>
-/// Service interface for querying OpenStreetMap via Overpass API.
-/// </summary>
-public interface IOverpassApiService
+namespace FoodMatch.Application.Interfaces
 {
-    Task<List<RestaurantDto>> SearchRestaurantsAsync(double lat, double lng, double radiusMeters);
+    public interface IOverpassApiService
+    {
+        Task<List<Restaurant>> FetchNearbyRestaurantsAsync(double latitude, double longitude, double radius);
+    }
 }

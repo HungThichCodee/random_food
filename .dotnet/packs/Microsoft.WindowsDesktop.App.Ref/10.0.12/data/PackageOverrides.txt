@@ -1,0 +1,16 @@
+Microsoft.Win32.Registry.AccessControl|10.0.12
+Microsoft.Win32.SystemEvents|10.0.12
+System.CodeDom|10.0.12
+System.Configuration.ConfigurationManager|10.0.12
+System.Diagnostics.EventLog|10.0.12
+System.Diagnostics.PerformanceCounter|10.0.12
+System.DirectoryServices|10.0.12
+System.Formats.Nrbf|10.0.12
+System.IO.Packaging|10.0.12
+System.Resources.Extensions|10.0.12
+System.Security.Cryptography.Pkcs|10.0.12
+System.Security.Cryptography.ProtectedData|10.0.12
+System.Security.Cryptography.Xml|10.0.12
+System.Security.Permissions|10.0.12
+System.Windows.Extensions|10.0.12
+System.Drawing.Common|10.0.12

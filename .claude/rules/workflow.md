@@ -29,6 +29,14 @@ After completing EACH step in the implementation plan:
 - Commit after each completed feature/function
 - Use conventional commits: feat:, fix:, refactor:, docs:, test:
 - Branch naming: feature/{batch}-{item-number}-{short-description}
+- **PRE-PUSH MANDATORY CHECKLIST**: Trước khi yêu cầu user cho phép `git.exe push`, Agent **BẮT BUỘC** phải tự chạy và xác nhận 4 điều kiện sau:
+  1. **Build Check**: Chạy `dotnet.exe build` (0 lỗi) và `npx.cmd tsc --noEmit` (0 lỗi).
+  2. **Test Check**: Chạy test của chức năng vừa làm (nếu có).
+  3. **UI/UX Check**: Rà soát thiết kế của phase hiện tại (đảm bảo chuẩn Mobile-First, đúng màu/font Stitch, có micro-interactions).
+  4. **Standard Web App Review**: Xác nhận code vừa viết đã tuân thủ: 
+     - *Validation*: Re-validate mọi input từ Frontend (Guard Clauses / Data Annotations).
+     - *Error Handling*: Bọc `try-catch` đầy đủ và trả về HTTP status chuẩn.
+     - *Rate Limiting*: Áp dụng giới hạn request cho API (chống spam).
 - **MANDATORY**: ALWAYS request user review and explicit approval before running `git.exe push` or publishing code to remote repositories.
 
 ## Context Continuity (MANDATORY)

@@ -100,14 +100,14 @@
 ---
 
 ## Phase 7 — Restaurant Service + Map (Group A — A3, A4)
-- [ ] P7.1 — Code DTOs: `RestaurantResponseDto`, `NearbyRequestDto`
-- [ ] P7.2 — Code `IOverpassApiService` + `OverpassApiService` — gọi Overpass API tra quán ăn
-- [ ] P7.3 — Code `IRestaurantService` + `RestaurantService` — lưu cache vào DB, query nearby
-- [ ] P7.4 — Code `RestaurantService.GetNearbyAsync(lat, lng, radius)`
-- [ ] P7.5 — Code `RestaurantService.GetBuffetInMallAsync(lat, lng)`
-- [ ] P7.6 — Code `RestaurantsController` — `GET /api/restaurants/nearby`, `GET /api/restaurants/buffet-mall`
-- [ ] P7.7 — Register services trong DI + HttpClient cho Overpass
-- [ ] P7.8 — ✅ BUILD CHECK + SWAGGER TEST
+- [x] P7.1 — Code DTOs: `RestaurantResponseDto`, `NearbyRequestDto`
+- [x] P7.2 — Code `IOverpassApiService` + `OverpassApiService` — gọi Overpass API tra quán ăn
+- [x] P7.3 — Code `IRestaurantService` + `RestaurantService` — lưu cache vào DB, query nearby
+- [x] P7.4 — Code `RestaurantService.GetNearbyAsync(lat, lng, radius)`
+- [x] P7.5 — Code `RestaurantService.GetBuffetInMallAsync(lat, lng)`
+- [x] P7.6 — Code `RestaurantsController` — `GET /api/restaurants/nearby`, `GET /api/restaurants/buffet-mall`
+- [x] P7.7 — Register services trong DI + HttpClient cho Overpass
+- [x] P7.8 — ✅ BUILD CHECK + SWAGGER TEST
 
 ---
 
