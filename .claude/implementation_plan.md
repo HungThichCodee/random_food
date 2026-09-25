@@ -85,17 +85,17 @@
 ---
 
 ## Phase 6 — Frontend (Group A — Random Món Ăn)
-- [ ] P6.1 — Code `axiosClient.ts` — base URL, interceptors, error handling
-- [ ] P6.2 — Code `foodApi.ts` — gọi 3 API endpoints food
-- [ ] P6.3 — Code `useFoodStore.ts` — Zustand store cho food state
-- [ ] P6.4 — Tích hợp **Stitch MCP Design System** — cài đặt mã màu, font, CSS variables theo chuẩn Mobile-First (Glassmorphism, Neon).
-- [ ] P6.5 — Code `AppLayout.tsx` — layout chung, TabBar (Bottom Navigation) dùng antd-mobile
-- [ ] P6.6 — Code `HomePage.tsx` — landing page, navigation cards (tuân thủ UI/UX từ Stitch)
-- [ ] P6.7 — Code `RandomFoodPage.tsx` — spin wheel animation, hiển thị kết quả dạng Card (antd-mobile)
-- [ ] P6.8 — Code `SuggestFoodPage.tsx` — form chọn tiêu chí, hiển thị gợi ý (dùng Form, Button, Selector của antd-mobile)
-- [ ] P6.8 — Setup i18n config (`i18n/index.ts`)
-- [ ] P6.9 — Thêm translation keys cho pages đã code (vi.json + en.json)
-- [ ] P6.10 — ✅ BUILD CHECK: `npx.cmd tsc --noEmit` passes
+- [x] P6.1 — Code `axiosClient.ts` — base URL, interceptors, error handling ✅
+- [x] P6.2 — Code `foodApi.ts` — gọi 3 API endpoints food ✅
+- [x] P6.3 — Code `useFoodStore.ts` — Zustand store cho food state ✅
+- [x] P6.4 — Tích hợp **Stitch MCP Design System** — cài đặt mã màu, font, CSS variables theo chuẩn Mobile-First (Glassmorphism, Neon). ✅
+- [x] P6.5 — Code `AppLayout.tsx` — layout chung, TabBar (Bottom Navigation) dùng antd-mobile ✅
+- [x] P6.6 — Code `HomePage.tsx` — landing page, navigation cards (tuân thủ UI/UX từ Stitch) ✅
+- [x] P6.7 — Code `RandomFoodPage.tsx` — spin wheel animation, hiển thị kết quả dạng Card (antd-mobile) ✅
+- [x] P6.8 — Code `SuggestFoodPage.tsx` — form chọn tiêu chí, hiển thị gợi ý (dùng Form, Button, Selector của antd-mobile) ✅
+- [x] P6.8 — Setup i18n config (`i18n/index.ts`) ✅
+- [x] P6.9 — Thêm translation keys cho pages đã code (vi.json + en.json) ✅
+- [x] P6.10 — ✅ BUILD CHECK: `npx.cmd tsc --noEmit` passes ✅
 
 ---
 

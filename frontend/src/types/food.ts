@@ -1,18 +1,22 @@
-export interface FoodDto {
+export interface FoodResponseDto {
   id: number;
   name: string;
-  category?: string;
-  cuisineType?: string;
-  imageUrl?: string;
-  avgPriceRange?: string;
-  mealTime?: string;
+  category: string;
+  cuisineType: string;
+  avgPriceRange: string;
+  mealTime: string;
   tags: string[];
 }
 
-export interface FoodCriteriaDto {
+export interface FoodRandomRequestDto {
   category?: string;
-  tags?: string[];
-  priceRange?: string;
+  sessionId: string;
+}
+
+export interface FoodSuggestRequestDto {
+  sessionId: string;
   mealTime?: string;
-  excludeFoodIds?: number[];
+  priceRange?: string;
+  includedTags?: string[];
+  excludedTags?: string[];
 }

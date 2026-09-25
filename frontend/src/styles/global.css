@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Colors - Neon & Dark Theme */
+  --color-bg-base: #0f172a; /* Slate 900 */
+  --color-bg-surface: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+  --color-primary: #06b6d4; /* Cyan 500 */
+  --color-primary-glow: rgba(6, 182, 212, 0.5);
+  --color-secondary: #8b5cf6; /* Violet 500 */
+  --color-secondary-glow: rgba(139, 92, 246, 0.5);
+  --color-text-primary: #f8fafc; /* Slate 50 */
+  --color-text-secondary: #94a3b8; /* Slate 400 */
+  
+  /* Typography */
+  --font-family: 'Inter', sans-serif;
+  
+  /* Glassmorphism */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glass-blur: blur(12px);
+  
+  /* Spacing & Border Radius */
+  --border-radius-lg: 16px;
+  --border-radius-md: 12px;
+  --border-radius-sm: 8px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism Card Utility */
+.glass-card {
+  background: var(--color-bg-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--border-radius-lg);
+}
+
+/* Neon Text Utility */
+.neon-text-primary {
+  color: var(--color-primary);
+  text-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+.neon-text-secondary {
+  color: var(--color-secondary);
+  text-shadow: 0 0 8px var(--color-secondary-glow);
+}
+
+/* Customizing antd-mobile variables for dark theme */
+:root:root {
+  --adm-color-primary: var(--color-primary);
+  --adm-color-text: var(--color-text-primary);
+  --adm-color-background: transparent;
+  --adm-color-box: var(--color-bg-surface);
+  --adm-font-family: var(--font-family);
+  --adm-color-border: rgba(255,255,255,0.1);
+}

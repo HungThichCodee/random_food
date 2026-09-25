@@ -1,0 +1,64 @@
+.suggest-page {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.suggest-page .header h2 {
+  font-size: 1.8rem;
+  margin: 0;
+  text-align: center;
+  padding-bottom: 16px;
+}
+
+/* Customizing antd-mobile Form for dark neon theme */
+.adm-list {
+  background: transparent !important;
+}
+
+.adm-list-item {
+  background: var(--color-bg-surface) !important;
+  color: var(--color-text-primary) !important;
+  border: var(--glass-border) !important;
+  border-radius: var(--border-radius-md) !important;
+  margin-bottom: 16px !important;
+  overflow: visible !important;
+}
+
+.adm-list-item-content {
+  border-bottom: none !important;
+}
+
+.adm-list-item-content-main {
+  color: var(--color-text-primary) !important;
+}
+
+.suggested-results {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Reusing result-card from RandomFoodPage if we want, or define here to be safe */
+.result-card {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.result-card h3 {
+  font-size: 1.5rem;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.food-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}

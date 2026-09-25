@@ -1,0 +1,33 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto; /* Center on desktop to simulate mobile */
+  background-color: var(--color-bg-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 20px;
+  /* hide scrollbar for clean mobile look */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.app-content::-webkit-scrollbar {
+  display: none;
+}
+
+.app-tabbar {
+  border-top: var(--glass-border);
+  background: var(--color-bg-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  padding-bottom: env(safe-area-inset-bottom);
+}

@@ -1,32 +1,49 @@
-import { Typography, Space, Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-const { Title, Paragraph } = Typography;
+import { Space, Card, Button } from 'antd-mobile';
+import { FireFill, SearchOutline, LocationFill, UserOutline } from 'antd-mobile-icons';
+import './HomePage.css';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   return (
-    <div style={{ textAlign: 'center', padding: '2rem' }}>
-      <Title>{t('app.title')}</Title>
-      <Paragraph>{t('app.subtitle')}</Paragraph>
-      <Space direction="vertical" size="large">
-        {/* TODO: Add feature cards with navigation */}
-        <Card hoverable onClick={() => navigate('/random')}>
-          <Title level={4}>{t('nav.random')}</Title>
-        </Card>
-        <Card hoverable onClick={() => navigate('/suggest')}>
-          <Title level={4}>{t('nav.suggest')}</Title>
-        </Card>
-        <Card hoverable onClick={() => navigate('/map')}>
-          <Title level={4}>{t('nav.map')}</Title>
-        </Card>
-        <Card hoverable onClick={() => navigate('/profile')}>
-          <Title level={4}>{t('nav.findBuddy')}</Title>
-        </Card>
-      </Space>
+    <div className="home-page">
+      <div className="hero-section">
+        <h1 className="neon-text-primary title">Random Food</h1>
+        <p className="subtitle">{t('app.subtitle', 'What should we eat today?')}</p>
+      </div>
+
+      <div className="features-grid">
+        <div className="glass-card feature-card" onClick={() => navigate('/random')}>
+          <div className="icon-wrapper neon-text-primary">
+            <FireFill fontSize={32} />
+          </div>
+          <h3>{t('nav.random', 'Pick Random')}</h3>
+        </div>
+
+        <div className="glass-card feature-card" onClick={() => navigate('/suggest')}>
+          <div className="icon-wrapper neon-text-secondary">
+            <SearchOutline fontSize={32} />
+          </div>
+          <h3>{t('nav.suggest', 'Suggest')}</h3>
+        </div>
+
+        <div className="glass-card feature-card" onClick={() => navigate('/map')}>
+          <div className="icon-wrapper neon-text-primary">
+            <LocationFill fontSize={32} />
+          </div>
+          <h3>{t('nav.map', 'Map')}</h3>
+        </div>
+
+        <div className="glass-card feature-card" onClick={() => navigate('/profile')}>
+          <div className="icon-wrapper neon-text-secondary">
+            <UserOutline fontSize={32} />
+          </div>
+          <h3>{t('nav.findBuddy', 'Find Buddy')}</h3>
+        </div>
+      </div>
     </div>
   );
 }

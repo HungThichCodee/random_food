@@ -13,6 +13,8 @@
   },
   "food": {
     "spinButton": "Spin Now!",
+    "spinning": "Spinning...",
+    "suggestButton": "Suggest for me!",
     "category": {
       "all": "All",
       "kho": "Dry Dishes",

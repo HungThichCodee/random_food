@@ -13,6 +13,8 @@
   },
   "food": {
     "spinButton": "Quay ngay!",
+    "spinning": "Đang quay...",
+    "suggestButton": "Gợi ý cho tôi!",
     "category": {
       "all": "Tất cả",
       "kho": "Món khô",

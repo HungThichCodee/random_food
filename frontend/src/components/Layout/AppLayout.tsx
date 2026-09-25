@@ -1,22 +1,57 @@
-import { Layout } from 'antd';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { TabBar } from 'antd-mobile';
 import { useTranslation } from 'react-i18next';
-import AppHeader from './Header';
-import AppFooter from './Footer';
-
-const { Content } = Layout;
+import { 
+  AppOutline, 
+  UnorderedListOutline,
+  EnvironmentOutline,
+  UserOutline 
+} from 'antd-mobile-icons';
+import './AppLayout.css';
 
 export default function AppLayout() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const tabs = [
+    {
+      key: '/',
+      title: t('Home', 'Trang chủ'),
+      icon: <AppOutline />,
+    },
+    {
+      key: '/random',
+      title: t('Random', 'Chọn món'),
+      icon: <UnorderedListOutline />,
+    },
+    {
+      key: '/map',
+      title: t('Map', 'Bản đồ'),
+      icon: <EnvironmentOutline />,
+    },
+    {
+      key: '/profile',
+      title: t('Profile', 'Hồ sơ'),
+      icon: <UserOutline />,
+    },
+  ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      {/* TODO: Shell with Ant Design Layout, Header with nav menu + LanguageSwitcher, Content, Footer */}
-      <AppHeader />
-      <Content style={{ padding: '0 24px', minHeight: 'calc(100vh - 134px)' }}>
+    <div className="app-layout">
+      <div className="app-content">
         <Outlet />
-      </Content>
-      <AppFooter />
-    </Layout>
+      </div>
+      <div className="app-tabbar">
+        <TabBar
+          activeKey={location.pathname}
+          onChange={key => navigate(key)}
+        >
+          {tabs.map(item => (
+            <TabBar.Item key={item.key} icon={item.icon} title={item.title} />
+          ))}
+        </TabBar>
+      </div>
+    </div>
   );
 }

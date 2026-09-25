@@ -1,18 +1,18 @@
 import apiClient from './axiosClient';
-import type { FoodDto, FoodCriteriaDto } from '../types/food';
+import type { FoodResponseDto, FoodRandomRequestDto, FoodSuggestRequestDto } from '../types/food';
 
-// TODO: Implement API calls
 export const foodApi = {
-  getRandomFood: async (): Promise<FoodDto> => {
-    throw new Error('Not implemented');
+  getRandomFood: async (request: FoodRandomRequestDto): Promise<FoodResponseDto> => {
+    const params = new URLSearchParams();
+    params.append('sessionId', request.sessionId);
+    if (request.category) {
+      params.append('category', request.category);
+    }
+    const response = await apiClient.get<unknown, FoodResponseDto>(`/foods/random?${params.toString()}`);
+    return response;
   },
-  getRandomFoodByCategory: async (category: string): Promise<FoodDto> => {
-    throw new Error('Not implemented');
-  },
-  suggestByCriteria: async (criteria: FoodCriteriaDto): Promise<FoodDto[]> => {
-    throw new Error('Not implemented');
-  },
-  getAllTags: async (): Promise<string[]> => {
-    throw new Error('Not implemented');
+  suggestFoods: async (request: FoodSuggestRequestDto): Promise<FoodResponseDto> => {
+    const response = await apiClient.post<unknown, FoodResponseDto>('/foods/suggest', request);
+    return response;
   },
 };
