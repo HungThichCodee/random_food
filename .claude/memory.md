@@ -4,11 +4,11 @@
 - **Date:** 2026-09-21T18:27:00+07:00
 - **Action:** Created README, initialized Git, pushed to GitHub (origin/main), and updated workflow rules.
 
-## Current Status: 🟢 PHASE 5 COMPLETE — STARTING PHASE 6
+## Current Status: 🟢 PHASE 6 COMPLETE — STARTING PHASE 7
 - Backend build: ✅ 0 errors, 7 warnings (unused params in stub services)
-- Frontend: ✅ dev server running
+- Frontend build: ✅ TSC passes, antd-mobile integrated with Glassmorphism UI
 - Docker PostgreSQL: container `foodmatch-postgres` running
-- Git repo: ✅ Phase 3, 4, 5 pushed to GitHub
+- Git repo: ✅ Phase 6 pushed to GitHub
 - Data: ✅ 50 Vietnamese foods seeded
 - Rules updated: ✅ `try-catch` & `Backend Validation` are now strict requirements (Step 0 in Self-Check).
 
@@ -19,7 +19,8 @@
 - **Phase 3 (Seed Data):** 6/6 done ██████████ 100%
 - **Phase 4 (Food Services):** 7/7 done ██████████ 100%
 - **Phase 5 (Food Controllers):** 5/5 done ██████████ 100%
-- **Phase 6-18:** Not started
+- **Phase 6 (Frontend Food UI):** 11/11 done ██████████ 100%
+- **Phase 7-18:** Not started
 
 ## Recent Rule Updates
 - **Initialization (Mandatory Context Reading)**: Agent must ALWAYS read `doc.md` and `.claude` files first upon receiving any new prompt to avoid context loss.
@@ -32,5 +33,5 @@
 - **OCR Delegate**: Using `ocr delegate preview` for automated code reviews.
 
 ## Next Immediate Action for Next Agent
-- Review `.claude/implementation_plan.md` and start **Phase 6 — Application Layer (Group B — Users & Matching)** (P6.1).
-- Implement `TempUserService` (Create Profile, Set Status) with strict `try-catch` and validation.
+- Review `.claude/implementation_plan.md` and start **Phase 7 — Restaurant Service + Map (Group A)** (P7.1).
+- Implement `RestaurantService`, `OverpassApiService`, and `RestaurantsController` (Nearby, Buffet in Mall) with strict `try-catch` and validation.

@@ -1,67 +1,305 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ==========================================
+   FOOD MATCH — Design System
+   Source: Stitch MCP · Project: Food Match Dining App
+   Theme: Dark Glassmorphism + Neon Luminescence
+   Font: Be Vietnam Pro
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 :root {
-  /* Colors - Neon & Dark Theme */
-  --color-bg-base: #0f172a; /* Slate 900 */
-  --color-bg-surface: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
-  --color-primary: #06b6d4; /* Cyan 500 */
-  --color-primary-glow: rgba(6, 182, 212, 0.5);
-  --color-secondary: #8b5cf6; /* Violet 500 */
-  --color-secondary-glow: rgba(139, 92, 246, 0.5);
-  --color-text-primary: #f8fafc; /* Slate 50 */
-  --color-text-secondary: #94a3b8; /* Slate 400 */
-  
-  /* Typography */
-  --font-family: 'Inter', sans-serif;
-  
-  /* Glassmorphism */
-  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --glass-blur: blur(12px);
-  
-  /* Spacing & Border Radius */
-  --border-radius-lg: 16px;
-  --border-radius-md: 12px;
-  --border-radius-sm: 8px;
+  /* ── Surface Colors ── */
+  --surface: #111319;
+  --surface-dim: #111319;
+  --surface-bright: #373940;
+  --surface-container-lowest: #0c0e14;
+  --surface-container-low: #191b22;
+  --surface-container: #1e1f26;
+  --surface-container-high: #282a30;
+  --surface-container-highest: #33343b;
+
+  /* ── Content Colors ── */
+  --on-surface: #e2e2eb;
+  --on-surface-variant: #e1bfb5;
+  --inverse-surface: #e2e2eb;
+  --inverse-on-surface: #2e3037;
+
+  /* ── Outline ── */
+  --outline: #a98a80;
+  --outline-variant: #594139;
+
+  /* ── Primary — Flame Orange ── */
+  --primary: #ffb59d;
+  --primary-container: #ff6b35;
+  --on-primary: #5d1900;
+  --on-primary-container: #5f1900;
+  --primary-fixed: #ffdbd0;
+  --primary-fixed-dim: #ffb59d;
+
+  /* ── Secondary — Tropical Teal ── */
+  --secondary: #4fdbcc;
+  --secondary-container: #00b1a3;
+  --on-secondary: #003732;
+  --on-secondary-container: #003d37;
+
+  /* ── Tertiary — Sun Yellow ── */
+  --tertiary: #e3c633;
+  --tertiary-container: #c5ab10;
+  --on-tertiary: #393000;
+  --on-tertiary-container: #4b3f00;
+
+  /* ── Error ── */
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error: #690005;
+
+  /* ── Background ── */
+  --background: #111319;
+  --on-background: #e2e2eb;
+  --surface-variant: #33343b;
+  --surface-tint: #ffb59d;
+
+  /* ── Typography — Be Vietnam Pro ── */
+  --font-family: 'Be Vietnam Pro', sans-serif;
+
+  /* ── Typography Scale (from Stitch) ── */
+  --text-headline-xl-size: 32px;
+  --text-headline-xl-weight: 800;
+  --text-headline-xl-lh: 40px;
+  --text-headline-xl-ls: -0.02em;
+
+  --text-headline-lg-size: 26px;
+  --text-headline-lg-weight: 700;
+  --text-headline-lg-lh: 34px;
+  --text-headline-lg-ls: -0.015em;
+
+  --text-headline-md-size: 20px;
+  --text-headline-md-weight: 700;
+  --text-headline-md-lh: 28px;
+  --text-headline-md-ls: -0.01em;
+
+  --text-title-md-size: 17px;
+  --text-title-md-weight: 600;
+  --text-title-md-lh: 24px;
+
+  --text-body-lg-size: 16px;
+  --text-body-lg-weight: 400;
+  --text-body-lg-lh: 24px;
+
+  --text-body-md-size: 14px;
+  --text-body-md-weight: 400;
+  --text-body-md-lh: 20px;
+
+  --text-body-sm-size: 12px;
+  --text-body-sm-weight: 400;
+  --text-body-sm-lh: 16px;
+
+  --text-label-lg-size: 14px;
+  --text-label-lg-weight: 600;
+  --text-label-lg-lh: 18px;
+  --text-label-lg-ls: 0.01em;
+
+  --text-label-md-size: 12px;
+  --text-label-md-weight: 600;
+  --text-label-md-lh: 16px;
+  --text-label-md-ls: 0.02em;
+
+  --text-label-sm-size: 10px;
+  --text-label-sm-weight: 700;
+  --text-label-sm-lh: 14px;
+  --text-label-sm-ls: 0.04em;
+
+  /* ── Spacing (from Stitch) ── */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --margin: 1rem;
+  --gutter: 0.75rem;
+
+  /* ── Border Radius (from Stitch: roundness=ROUND_FULL) ── */
+  --rounded-sm: 0.5rem;
+  --rounded-md: 1rem;    /* default */
+  --rounded-lg: 2rem;
+  --rounded-xl: 3rem;
+  --rounded-full: 9999px;
+
+  /* ── Glassmorphism Specs (from Stitch design notes) ── */
+  --glass-bg: rgba(30, 31, 38, 0.75);       /* surface-container at 75% */
+  --glass-bg-elevated: rgba(15, 17, 23, 0.85); /* for modals/tabbar */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --glass-border-active: 1px solid rgba(255, 107, 53, 0.25);
+  --glass-blur: blur(16px);
+  --glass-blur-elevated: blur(24px);
+  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --glass-shadow-active: 0 8px 32px -4px rgba(255, 107, 53, 0.25);
+
+  /* ── Neon Glows ── */
+  --glow-primary: 0 0 12px rgba(255, 107, 53, 0.4);
+  --glow-secondary: 0 0 12px rgba(79, 219, 204, 0.35);
+  --glow-tertiary: 0 0 12px rgba(227, 198, 51, 0.35);
 }
 
-body {
+/* ── Base Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: var(--font-family);
-  background-color: var(--color-bg-base);
-  color: var(--color-text-primary);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism Card Utility */
+html, body {
+  width: 100vw;
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-family);
+  font-size: var(--text-body-md-size);
+  line-height: var(--text-body-md-lh);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* Hide scrollbar (Mobile app feel) */
+::-webkit-scrollbar { display: none; }
+* { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Typography Utilities ── */
+.text-headline-xl {
+  font-size: var(--text-headline-xl-size);
+  font-weight: var(--text-headline-xl-weight);
+  line-height: var(--text-headline-xl-lh);
+  letter-spacing: var(--text-headline-xl-ls);
+}
+.text-headline-lg {
+  font-size: var(--text-headline-lg-size);
+  font-weight: var(--text-headline-lg-weight);
+  line-height: var(--text-headline-lg-lh);
+  letter-spacing: var(--text-headline-lg-ls);
+}
+.text-headline-md {
+  font-size: var(--text-headline-md-size);
+  font-weight: var(--text-headline-md-weight);
+  line-height: var(--text-headline-md-lh);
+  letter-spacing: var(--text-headline-md-ls);
+}
+.text-title-md {
+  font-size: var(--text-title-md-size);
+  font-weight: var(--text-title-md-weight);
+  line-height: var(--text-title-md-lh);
+}
+.text-body-lg {
+  font-size: var(--text-body-lg-size);
+  font-weight: var(--text-body-lg-weight);
+  line-height: var(--text-body-lg-lh);
+}
+.text-body-md {
+  font-size: var(--text-body-md-size);
+  font-weight: var(--text-body-md-weight);
+  line-height: var(--text-body-md-lh);
+}
+.text-body-sm {
+  font-size: var(--text-body-sm-size);
+  font-weight: var(--text-body-sm-weight);
+  line-height: var(--text-body-sm-lh);
+}
+.text-label-lg {
+  font-size: var(--text-label-lg-size);
+  font-weight: var(--text-label-lg-weight);
+  line-height: var(--text-label-lg-lh);
+  letter-spacing: var(--text-label-lg-ls);
+}
+.text-label-md {
+  font-size: var(--text-label-md-size);
+  font-weight: var(--text-label-md-weight);
+  line-height: var(--text-label-md-lh);
+  letter-spacing: var(--text-label-md-ls);
+}
+.text-label-sm {
+  font-size: var(--text-label-sm-size);
+  font-weight: var(--text-label-sm-weight);
+  line-height: var(--text-label-sm-lh);
+  letter-spacing: var(--text-label-sm-ls);
+}
+
+/* ── Color Utilities ── */
+.text-primary { color: var(--primary); }
+.text-primary-container { color: var(--primary-container); }
+.text-secondary { color: var(--secondary); }
+.text-secondary-container { color: var(--secondary-container); }
+.text-tertiary { color: var(--tertiary); }
+.text-on-surface { color: var(--on-surface); }
+.text-on-surface-variant { color: var(--on-surface-variant); }
+.text-outline { color: var(--outline); }
+
+/* ── Glassmorphism Card Utility ── */
 .glass-card {
-  background: var(--color-bg-surface);
+  background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: var(--glass-border);
   box-shadow: var(--glass-shadow);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--rounded-lg);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-/* Neon Text Utility */
-.neon-text-primary {
-  color: var(--color-primary);
-  text-shadow: 0 0 8px var(--color-primary-glow);
+.glass-card:active {
+  transform: scale(0.98);
 }
 
-.neon-text-secondary {
-  color: var(--color-secondary);
-  text-shadow: 0 0 8px var(--color-secondary-glow);
+.glass-card-active {
+  border: var(--glass-border-active);
+  box-shadow: var(--glass-shadow-active);
 }
 
-/* Customizing antd-mobile variables for dark theme */
+/* ── antd-mobile dark theme overrides ── */
 :root:root {
-  --adm-color-primary: var(--color-primary);
-  --adm-color-text: var(--color-text-primary);
+  --adm-color-primary: var(--primary-container);
+  --adm-color-text: var(--on-surface);
+  --adm-color-text-secondary: var(--on-surface-variant);
   --adm-color-background: transparent;
-  --adm-color-box: var(--color-bg-surface);
+  --adm-color-box: var(--surface-container);
   --adm-font-family: var(--font-family);
-  --adm-color-border: rgba(255,255,255,0.1);
+  --adm-color-border: rgba(255,255,255,0.08);
+  --adm-color-fill-content: var(--surface-container);
 }
+
+/* ── Gradient Text (Stitch hero title style) ── */
+.gradient-text-primary {
+  background: linear-gradient(to right, var(--primary-container), var(--primary-fixed), var(--tertiary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Ambient Radial Glow (Stitch background effect) ── */
+.ambient-glow-primary {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.08);
+  filter: blur(85px);
+  pointer-events: none;
+}
+.ambient-glow-secondary {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(79, 219, 204, 0.08);
+  filter: blur(85px);
+  pointer-events: none;
+}
+
+/* ── Animation: Bounce In ── */
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); opacity: 1; }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.bounce-in {
+  animation: bounceIn 0.5s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+
+/* ── Safe area support ── */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+

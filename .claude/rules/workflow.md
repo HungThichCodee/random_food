@@ -102,6 +102,14 @@ public async Task<TempUserResponseDto> CreateAsync(CreateTempUserDto dto)
 ## UI/UX & Frontend Standards (CRITICAL)
 - **Mobile-First Design**: Giao diện (UI) và trải nghiệm người dùng (UX) phải được thiết kế và lập trình theo hướng **Mobile-First** (ưu tiên hiển thị trên điện thoại trước).
 - **Tuân thủ Thiết kế Stitch**: Tuân thủ nghiêm ngặt các mã màu, font chữ, độ bo góc, bóng mờ (elevation), và hệ thống thiết kế (Design System) đã được thống nhất và sinh ra từ máy chủ **Stitch MCP**.
+- **BẮT BUỘC Tra cứu Stitch TRƯỚC KHI code UI**: Trước khi viết bất kỳ component, page, hoặc CSS nào, Agent PHẢI thực hiện các bước sau theo thứ tự:
+  1. Gọi `list_projects` (Stitch MCP) → tìm đúng project của dự án (Food Match).
+  2. Gọi `list_screens` → xem danh sách các màn hình đã thiết kế.
+  3. Gọi `get_screen` → lấy chi tiết (mã màu, layout, component) của màn hình tương ứng.
+  4. Gọi `list_design_systems` → lấy design tokens (màu, font, spacing).
+  5. Chỉ SAU KHI đã đọc và nắm rõ thiết kế từ Stitch, mới được bắt đầu viết code.
+  6. Nếu Stitch chưa có thiết kế cho màn hình đó, dùng `generate_screen_from_text` để tạo mẫu mới trước.
+  7. **KHÔNG ĐƯỢC tự ý đặt màu sắc/font/spacing** khi chưa tra cứu Stitch — đây là vi phạm nghiêm trọng.
 - **Sử dụng Thư viện Component**: Tận dụng tối đa các thư viện Frontend có sẵn được thiết kế tối ưu cho mobile, đặc biệt là **Ant Design Mobile (antd-mobile)** để xây dựng giao diện nhanh, mượt mà và chuẩn UX mobile.
 
 ## AI Code Review — Open Code Review (MANDATORY)

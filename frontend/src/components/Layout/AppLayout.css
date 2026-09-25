@@ -1,11 +1,13 @@
+/* AppLayout — Based on Stitch Bottom Navigation Deck */
+
 .app-layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto; /* Center on desktop to simulate mobile */
-  background-color: var(--color-bg-base);
+  max-width: 430px; /* Standard mobile viewport */
+  margin: 0 auto;
+  background-color: var(--background);
   position: relative;
   overflow: hidden;
 }
@@ -14,8 +16,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 20px;
-  /* hide scrollbar for clean mobile look */
+  padding-bottom: 90px; /* clearance above floating tabbar */
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -24,10 +25,43 @@
   display: none;
 }
 
+/* Floating TabBar Dock — from Stitch design */
 .app-tabbar {
-  border-top: var(--glass-border);
-  background: var(--color-bg-surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  padding-bottom: env(safe-area-inset-bottom);
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 398px;
+  margin-bottom: 1.5rem;
+  border-radius: var(--rounded-full);
+  background: rgba(22, 24, 34, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  overflow: hidden;
 }
+
+/* Override antd-mobile TabBar styles for dark theme */
+.app-tabbar .adm-tab-bar {
+  background: transparent !important;
+  padding: 8px 0;
+}
+
+.app-tabbar .adm-tab-bar-item {
+  color: var(--on-surface-variant) !important;
+}
+
+.app-tabbar .adm-tab-bar-item-active {
+  color: var(--primary-container) !important;
+}
+
+.app-tabbar .adm-tab-bar-item-icon-active-line {
+  background: var(--primary-container) !important;
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+}
+
