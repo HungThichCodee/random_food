@@ -29,10 +29,24 @@ namespace FoodMatch.Application.Services
         {
             try
             {
-                // Guard clause
+                if (request == null)
+                {
+                    throw new ArgumentNullException(nameof(request), "Request cannot be null");
+                }
+
+                if (request.Latitude < -90 || request.Latitude > 90)
+                {
+                    throw new ArgumentException("Latitude must be between -90 and 90", nameof(request.Latitude));
+                }
+
+                if (request.Longitude < -180 || request.Longitude > 180)
+                {
+                    throw new ArgumentException("Longitude must be between -180 and 180", nameof(request.Longitude));
+                }
+
                 if (request.Radius < 100 || request.Radius > 5000)
                 {
-                    throw new ApplicationException("Radius must be between 100 and 5000 meters");
+                    throw new ArgumentException("Radius must be between 100 and 5000 meters", nameof(request.Radius));
                 }
 
                 // Check DB first

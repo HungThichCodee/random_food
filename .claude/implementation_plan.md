@@ -1,6 +1,12 @@
 # 📋 Food Match — Implementation Plan (Chi Tiết Từng Bước)
 
 > Mỗi bước (~30 phút) là 1 đơn vị code nhỏ. Sau mỗi bước PHẢI self-check: build, fix lỗi, update memory.
+> **QUY TẮC BẮT BUỘC TRƯỚC KHI PUSH CODE (Pre-Push Checklist)**:
+> 1. Build project thành công (không lỗi).
+> 2. Chạy test từng chức năng của phase đang tiến hành.
+> 3. Kiểm tra UI/UX đảm bảo khớp hoàn toàn với thiết kế Stitch MCP.
+> 4. Rà soát đánh giá các quy chuẩn web app (Try-Catch, Validate, Rate Limit, SEO...).
+> Chỉ khi thoả mãn tất cả các điều kiện trên mới được push code.
 
 ---
 
@@ -108,6 +114,7 @@
 - [x] P7.6 — Code `RestaurantsController` — `GET /api/restaurants/nearby`, `GET /api/restaurants/buffet-mall`
 - [x] P7.7 — Register services trong DI + HttpClient cho Overpass
 - [x] P7.8 — ✅ BUILD CHECK + SWAGGER TEST
+- [x] P7.9 — 🔧 FIX BẮT BUỘC: Thêm strict validation và try-catch toàn bộ cho Controller/Service (lỗi lặp lại)
 
 ---
 
@@ -118,7 +125,7 @@
 - [x] P8.4 — Code popup thông tin quán ăn khi click marker
 - [x] P8.5 — Code `restaurantApi.ts` — gọi API nearby + buffet
 - [x] P8.6 — Thêm translation keys cho Map (vi.json + en.json)
-- [x] P8.7 — ✅ BUILD CHECK: `npx.cmd tsc --noEmit` passes
+- [x] P8.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -131,7 +138,7 @@
 - [ ] P9.6 — Code `TempUsersController` — POST, PUT location, GET nearby
 - [ ] P9.7 — Code `ExpiredUserCleanupService` (BackgroundService) — job chạy định kỳ xoá hết hạn
 - [ ] P9.8 — Register services + background job trong DI
-- [ ] P9.9 — ✅ BUILD CHECK + SWAGGER TEST
+- [ ] P9.9 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -141,7 +148,7 @@
 - [ ] P10.3 — Code `tempUserApi.ts` — gọi API tạo profile, update location
 - [ ] P10.4 — Code hiển thị nearby users trên map (markers với offset)
 - [ ] P10.5 — Thêm translation keys cho Profile (vi.json + en.json)
-- [ ] P10.6 — ✅ BUILD CHECK
+- [ ] P10.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -151,7 +158,7 @@
 - [ ] P11.3 — Code `ChatHub.cs` — gửi/nhận tin nhắn real-time
 - [ ] P11.4 — Uncomment MapHub lines trong Program.cs, register hubs
 - [ ] P11.5 — Code `useSignalR.ts` hook — connect, disconnect, event handlers
-- [ ] P11.6 — ✅ BUILD CHECK
+- [ ] P11.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -162,7 +169,7 @@
 - [ ] P12.4 — Code `MatchService.GetPendingRequestsAsync()` — lấy lời mời đang chờ
 - [ ] P12.5 — Code `MatchRequestsController` — POST, PUT respond, GET pending
 - [ ] P12.6 — Tích hợp SignalR push notification khi có lời mời mới
-- [ ] P12.7 — ✅ BUILD CHECK + SWAGGER TEST
+- [ ] P12.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -171,7 +178,7 @@
 - [ ] P13.2 — Code `IChatService` + `ChatService` — gửi/lấy tin nhắn, lưu DB
 - [ ] P13.3 — Code `ChatController` — GET messages by match
 - [ ] P13.4 — Tích hợp ChatHub — real-time send/receive
-- [ ] P13.5 — ✅ BUILD CHECK
+- [ ] P13.5 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -183,7 +190,7 @@
 - [ ] P14.5 — Code UI đồng ý/từ chối lời mời
 - [ ] P14.6 — Code Chat popup/drawer — giao diện chat real-time
 - [ ] P14.7 — Thêm translation keys cho Match + Chat
-- [ ] P14.8 — ✅ BUILD CHECK
+- [ ] P14.8 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -194,7 +201,7 @@
 - [ ] P15.4 — Code `IReportService` + `ReportService` — báo cáo/chặn user
 - [ ] P15.5 — Code `ReportsController` — POST report
 - [ ] P15.6 — Code UI nút báo cáo/chặn user
-- [ ] P15.7 — ✅ BUILD CHECK + SWAGGER TEST
+- [ ] P15.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -202,7 +209,7 @@
 - [ ] P16.1 — Code `GlobalExceptionMiddleware` — catch unhandled exceptions, return consistent error JSON
 - [ ] P16.2 — Code custom exception classes: `NotFoundException`, `BadRequestException`
 - [ ] P16.3 — Register middleware trong Program.cs
-- [ ] P16.4 — ✅ BUILD CHECK
+- [ ] P16.4 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -234,7 +241,7 @@
 | P4 | Food Service (Backend) | 7 |
 | P5 | Food Controller (API) | 5 |
 | P6 | Food Frontend | 10 |
-| P7 | Restaurant Service + API | 8 |
+| P7 | Restaurant Service + API | 9 |
 | P8 | Map Frontend | 7 |
 | P9 | TempUser Service + API | 9 |
 | P10 | Profile Frontend | 6 |
