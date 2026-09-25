@@ -34,8 +34,10 @@ export default function RandomFoodPage() {
 
   return (
     <div className="random-page">
+      <div className="ambient-glow-primary" style={{ top: '-40px', right: '-40px', width: '200px', height: '200px' }} />
+
       <div className="header">
-        <h2 className="neon-text-secondary">{translate('nav.random', 'Pick Random Food')}</h2>
+        <h2 className="gradient-text-primary text-headline-xl">{translate('nav.random', 'Pick Random Food')}</h2>
       </div>
 
       <div className="selector-container">
@@ -65,16 +67,19 @@ export default function RandomFoodPage() {
 
       {currentFood && !isLoading && (
         <div className="glass-card result-card bounce-in">
-          <h3 className="neon-text-primary">{currentFood.name}</h3>
+          <div className="result-icon-wrapper">
+            <span className="material-symbols-outlined result-icon">restaurant</span>
+          </div>
+          <h3 className="text-primary-container text-headline-md">{currentFood.name}</h3>
           <div className="food-tags">
-            <span className="tag">{currentFood.category}</span>
-            <span className="tag">{currentFood.cuisineType}</span>
-            <span className="tag">{currentFood.avgPriceRange}</span>
-            <span className="tag">{currentFood.mealTime}</span>
+            <span className="tag text-label-md">{currentFood.category}</span>
+            <span className="tag text-label-md">{currentFood.cuisineType}</span>
+            <span className="tag text-label-md">{currentFood.avgPriceRange}</span>
+            <span className="tag text-label-md">{currentFood.mealTime}</span>
           </div>
           <div className="food-extra-tags">
             {currentFood.tags.map(tag => (
-              <span key={tag} className="tag outline">{tag}</span>
+              <span key={tag} className="tag outline text-label-sm">{tag}</span>
             ))}
           </div>
         </div>

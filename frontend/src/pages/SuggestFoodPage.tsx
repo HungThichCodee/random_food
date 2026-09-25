@@ -34,20 +34,22 @@ export default function SuggestFoodPage() {
 
   return (
     <div className="suggest-page">
+      <div className="ambient-glow-tertiary" style={{ top: '-40px', left: '-40px', width: '200px', height: '200px' }} />
+
       <div className="header">
-        <h2 className="neon-text-secondary">{t('nav.suggest', 'Suggest Food')}</h2>
+        <h2 className="text-tertiary text-headline-xl">{t('nav.suggest', 'Suggest Food')}</h2>
       </div>
 
       <Form
         form={form}
         onFinish={onFinish}
         footer={
-          <Button block type="submit" color="primary" size="large" loading={isLoading}>
+          <Button block type="submit" color="primary" size="large" loading={isLoading} className="suggest-btn">
             {t('food.suggestButton', 'Get Suggestion')}
           </Button>
         }
       >
-        <Form.Item name="mealTime" label={t('food.mealTime', 'Meal Time')}>
+        <Form.Item name="mealTime" label={<span className="text-label-lg text-on-surface">{t('food.mealTime', 'Meal Time')}</span>}>
           <Selector
             options={[
               { label: 'Sáng', value: 'Sang' },
@@ -58,7 +60,7 @@ export default function SuggestFoodPage() {
             ]}
           />
         </Form.Item>
-        <Form.Item name="priceRange" label={t('food.priceRange', 'Price Range')}>
+        <Form.Item name="priceRange" label={<span className="text-label-lg text-on-surface">{t('food.priceRange', 'Price Range')}</span>}>
           <Selector
             options={[
               { label: 'Rẻ', value: 'Re' },
@@ -73,12 +75,15 @@ export default function SuggestFoodPage() {
         <div className="suggested-results">
           {suggestedFoods.map((food, idx) => (
             <div key={`${food.id}-${idx}`} className="glass-card result-card bounce-in">
-              <h3 className="neon-text-primary">{food.name}</h3>
+              <div className="result-icon-wrapper-tertiary">
+                <span className="material-symbols-outlined result-icon-tertiary">dinner_dining</span>
+              </div>
+              <h3 className="text-tertiary text-title-md">{food.name}</h3>
               <div className="food-tags">
-                <span className="tag">{food.category}</span>
-                <span className="tag">{food.cuisineType}</span>
-                <span className="tag">{food.avgPriceRange}</span>
-                <span className="tag">{food.mealTime}</span>
+                <span className="tag text-label-md">{food.category}</span>
+                <span className="tag text-label-md">{food.cuisineType}</span>
+                <span className="tag text-label-md">{food.avgPriceRange}</span>
+                <span className="tag text-label-md">{food.mealTime}</span>
               </div>
             </div>
           ))}

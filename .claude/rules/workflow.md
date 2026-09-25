@@ -110,6 +110,7 @@ public async Task<TempUserResponseDto> CreateAsync(CreateTempUserDto dto)
   5. Chỉ SAU KHI đã đọc và nắm rõ thiết kế từ Stitch, mới được bắt đầu viết code.
   6. Nếu Stitch chưa có thiết kế cho màn hình đó, dùng `generate_screen_from_text` để tạo mẫu mới trước.
   7. **KHÔNG ĐƯỢC tự ý đặt màu sắc/font/spacing** khi chưa tra cứu Stitch — đây là vi phạm nghiêm trọng.
+- **Cascade Design Update (Kiểm tra dây chuyền)**: Nếu bạn sửa đổi/ghi đè các file nền tảng như `global.css` (đổi tên biến CSS, xóa class cũ), bạn **BẮT BUỘC** phải dùng công cụ tìm kiếm (như `grep_search`) để tìm lại tất cả các file trong project đang sử dụng các biến/class cũ đó và cập nhật chúng đồng loạt. KHÔNG ĐƯỢC để lại các file UI dùng CSS cũ bị hỏng (broken UI). Bắt buộc phải check lại toàn bộ Pages và Components.
 - **Sử dụng Thư viện Component**: Tận dụng tối đa các thư viện Frontend có sẵn được thiết kế tối ưu cho mobile, đặc biệt là **Ant Design Mobile (antd-mobile)** để xây dựng giao diện nhanh, mượt mà và chuẩn UX mobile.
 
 ## AI Code Review — Open Code Review (MANDATORY)

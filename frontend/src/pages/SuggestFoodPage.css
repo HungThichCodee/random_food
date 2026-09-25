@@ -1,29 +1,32 @@
 .suggest-page {
-  padding: 24px;
+  padding: 0 var(--margin) var(--space-xl);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-md);
+  position: relative;
 }
 
 .suggest-page .header h2 {
-  font-size: 1.8rem;
   margin: 0;
   text-align: center;
-  padding-bottom: 16px;
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-sm);
+  text-shadow: 0 0 12px rgba(227, 198, 51, 0.4);
 }
 
-/* Customizing antd-mobile Form for dark neon theme */
+/* Customizing antd-mobile Form for Stitch theme */
 .adm-list {
   background: transparent !important;
 }
 
 .adm-list-item {
-  background: var(--color-bg-surface) !important;
-  color: var(--color-text-primary) !important;
-  border: var(--glass-border) !important;
-  border-radius: var(--border-radius-md) !important;
-  margin-bottom: 16px !important;
+  background: var(--surface-container-high) !important;
+  color: var(--on-surface) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: var(--rounded-lg) !important;
+  margin-bottom: var(--space-md) !important;
   overflow: visible !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
 }
 
 .adm-list-item-content {
@@ -31,29 +34,59 @@
 }
 
 .adm-list-item-content-main {
-  color: var(--color-text-primary) !important;
+  color: var(--on-surface) !important;
+}
+
+.suggest-btn {
+  border-radius: var(--rounded-full) !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--tertiary-container), var(--tertiary)) !important;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(227, 198, 51, 0.3) !important;
+  color: var(--on-tertiary-container) !important;
+  height: 56px !important;
+  font-family: var(--font-family) !important;
 }
 
 .suggested-results {
-  margin-top: 24px;
+  margin-top: var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
-/* Reusing result-card from RandomFoodPage if we want, or define here to be safe */
 .result-card {
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-icon-wrapper-tertiary {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--rounded-full);
+  background: rgba(227, 198, 51, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 12px rgba(227, 198, 51, 0.3);
+  margin-bottom: -4px;
+}
+
+.result-icon-tertiary {
+  font-size: 28px;
+  color: var(--tertiary);
 }
 
 .result-card h3 {
-  font-size: 1.5rem;
   margin: 0;
   text-transform: capitalize;
+  text-shadow: 0 0 12px rgba(227, 198, 51, 0.3);
 }
 
 .food-tags {

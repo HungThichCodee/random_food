@@ -1,12 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { TabBar } from 'antd-mobile';
 import { useTranslation } from 'react-i18next';
-import { 
-  AppOutline, 
-  UnorderedListOutline,
-  EnvironmentOutline,
-  UserOutline 
-} from 'antd-mobile-icons';
 import './AppLayout.css';
 
 export default function AppLayout() {
@@ -18,22 +12,22 @@ export default function AppLayout() {
     {
       key: '/',
       title: t('Home', 'Trang chủ'),
-      icon: <AppOutline />,
+      icon: <span className="material-symbols-outlined">home</span>,
     },
     {
       key: '/random',
       title: t('Random', 'Chọn món'),
-      icon: <UnorderedListOutline />,
+      icon: <span className="material-symbols-outlined">casino</span>,
     },
     {
       key: '/map',
       title: t('Map', 'Bản đồ'),
-      icon: <EnvironmentOutline />,
+      icon: <span className="material-symbols-outlined">explore</span>,
     },
     {
       key: '/profile',
       title: t('Profile', 'Hồ sơ'),
-      icon: <UserOutline />,
+      icon: <span className="material-symbols-outlined">person</span>,
     },
   ];
 
