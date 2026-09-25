@@ -12,7 +12,7 @@ export default function RestaurantMarker({ restaurant }: RestaurantMarkerProps) 
 
   return (
     // TODO: Leaflet Marker for restaurant
-    <Marker position={[restaurant.lat, restaurant.lng]}>
+    <Marker position={[restaurant.latitude, restaurant.longitude]}>
       <RestaurantPopup restaurant={restaurant} />
     </Marker>
   );

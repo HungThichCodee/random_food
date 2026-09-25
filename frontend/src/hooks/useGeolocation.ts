@@ -17,12 +17,51 @@ export function useGeolocation() {
   });
 
   useEffect(() => {
-    // TODO: Implement geolocation watching
-    // 1. Check if navigator.geolocation is available
-    // 2. Request permission
-    // 3. Watch position changes
-    // 4. Update state
-    setState((prev) => ({ ...prev, isLoading: false, error: 'Not implemented' }));
+    if (!navigator.geolocation) {
+      setState({
+        lat: 10.776889, // Default to HCM city
+        lng: 106.700806,
+        error: 'Geolocation is not supported by your browser',
+        isLoading: false,
+      });
+      return;
+    }
+
+    const success = (position: GeolocationPosition) => {
+      setState({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        error: null,
+        isLoading: false,
+      });
+    };
+
+    const handleError = (error: GeolocationPositionError) => {
+      setState({
+        lat: 10.776889, // Default to HCM city
+        lng: 106.700806,
+        error: error.message,
+        isLoading: false,
+      });
+    };
+
+    // Get initial position
+    navigator.geolocation.getCurrentPosition(success, handleError, {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    });
+
+    // Watch position
+    const watchId = navigator.geolocation.watchPosition(success, handleError, {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    });
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
   }, []);
 
   return state;

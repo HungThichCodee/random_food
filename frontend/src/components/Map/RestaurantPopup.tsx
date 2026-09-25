@@ -16,7 +16,7 @@ export default function RestaurantPopup({ restaurant }: RestaurantPopupProps) {
       <div>
         <h4>{restaurant.name}</h4>
         {restaurant.address && <p>{restaurant.address}</p>}
-        {restaurant.isInMall && <p>{restaurant.mallName}</p>}
+        {restaurant.isInMall && <p>In Mall</p>}
         <Button type="primary" size="small">
           {t('map.getDirections')}
         </Button>

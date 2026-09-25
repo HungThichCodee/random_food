@@ -112,13 +112,13 @@
 ---
 
 ## Phase 8 — Frontend Map + Restaurant (Group A)
-- [ ] P8.1 — Code `useGeolocation.ts` hook — request browser location
-- [ ] P8.2 — Code `MapPage.tsx` — Leaflet map, user location marker
-- [ ] P8.3 — Code component hiển thị restaurant markers trên map
-- [ ] P8.4 — Code popup thông tin quán ăn khi click marker
-- [ ] P8.5 — Code `restaurantApi.ts` — gọi API nearby + buffet
-- [ ] P8.6 — Thêm translation keys cho Map (vi.json + en.json)
-- [ ] P8.7 — ✅ BUILD CHECK: `npx.cmd tsc --noEmit` passes
+- [x] P8.1 — Code `useGeolocation.ts` hook — request browser location
+- [x] P8.2 — Code `MapPage.tsx` — Leaflet map, user location marker
+- [x] P8.3 — Code component hiển thị restaurant markers trên map
+- [x] P8.4 — Code popup thông tin quán ăn khi click marker
+- [x] P8.5 — Code `restaurantApi.ts` — gọi API nearby + buffet
+- [x] P8.6 — Thêm translation keys cho Map (vi.json + en.json)
+- [x] P8.7 — ✅ BUILD CHECK: `npx.cmd tsc --noEmit` passes
 
 ---
 

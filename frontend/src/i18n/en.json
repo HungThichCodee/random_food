@@ -57,7 +57,18 @@
     "randomRestaurant": "Random Restaurant",
     "showBuffet": "Buffet in Malls",
     "getDirections": "Get Directions",
-    "radius": "Radius: {{km}}km"
+    "radius": "Radius: {{km}}km",
+    "searchPlaceholder": "Search by restaurant name...",
+    "allRestaurants": "All",
+    "openNow": "Open Now",
+    "radius1km": "Radius <1km",
+    "buffet": "Buffet",
+    "youAreHere": "You are here",
+    "inviteBuddy": "Invite Buddy",
+    "nearbyGems": "Nearby Gems",
+    "restaurantsCount": "({{count}} places)",
+    "notFound": "No restaurants found.",
+    "searching": "Searching..."
   },
   "report": {
     "title": "Report User",

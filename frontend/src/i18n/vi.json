@@ -57,7 +57,18 @@
     "randomRestaurant": "Random 1 quán",
     "showBuffet": "Buffet trong TTTM",
     "getDirections": "Chỉ đường",
-    "radius": "Bán kính: {{km}}km"
+    "radius": "Bán kính: {{km}}km",
+    "searchPlaceholder": "Tìm theo tên quán...",
+    "allRestaurants": "Tất cả",
+    "openNow": "Đang mở cửa",
+    "radius1km": "Bán kính <1km",
+    "buffet": "Buffet",
+    "youAreHere": "Bạn ở đây",
+    "inviteBuddy": "Mời Bạn",
+    "nearbyGems": "Gần bạn nhất",
+    "restaurantsCount": "({{count}} quán)",
+    "notFound": "Không tìm thấy quán ăn nào.",
+    "searching": "Đang tìm kiếm..."
   },
   "report": {
     "title": "Báo cáo người dùng",
