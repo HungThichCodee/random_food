@@ -99,14 +99,37 @@ public async Task<TempUserResponseDto> CreateAsync(CreateTempUserDto dto)
 }
 ```
 
+## Security & OWASP Standards (CRITICAL)
+
+- **Zero Trust (Never Trust the Client):**
+  - **Backend as Source of Truth:** Mọi quyết định phân quyền (Admin, VIP, Premium) và logic nghiệp vụ BẮT BUỘC phải thực thi ở Backend. Frontend chỉ là "Dumb UI".
+  - **No Mass Assignment:** Backend tuyệt đối không map các trường phân quyền (như `isAdmin`, `isPremium`, `role`) từ request (DTO) trực tiếp vào Entity. Phải chủ động bỏ qua hoặc báo lỗi (400/403) nếu frontend cố tình gửi lên.
+
+- **Broken Access Control & IDOR Prevention:**
+  - **Token-based Identity:** Backend BẮT BUỘC lấy danh tính người dùng (`userId`) từ Context của Token xác thực (JWT/Session). TUYỆT ĐỐI KHÔNG dùng `userId` truyền lên từ Body hoặc tham số URL để xác định người thực hiện hành động.
+  - **Ownership Check:** Trước mọi thao tác thay đổi (PUT, PATCH, DELETE) hoặc xem dữ liệu riêng tư, phải kiểm tra xem người dùng hiện tại có quyền sở hữu (owner) đối với resource đó hay không.
+
+- **Excessive Data Exposure Prevention:**
+  - **Minimalist DTOs:** DTO trả về cho Frontend CHỈ chứa những dữ liệu thực sự cần thiết để render UI.
+  - **Masking:** Backend phải tự che (mask) hoặc loại bỏ hoàn toàn các thông tin nhạy cảm (như mật khẩu, email, ID nội bộ, cờ admin) trước khi gửi qua mạng.
+  - **No Hardcoded Secrets:** TUYỆT ĐỐI KHÔNG hardcode email admin, ID quản trị, hoặc URL/Key media nhạy cảm trong mã nguồn Frontend. (Ví dụ: URL video VIP không được gửi về browser nếu user chưa mua VIP; không dùng CSS `display: none` để giấu nội dung Premium).
+
+- **Anti-Automation & Anti-Spam:**
+  - **Strict Rate Limiting:** Áp dụng giới hạn cực kỳ khắt khe (ví dụ: 3 req/phút/IP) cho các API nhạy cảm (Tạo tài khoản, Đăng nhập, Gửi OTP).
+  - **Verification Requirement:** BẮT BUỘC yêu cầu tích hợp CAPTCHA, Device Fingerprinting, hoặc Xác thực (OTP qua Email/Phone) cho các hành động đăng ký, đăng nhập để chống tạo tài khoản ảo hàng loạt.
+
 ## Code Review Checklist
-- [ ] No Domain entities exposed in API responses
-- [ ] All async methods use async/await
-- [ ] DTOs have proper validation attributes
-- [ ] Error handling with proper HTTP status codes
-- [ ] No hardcoded secrets in source code
-- [ ] All service methods wrapped in try-catch with descriptive error messages
+- [ ] No Domain entities exposed in API responses (DTO only)
+- [ ] DTOs strictly minimized to avoid Excessive Data Exposure
+- [ ] No hardcoded admin IDs, emails, or hidden media URLs in frontend code
+- [ ] Backend extracts user identity from Auth Token (No trusting `userId` from body/URL)
+- [ ] Backend performs Ownership Check before PUT/PATCH/DELETE
+- [ ] Backend strictly controls Authorization (no role/VIP manipulation from frontend)
+- [ ] Registration/Login endpoints protected by strict Rate Limiting and Verification (Anti-spam)
 - [ ] Backend re-validates all input from frontend (never trust FE data)
+- [ ] Error handling with proper HTTP status codes (no raw exception leakage)
+- [ ] All async methods use async/await
+- [ ] All service methods wrapped in try-catch with descriptive error messages
 
 ## UI/UX & Frontend Standards (CRITICAL)
 - **Mobile-First Design**: Giao diện (UI) và trải nghiệm người dùng (UX) phải được thiết kế và lập trình theo hướng **Mobile-First** (ưu tiên hiển thị trên điện thoại trước).
