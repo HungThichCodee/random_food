@@ -26,6 +26,7 @@ After completing EACH step in the implementation plan:
 6. **NEVER skip** this verification — a step is NOT done until build passes
 
 ## Git Workflow
+- BẮT BUỘC SỬ DỤNG `git.exe` cho mọi lệnh (ví dụ: `git.exe add`, `git.exe commit`, `git.exe push`). KHÔNG ĐƯỢC dùng `git` trơn.
 - Commit after each completed feature/function
 - Use conventional commits: feat:, fix:, refactor:, docs:, test:
 - Branch naming: feature/{batch}-{item-number}-{short-description}

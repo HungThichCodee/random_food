@@ -130,25 +130,25 @@
 ---
 
 ## Phase 9 — Temp User Profile (Group B)
-- [ ] P9.1 — Code DTOs: `CreateTempUserDto`, `TempUserResponseDto`, `UpdateLocationDto`
-- [ ] P9.2 — Code `ITempUserService` + `TempUserService.CreateAsync()` — tạo profile tạm
-- [ ] P9.3 — Code `TempUserService.UpdateLocationAsync()` — cập nhật vị trí (offset ngẫu nhiên)
-- [ ] P9.4 — Code `TempUserService.GetNearbyUsersAsync()` — lấy users gần đó (visible only)
-- [ ] P9.5 — Code `TempUserService.DeactivateExpiredAsync()` — xoá/ẩn users hết hạn
-- [ ] P9.6 — Code `TempUsersController` — POST, PUT location, GET nearby
-- [ ] P9.7 — Code `ExpiredUserCleanupService` (BackgroundService) — job chạy định kỳ xoá hết hạn
-- [ ] P9.8 — Register services + background job trong DI
-- [ ] P9.9 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P9.1 — Code DTOs: `CreateTempUserDto`, `TempUserResponseDto`, `UpdateLocationDto`
+- [x] P9.2 — Code `ITempUserService` + `TempUserService.CreateAsync()` — tạo profile tạm
+- [x] P9.3 — Code `TempUserService.UpdateLocationAsync()` — cập nhật vị trí (offset ngẫu nhiên)
+- [x] P9.4 — Code `TempUserService.GetNearbyUsersAsync()` — lấy users gần đó (visible only)
+- [x] P9.5 — Code `TempUserService.DeactivateExpiredAsync()` — xoá/ẩn users hết hạn
+- [x] P9.6 — Code `TempUsersController` — POST, PUT location, GET nearby
+- [x] P9.7 — Code `ExpiredUserCleanupService` (BackgroundService) — job chạy định kỳ xoá hết hạn
+- [x] P9.8 — Register services + background job trong DI
+- [x] P9.9 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
 ## Phase 10 — Frontend Profile (Group B)
-- [ ] P10.1 — Code `CreateProfilePage.tsx` — form nhập tên, giới tính, sở thích, món muốn ăn
-- [ ] P10.2 — Code `useUserStore.ts` — Zustand store cho temp user state
-- [ ] P10.3 — Code `tempUserApi.ts` — gọi API tạo profile, update location
-- [ ] P10.4 — Code hiển thị nearby users trên map (markers với offset)
-- [ ] P10.5 — Thêm translation keys cho Profile (vi.json + en.json)
-- [ ] P10.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P10.1 — Code `CreateProfilePage.tsx` — form nhập tên, giới tính, sở thích, món muốn ăn
+- [x] P10.2 — Code `useUserStore.ts` — Zustand store cho temp user state
+- [x] P10.3 — Code `tempUserApi.ts` — gọi API tạo profile, update location
+- [x] P10.4 — Code hiển thị nearby users trên map (markers với offset)
+- [x] P10.5 — Thêm translation keys cho Profile (vi.json + en.json)
+- [x] P10.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 

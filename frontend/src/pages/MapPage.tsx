@@ -5,6 +5,9 @@ import L from 'leaflet';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { restaurantApi } from '../api/restaurantApi';
 import type { RestaurantDto } from '../types/restaurant';
+import { tempUserApi } from '../api/tempUserApi';
+import { useUserStore } from '../stores/useUserStore';
+import type { TempUserDto } from '../types/tempUser';
 
 // Component to recenter map when location changes
 const RecenterMap = ({ lat, lng }: { lat: number; lng: number }) => {
@@ -80,19 +83,65 @@ const createRestaurantIcon = (r: RestaurantDto, isActive: boolean) => {
   });
 };
 
+const createOtherUserIcon = (user: TempUserDto) => {
+  const emoji = user.gender === 'Female' ? '👩' : user.gender === 'Male' ? '👨' : '👤';
+  return L.divIcon({
+    className: 'custom-other-user-marker',
+    html: `
+      <div style="display: flex; flex-direction: column; align-items: center; transition: transform 0.2s;">
+        <div style="padding: 2px 8px; border-radius: 9999px; background-color: rgba(60,60,80,0.9); margin-bottom: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          <span style="font-size: 10px; color: var(--primary); font-weight: bold;">${user.displayName}</span>
+        </div>
+        <div style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+          ${emoji}
+        </div>
+      </div>
+    `,
+    iconSize: [80, 60],
+    iconAnchor: [40, 60],
+  });
+};
+
 export default function MapPage() {
   const { t } = useTranslation();
   const location = useGeolocation();
+  const { profile } = useUserStore();
   const [restaurants, setRestaurants] = useState<RestaurantDto[]>([]);
   const [activeRestaurant, setActiveRestaurant] = useState<RestaurantDto | null>(null);
+  const [nearbyUsers, setNearbyUsers] = useState<TempUserDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterRadius, setFilterRadius] = useState(2000);
 
   useEffect(() => {
     if (!location.isLoading && location.lat && location.lng) {
       fetchRestaurants();
+      if (profile) {
+        updateAndFetchUsers();
+      }
     }
-  }, [location.isLoading, location.lat, location.lng, filterRadius]);
+  }, [location.isLoading, location.lat, location.lng, filterRadius, profile]);
+
+  useEffect(() => {
+     let interval: any;
+     if (profile && location.lat && location.lng) {
+        interval = setInterval(() => {
+           updateAndFetchUsers();
+        }, 30000); // 30s
+     }
+     return () => clearInterval(interval);
+  }, [profile, location.lat, location.lng]);
+
+  const updateAndFetchUsers = async () => {
+    try {
+      if (location.lat && location.lng && profile) {
+         await tempUserApi.updateLocation(profile.id, location.lat, location.lng);
+         const users = await tempUserApi.getNearby(location.lat, location.lng, filterRadius / 1000);
+         setNearbyUsers(users.filter(u => u.id !== profile.id));
+      }
+    } catch (e) {
+      console.error("Failed to update/fetch temp users", e);
+    }
+  };
 
   const fetchRestaurants = async () => {
     setIsLoading(true);
@@ -158,8 +207,9 @@ export default function MapPage() {
         zoomControl={false}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          className="dark-map-tiles"
         />
         <RecenterMap lat={centerLat} lng={centerLng} />
 
@@ -185,6 +235,42 @@ export default function MapPage() {
               click: () => setActiveRestaurant(r),
             }}
           />
+        ))}
+
+        {/* Nearby User Markers */}
+        {nearbyUsers.map((u) => (
+          u.currentLat && u.currentLng ? (
+            <Marker
+              key={u.id}
+              position={[u.currentLat, u.currentLng]}
+              icon={createOtherUserIcon(u)}
+            >
+              <Popup>
+                <div style={{ padding: '8px', minWidth: '150px' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '16px', color: 'var(--on-surface)', marginBottom: '4px' }}>
+                    {u.displayName}
+                  </div>
+                  {u.desiredFood && (
+                    <div style={{ fontSize: '12px', color: 'var(--primary)', marginBottom: '8px' }}>
+                      Muốn ăn: {u.desiredFood}
+                    </div>
+                  )}
+                  {u.foodPreferences && u.foodPreferences.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                      {u.foodPreferences.map(pref => (
+                        <span key={pref} style={{ fontSize: '10px', background: 'var(--surface-container-high)', padding: '2px 6px', borderRadius: '4px' }}>
+                          {pref}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <button style={{ marginTop: '12px', width: '100%', padding: '6px', background: 'var(--primary)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>
+                    Rủ ăn chung
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          ) : null
         ))}
       </MapContainer>
 

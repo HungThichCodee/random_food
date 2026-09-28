@@ -1,18 +1,31 @@
 import apiClient from './axiosClient';
 import type { CreateTempUserDto, TempUserDto } from '../types/tempUser';
 
-// TODO: Implement API calls
 export const tempUserApi = {
   create: async (dto: CreateTempUserDto): Promise<TempUserDto> => {
-    throw new Error('Not implemented');
+    const response = await apiClient.post<TempUserDto>('/tempusers', dto);
+    return response.data;
+  },
+  getMe: async (sessionToken: string): Promise<TempUserDto> => {
+    const response = await apiClient.get<TempUserDto>('/tempusers/me', {
+      headers: {
+        'X-Session-Token': sessionToken,
+      },
+    });
+    return response.data;
   },
   updateLocation: async (userId: string, lat: number, lng: number): Promise<void> => {
-    throw new Error('Not implemented');
+    await apiClient.put(`/tempusers/${userId}/location`, { lat, lng });
   },
   getNearby: async (lat: number, lng: number, radius?: number): Promise<TempUserDto[]> => {
-    throw new Error('Not implemented');
+    const response = await apiClient.get<TempUserDto[]>('/tempusers/nearby', {
+      params: { lat, lng, radiusKm: radius },
+    });
+    return response.data;
   },
   setVisibility: async (userId: string, visible: boolean): Promise<void> => {
-    throw new Error('Not implemented');
+    await apiClient.put(`/tempusers/${userId}/visibility`, visible, {
+      headers: { 'Content-Type': 'application/json' }
+    });
   },
 };

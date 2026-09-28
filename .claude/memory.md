@@ -1,14 +1,13 @@
 # Food Match — Project Memory
 
 ## Last Updated
-- **Date:** 2026-09-25T11:12:00+07:00
-- **Action:** Completed Phase 8 (Frontend Map + Restaurant Matching). Map page is fully styled with Glassmorphism and integrated with backend API.
+- **Date:** 2026-09-28T11:25:00+07:00
+- **Action:** Completed Phase 10 (Frontend Profile). Implemented `CreateProfilePage` (antd-mobile), `tempUserApi`, and Zustand store with persistence. Integrated nearby users to show on Map. Fixed Git.exe workflow rule.
 
-## Current Status: 🟢 PHASE 8 COMPLETE — STARTING PHASE 9
+## Current Status: 🟢 PHASE 10 COMPLETE — STARTING PHASE 11
 - Backend build: ✅ 0 errors
-- Frontend build: ✅ TSC passes
-- Map UI: Leaflet implemented matching Stitch Design System
-- Translation: `vi.json` and `en.json` updated for map strings
+- Frontend build (tsc): ✅ 0 errors
+- Phase 10 Frontend implemented with strict UI guidelines and Map offset testing.
 
 ## Progress Tracker
 - **Phase 0 (Environment Setup):** 12/12 done ██████████ 100%
@@ -20,12 +19,15 @@
 - **Phase 6 (Frontend Food UI):** 11/11 done ██████████ 100%
 - **Phase 7 (Restaurant Service):** 8/8 done ██████████ 100%
 - **Phase 8 (Map Frontend):** 7/7 done ██████████ 100%
-- **Phase 9-18:** Not started
+- **Phase 9 (TempUser Backend):** 9/9 done ██████████ 100%
+- **Phase 10 (TempUser Frontend):** 6/6 done ██████████ 100%
+- **Phase 11-18:** Not started
 
 ## Recent Rule Updates
-- **Pre-Push Mandatory Checklist**: Agent must always build code, check UI/UX, and review validation/error handling/rate limiting *before* asking to `git push`.
-- **Stitch MCP Design System**: UI components MUST match Stitch MCP output exactly.
+- **Git Execution**: MUST use `git.exe` explicitly for all Git commands.
+- **Pre-Push Mandatory Checklist**: Agent must always build code, check UI/UX, and review validation/error handling/rate limiting *before* asking to `git.exe push`.
+- **Project Structure Integrity**: Do not leave duplicate or empty .NET project folders at the root.
 
 ## Next Immediate Action for Next Agent
-- Review `.claude/implementation_plan.md` and start **Phase 9 — Temp User Profile (Group B)** (P9.1).
-- Implement DTOs, `TempUserService`, background clean-up job for Temp Users, and controllers.
+- Review `.claude/implementation_plan.md` and start **Phase 11 — SignalR Real-time (Group C — Setup)**.
+- Implement SignalR Hubs (`LocationHub`, `MatchHub`, `ChatHub`) in Backend and `useSignalR.ts` in Frontend.
