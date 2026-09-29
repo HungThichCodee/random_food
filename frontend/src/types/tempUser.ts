@@ -8,6 +8,7 @@ export interface CreateTempUserDto {
 export interface TempUserDto {
   id: string;
   sessionToken: string;
+  token: string;
   displayName: string;
   gender?: string;
   foodPreferences: string[];

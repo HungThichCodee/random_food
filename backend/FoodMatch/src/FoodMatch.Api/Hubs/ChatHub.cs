@@ -1,15 +1,31 @@
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace FoodMatch.Api.Hubs;
 
 /// <summary>
 /// SignalR hub for real-time chat between matched users.
-/// Handles: SendMessage, JoinChat, ReceiveMessage
 /// </summary>
+[Authorize]
 public class ChatHub : Hub
 {
-    // TODO: Implement chat messaging
-    // - JoinChat(int matchRequestId)
-    // - SendMessage(int matchRequestId, string message)
-    // - Broadcast ReceiveMessage to chat participants
+    // Will be fully implemented in Phase 13
+    public async Task SendMessage(string matchId, string message)
+    {
+        var userIdString = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            throw new HubException("Unauthorized");
+        }
+
+        // Send to group representing the match
+        await Clients.Group(matchId).SendAsync("ReceiveMessage", new { FromUserId = userId, Message = message });
+    }
+
+    public async Task JoinChatGroup(string matchId)
+    {
+        // Add current connection to the match chat group
+        await Groups.AddToGroupAsync(Context.ConnectionId, matchId);
+    }
 }

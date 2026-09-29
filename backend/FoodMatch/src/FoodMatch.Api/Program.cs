@@ -17,6 +17,39 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IFoodService, FoodMatch.Application.Services.FoodService>();
 builder.Services.AddScoped<IRestaurantService, FoodMatch.Application.Services.RestaurantService>();
 builder.Services.AddScoped<ITempUserService, FoodMatch.Application.Services.TempUserService>();
+builder.Services.AddScoped<FoodMatch.Api.Services.IJwtTokenGenerator, FoodMatch.Api.Services.JwtTokenGenerator>();
+
+// JWT Authentication
+var jwtSecret = builder.Configuration["JwtSettings:Secret"] ?? "SuperSecretKeyForFoodMatchApp12345!@#";
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "FoodMatchApi",
+            ValidAudience = builder.Configuration["JwtSettings:Audience"] ?? "FoodMatchClient",
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSecret))
+        };
+        
+        // SignalR Auth configuration
+        options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+    });
 
 // 4. SignalR
 // 5. CORS
@@ -79,12 +112,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 // TODO: Map SignalR hubs
-// app.MapHub<LocationHub>("/hubs/location");
-// app.MapHub<MatchHub>("/hubs/match");
-// app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<FoodMatch.Api.Hubs.LocationHub>("/hubs/location");
+app.MapHub<FoodMatch.Api.Hubs.MatchHub>("/hubs/match");
+app.MapHub<FoodMatch.Api.Hubs.ChatHub>("/hubs/chat");
 
 app.Run();

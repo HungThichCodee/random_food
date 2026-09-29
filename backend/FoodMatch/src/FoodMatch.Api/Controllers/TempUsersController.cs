@@ -13,10 +13,12 @@ namespace FoodMatch.Api.Controllers;
 public class TempUsersController : ControllerBase
 {
     private readonly ITempUserService _tempUserService;
+    private readonly FoodMatch.Api.Services.IJwtTokenGenerator _jwtTokenGenerator;
 
-    public TempUsersController(ITempUserService tempUserService)
+    public TempUsersController(ITempUserService tempUserService, FoodMatch.Api.Services.IJwtTokenGenerator jwtTokenGenerator)
     {
         _tempUserService = tempUserService;
+        _jwtTokenGenerator = jwtTokenGenerator;
     }
 
     [HttpPost]
@@ -36,6 +38,7 @@ public class TempUsersController : ControllerBase
             }
 
             var result = await _tempUserService.CreateTempUserAsync(dto);
+            result.Token = _jwtTokenGenerator.GenerateToken(result);
             return Ok(result);
         }
         catch (ArgumentException ex)
