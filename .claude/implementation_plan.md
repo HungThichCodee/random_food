@@ -153,12 +153,12 @@
 ---
 
 ## Phase 11 — SignalR Real-time (Group C — Setup)
-- [ ] P11.1 — Code `LocationHub.cs` — nhận/broadcast vị trí real-time
-- [ ] P11.2 — Code `MatchHub.cs` — gửi/nhận lời mời match
-- [ ] P11.3 — Code `ChatHub.cs` — gửi/nhận tin nhắn real-time
-- [ ] P11.4 — Uncomment MapHub lines trong Program.cs, register hubs
-- [ ] P11.5 — Code `useSignalR.ts` hook — connect, disconnect, event handlers
-- [ ] P11.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P11.1 — Code `LocationHub.cs` — nhận/broadcast vị trí real-time
+- [x] P11.2 — Code `MatchHub.cs` — gửi/nhận lời mời match
+- [x] P11.3 — Code `ChatHub.cs` — gửi/nhận tin nhắn real-time
+- [x] P11.4 — Uncomment MapHub lines trong Program.cs, register hubs
+- [x] P11.5 — Code `useSignalR.ts` hook — connect, disconnect, event handlers
+- [x] P11.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
