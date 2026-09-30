@@ -1,27 +1,47 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 using FoodMatch.Application.Interfaces;
 using FoodMatch.Application.DTOs.Chat;
+using FoodMatch.Api.Hubs;
 
 namespace FoodMatch.Api.Controllers;
 
-/// <summary>
-/// API controller for chat messaging between matched dining users.
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class ChatController : ControllerBase
+[Authorize]
+public class ChatController(
+    IChatService chatService,
+    IHubContext<ChatHub> chatHubContext) : ControllerBase
 {
-    private readonly IChatService _chatService;
-
-    public ChatController(IChatService chatService)
+    [HttpGet("{matchRequestId}/messages")]
+    public async Task<IActionResult> GetMessages(int matchRequestId)
     {
-        _chatService = chatService;
+        var messages = await chatService.GetMessagesAsync(matchRequestId);
+        return Ok(messages);
     }
 
-    [HttpGet("{matchRequestId}/messages")]
-    public async Task<ActionResult<List<ChatMessageDto>>> GetMessages(int matchRequestId)
+    [HttpPost]
+    public async Task<IActionResult> SendMessage([FromBody] SendMessageDto dto)
     {
-        // TODO: Call _chatService.GetMessagesAsync
-        throw new NotImplementedException();
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            return Unauthorized();
+
+        try
+        {
+            var message = await chatService.SendMessageAsync(userId, dto);
+            
+            // Notify other users in the chat room (match group)
+            await chatHubContext.Clients.Group(dto.MatchRequestId.ToString())
+                .SendAsync("ReceiveMessage", message);
+
+            return Ok(message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }

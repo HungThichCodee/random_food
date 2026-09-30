@@ -109,10 +109,10 @@ public async Task<TempUserResponseDto> CreateAsync(CreateTempUserDto dto)
   - **Token-based Identity:** Backend BẮT BUỘC lấy danh tính người dùng (`userId`) từ Context của Token xác thực (JWT/Session). TUYỆT ĐỐI KHÔNG dùng `userId` truyền lên từ Body hoặc tham số URL để xác định người thực hiện hành động.
   - **Ownership Check:** Trước mọi thao tác thay đổi (PUT, PATCH, DELETE) hoặc xem dữ liệu riêng tư, phải kiểm tra xem người dùng hiện tại có quyền sở hữu (owner) đối với resource đó hay không.
 
-- **Excessive Data Exposure Prevention:**
-  - **Minimalist DTOs:** DTO trả về cho Frontend CHỈ chứa những dữ liệu thực sự cần thiết để render UI.
-  - **Masking:** Backend phải tự che (mask) hoặc loại bỏ hoàn toàn các thông tin nhạy cảm (như mật khẩu, email, ID nội bộ, cờ admin) trước khi gửi qua mạng.
-  - **No Hardcoded Secrets:** TUYỆT ĐỐI KHÔNG hardcode email admin, ID quản trị, hoặc URL/Key media nhạy cảm trong mã nguồn Frontend. (Ví dụ: URL video VIP không được gửi về browser nếu user chưa mua VIP; không dùng CSS `display: none` để giấu nội dung Premium).
+- **Excessive Data Exposure Prevention (CHỐNG LỘ THÔNG TIN):**
+  - **Strict Minimalist DTOs (Luật "FE cần gì, BE trả đúng nấy"):** DTO trả về cho Frontend CHỈ chứa chính xác những trường dữ liệu mà Frontend THỰC SỰ CẦN để render giao diện hiện tại. TUYỆT ĐỐI KHÔNG trả về dư thừa (ví dụ: FE chỉ cần `id` và `name` thì BE không được trả nguyên object chứa cả `createdAt`, `status`, v.v.).
+  - **Masking:** Backend phải tự che (mask) hoặc loại bỏ hoàn toàn các thông tin nhạy cảm (mật khẩu, email, cờ admin, internal IDs) ở ngay tầng mapping, trước khi gửi qua mạng.
+  - **No Hidden DOM Secrets:** TUYỆT ĐỐI KHÔNG truyền dữ liệu dư thừa xuống Frontend rồi dùng CSS (`display: none`) hoặc React logic để giấu đi. Dữ liệu không hiển thị thì KHÔNG ĐƯỢC CÓ trong API response.
 
 - **Anti-Automation & Anti-Spam:**
   - **Strict Rate Limiting:** Áp dụng giới hạn cực kỳ khắt khe (ví dụ: 3 req/phút/IP) cho các API nhạy cảm (Tạo tài khoản, Đăng nhập, Gửi OTP).

@@ -1,15 +1,17 @@
 import apiClient from './axiosClient';
 import type { MatchRequestDto, CreateMatchRequestDto } from '../types/match';
 
-// TODO: Implement API calls
 export const matchApi = {
   sendRequest: async (dto: CreateMatchRequestDto): Promise<MatchRequestDto> => {
-    throw new Error('Not implemented');
+    const res = await apiClient.post<MatchRequestDto>('/MatchRequests', dto);
+    return res.data;
   },
   respond: async (requestId: number, accept: boolean): Promise<MatchRequestDto> => {
-    throw new Error('Not implemented');
+    const res = await apiClient.put<MatchRequestDto>(`/MatchRequests/${requestId}/respond`, { accept });
+    return res.data;
   },
   getPending: async (): Promise<MatchRequestDto[]> => {
-    throw new Error('Not implemented');
+    const res = await apiClient.get<MatchRequestDto[]>('/MatchRequests/pending');
+    return res.data;
   },
 };

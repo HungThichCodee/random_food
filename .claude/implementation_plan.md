@@ -163,44 +163,44 @@
 ---
 
 ## Phase 12 — Match System (Group C — C1, C2, C3)
-- [ ] P12.1 — Code DTOs: `MatchRequestDto`, `MatchResponseDto`, `RespondMatchDto`
-- [ ] P12.2 — Code `IMatchService` + `MatchService.SendRequestAsync()` — gửi lời mời
-- [ ] P12.3 — Code `MatchService.RespondAsync()` — đồng ý/từ chối
-- [ ] P12.4 — Code `MatchService.GetPendingRequestsAsync()` — lấy lời mời đang chờ
-- [ ] P12.5 — Code `MatchRequestsController` — POST, PUT respond, GET pending
-- [ ] P12.6 — Tích hợp SignalR push notification khi có lời mời mới
-- [ ] P12.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P12.1 — Code DTOs: `MatchRequestDto`, `MatchResponseDto`, `RespondMatchDto`
+- [x] P12.2 — Code `IMatchService` + `MatchService.SendRequestAsync()` — gửi lời mời
+- [x] P12.3 — Code `MatchService.RespondAsync()` — đồng ý/từ chối
+- [x] P12.4 — Code `MatchService.GetPendingRequestsAsync()` — lấy lời mời đang chờ
+- [x] P12.5 — Code `MatchRequestsController` — POST, PUT respond, GET pending
+- [x] P12.6 — Tích hợp SignalR push notification khi có lời mời mới
+- [x] P12.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
 ## Phase 13 — Chat System (Group C — C3)
-- [ ] P13.1 — Code DTOs: `ChatMessageDto`, `SendMessageDto`
-- [ ] P13.2 — Code `IChatService` + `ChatService` — gửi/lấy tin nhắn, lưu DB
-- [ ] P13.3 — Code `ChatController` — GET messages by match
-- [ ] P13.4 — Tích hợp ChatHub — real-time send/receive
-- [ ] P13.5 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P13.1 — Code DTOs: `ChatMessageDto`, `SendMessageDto`
+- [x] P13.2 — Code `IChatService` + `ChatService` — gửi/lấy tin nhắn, lưu DB
+- [x] P13.3 — Code `ChatController` — GET messages by match
+- [x] P13.4 — Tích hợp ChatHub — real-time send/receive
+- [x] P13.5 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
 ## Phase 14 — Frontend Match + Chat (Group C)
-- [ ] P14.1 — Code `useMatchStore.ts` — Zustand store cho match state
-- [ ] P14.2 — Code `matchApi.ts` + `chatApi.ts` — gọi API
-- [ ] P14.3 — Code UI gửi lời mời ăn cùng (click user trên map → popup → nút mời)
-- [ ] P14.4 — Code UI thông báo real-time khi nhận lời mời
-- [ ] P14.5 — Code UI đồng ý/từ chối lời mời
-- [ ] P14.6 — Code Chat popup/drawer — giao diện chat real-time
-- [ ] P14.7 — Thêm translation keys cho Match + Chat
-- [ ] P14.8 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P14.1 — Code `useMatchStore.ts` — Zustand store cho match state
+- [x] P14.2 — Code `matchApi.ts` + `chatApi.ts` — gọi API
+- [x] P14.3 — Code UI gửi lời mời ăn cùng (click user trên map → popup → nút mời) (✅ UI Done)
+- [x] P14.4 — Code UI thông báo real-time khi nhận lời mời (✅ UI Done)
+- [x] P14.5 — Code UI đồng ý/từ chối lời mời (✅ UI Done)
+- [x] P14.6 — Code Chat popup/drawer — giao diện chat real-time (✅ UI Done)
+- [x] P14.7 — Thêm translation keys cho Match + Chat
+- [x] P14.8 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
 ## Phase 15 — Routing + Report (Group C — C4, C5)
 - [ ] P15.1 — Code `IRoutingService` + `OsrmRoutingService` — gọi OSRM API lấy route
 - [ ] P15.2 — Code `RoutingController` — GET route between 2 points
-- [ ] P15.3 — Code vẽ route trên Leaflet map (polyline)
+- [x] P15.3 — Code vẽ route trên Leaflet map (polyline) (✅ UI Done)
 - [ ] P15.4 — Code `IReportService` + `ReportService` — báo cáo/chặn user
 - [ ] P15.5 — Code `ReportsController` — POST report
-- [ ] P15.6 — Code UI nút báo cáo/chặn user
+- [x] P15.6 — Code UI nút báo cáo/chặn user (✅ UI Done)
 - [ ] P15.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
@@ -232,25 +232,25 @@
 ---
 
 ## Summary
-| Phase | Mô tả | Số bước |
-|---|---|---|
-| P0 | Environment Setup | 11 |
-| P1 | Domain Entities + Enums | 10 |
-| P2 | Infrastructure (DB + EF Core) | 13 |
-| P3 | Seed Data | 6 |
-| P4 | Food Service (Backend) | 7 |
-| P5 | Food Controller (API) | 5 |
-| P6 | Food Frontend | 10 |
-| P7 | Restaurant Service + API | 9 |
-| P8 | Map Frontend | 7 |
-| P9 | TempUser Service + API | 9 |
-| P10 | Profile Frontend | 6 |
-| P11 | SignalR Setup | 6 |
-| P12 | Match System | 7 |
-| P13 | Chat System | 5 |
-| P14 | Match + Chat Frontend | 8 |
-| P15 | Routing + Report | 7 |
-| P16 | Error Handling | 4 |
-| P17 | Unit Tests | 5 |
-| P18 | Polish + Final | 5 |
-| **TOTAL** | | **~139 bước** |
+| Phase | Mô tả | Số bước | Trạng thái |
+|---|---|---|---|
+| P0 | Environment Setup | 11 | ✅ Hoàn thành |
+| P1 | Domain Entities + Enums | 10 | ✅ Hoàn thành |
+| P2 | Infrastructure (DB + EF Core) | 13 | ✅ Hoàn thành |
+| P3 | Seed Data | 6 | ✅ Hoàn thành |
+| P4 | Food Service (Backend) | 7 | ✅ Hoàn thành |
+| P5 | Food Controller (API) | 5 | ✅ Hoàn thành |
+| P6 | Food Frontend | 10 | ✅ Hoàn thành |
+| P7 | Restaurant Service + API | 9 | ✅ Hoàn thành |
+| P8 | Map Frontend | 7 | ✅ Hoàn thành |
+| P9 | TempUser Service + API | 9 | ✅ Hoàn thành |
+| P10 | Profile Frontend | 6 | ✅ Hoàn thành |
+| P11 | SignalR Setup | 6 | ✅ Hoàn thành |
+| P12 | Match System | 7 | ✅ Hoàn thành |
+| P13 | Chat System (Backend) | 5 | ✅ Hoàn thành |
+| P14 | Match + Chat Frontend | 8 | 🟡 Đang làm (UI done) |
+| P15 | Routing + Report | 7 | 🟡 Đang làm (UI done) |
+| P16 | Error Handling | 4 | ⬜ Chưa bắt đầu |
+| P17 | Unit Tests | 5 | ⬜ Chưa bắt đầu |
+| P18 | Polish + Final | 5 | ⬜ Chưa bắt đầu |
+| **TOTAL** | | **~139 bước** | |

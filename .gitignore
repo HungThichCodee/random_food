@@ -1,4 +1,5 @@
 ## .NET
+.dotnet/
 [Bb]in/
 [Oo]bj/
 *.user

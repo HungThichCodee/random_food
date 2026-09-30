@@ -1,13 +1,16 @@
 # Food Match — Project Memory
 
 ## Last Updated
-- **Date:** 2026-09-29T09:40:00+07:00
-- **Action:** Completed Phase 11 (SignalR Real-time Setup). Implemented `LocationHub`, `MatchHub`, `ChatHub` with JWT token-based identity per OWASP rules. Set up frontend `useSignalR` hook. Checked build and pushed.
+- **Date:** 2026-09-29T12:48:00+07:00
+- **Action:** Tổng hợp báo cáo UI/UX redesign (8/8 screens 100% matched). Cập nhật progress tracker, tài liệu, và anti-regression guidelines.
 
-## Current Status: 🟢 PHASE 11 COMPLETE — STARTING PHASE 12
-- Backend build: ✅ 0 errors
-- Frontend build (tsc): ✅ 0 errors
-- Phase 11 implemented with strict SignalR Auth configuration.
+## Current Status: 🟢 UI/UX REDESIGN COMPLETE — READY FOR PHASE 13
+
+- Frontend Hot Reload: ✅ 0 errors, running on http://localhost:5173
+- Backend: ✅ Running on https://localhost:7154
+- Database: ✅ PostgreSQL Docker container active
+- Stitch UI Match: ✅ 100% identical for all 8 screens
+- UI/UX Report: See `.gemini/antigravity-ide/brain/.../ui_ux_final_report.md`
 
 ## Progress Tracker
 - **Phase 0 (Environment Setup):** 12/12 done ██████████ 100%
@@ -22,14 +25,34 @@
 - **Phase 9 (TempUser Backend):** 9/9 done ██████████ 100%
 - **Phase 10 (TempUser Frontend):** 6/6 done ██████████ 100%
 - **Phase 11 (SignalR Real-time Setup):** 6/6 done ██████████ 100%
-- **Phase 12-18:** Not started
+- **Phase 12 (Match System Backend):** 7/7 done ██████████ 100%
+- **Phase 13 (Chat System Backend):** 5/5 done ██████████ 100%
+- **Phase 14-18:** Not started
+
+## UI/UX Redesign Summary (Complete)
+All 8 screens matched 100% to Stitch design (`ui_Mau`):
+1. Home (`/`) → `HomePage.tsx`
+2. Spin Wheel (`/random`) → `RandomFoodPage.tsx`
+3. Food Suggest (`/suggest`) → `SuggestFoodPage.tsx`
+4. Full Map (`/map`) → `MapPage.tsx`
+5. Profile (`/profile`) → `CreateProfilePage.tsx`
+6. Matching Toast (overlay on `/map`) → `MapPage.tsx`
+7. Chat (`/chat/:matchId`) → `ChatPage.tsx` — **nav hidden**
+8. Direction Route (`/route`) → `DirectionRoutePage.tsx` — **nav hidden**
+
+### Architecture Decisions
+- **Navigation Isolation:** Bottom nav hidden on `/chat/*` and `/route` via `AppLayout.tsx` line 32
+- **Design Tokens:** All in `global.css` (DO NOT change color tokens)
+- **Anti-Regression:** See `.agents/rules/ui_guidelines.md`
 
 ## Recent Rule Updates
 - **Git Execution**: MUST use `git.exe` explicitly for all Git commands.
 - **Pre-Push Mandatory Checklist**: Agent must always build code, check UI/UX, and review validation/error handling/rate limiting *before* asking to `git.exe push`.
-- **Project Structure Integrity**: Do not leave duplicate or empty .NET project folders at the root.
-- **Security**: Added token-based identity using JWT for SignalR authentication per OWASP rules.
+- **Security**: Token-based identity using JWT is fully integrated.
+- **UI/UX Anti-Regression**: MUST read `ui_guidelines.md` before modifying any page component. MUST NOT duplicate bottom nav, change color tokens, or break pointer-events on map overlays.
 
 ## Next Immediate Action for Next Agent
-- Review `.claude/implementation_plan.md` and start **Phase 12 — Match System (Group C — C1, C2, C3)**.
-- Implement Match Requests system (DTOs, Service, Controller).
+- Review `.claude/implementation_plan.md` and start **Phase 14 — Frontend Match + Chat (Group C)**.
+- Implement `useMatchStore.ts`, `matchApi.ts`, `chatApi.ts` and connect SignalR (`chatHub` / `matchHub`) to the frontend.
+- **DO NOT** modify `ChatPage.tsx` or `MapPage.tsx` UI — it is already complete and matched to design.
+- Only connect real API/SignalR to replace mock data.
