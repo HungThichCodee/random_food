@@ -5,11 +5,13 @@ import { foodApi } from '../api/foodApi';
 interface FoodState {
   currentFood: FoodResponseDto | null;
   suggestedFoods: FoodResponseDto[];
+  wheelFoods: FoodResponseDto[];
   isLoading: boolean;
   error: string | null;
   
   fetchRandomFood: (request: FoodRandomRequestDto) => Promise<void>;
   fetchSuggestedFoods: (request: FoodSuggestRequestDto) => Promise<void>;
+  fetchWheelFoods: (category?: string, count?: number) => Promise<void>;
   clearCurrentFood: () => void;
   clearSuggestedFoods: () => void;
 }
@@ -17,6 +19,7 @@ interface FoodState {
 export const useFoodStore = create<FoodState>((set) => ({
   currentFood: null,
   suggestedFoods: [],
+  wheelFoods: [],
   isLoading: false,
   error: null,
   
@@ -34,12 +37,19 @@ export const useFoodStore = create<FoodState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const food = await foodApi.suggestFoods(request);
-      // Wait, suggestFoods currently returns a single FoodResponseDto (the backend PickRandomFood returns one). 
-      // So suggestedFoods array should just store the single result or we can keep appending to history.
-      // Let's just store the latest result as an array of 1 for now, or update the state properly.
       set({ suggestedFoods: [food], currentFood: food, isLoading: false });
     } catch (err: any) {
       set({ error: err.response?.data?.Error || err.message || 'Failed to suggest foods', isLoading: false });
+    }
+  },
+
+  fetchWheelFoods: async (category?: string, count: number = 8) => {
+    set({ isLoading: true, error: null });
+    try {
+      const foods = await foodApi.getWheelFoods(category, count);
+      set({ wheelFoods: foods, isLoading: false });
+    } catch (err: any) {
+      set({ error: err.response?.data?.Error || err.message || 'Failed to fetch wheel foods', isLoading: false });
     }
   },
   

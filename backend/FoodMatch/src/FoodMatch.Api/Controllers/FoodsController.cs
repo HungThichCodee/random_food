@@ -48,6 +48,20 @@ public class FoodsController : ControllerBase
         }
     }
 
+    [HttpGet("wheel")]
+    public async Task<ActionResult<IEnumerable<FoodResponseDto>>> GetWheelFoods([FromQuery] string? category, [FromQuery] int count = 8)
+    {
+        try
+        {
+            var result = await _foodService.GetWheelFoodsAsync(category, count);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Error = $"Internal server error while fetching wheel foods: {ex.Message}" });
+        }
+    }
+
     [HttpPost("suggest")]
     public async Task<ActionResult<FoodResponseDto>> SuggestFoods([FromBody] FoodSuggestRequestDto request)
     {

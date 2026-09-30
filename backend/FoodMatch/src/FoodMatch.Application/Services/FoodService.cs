@@ -92,6 +92,30 @@ public class FoodService(
         }
     }
 
+    public async Task<IEnumerable<FoodResponseDto>> GetWheelFoodsAsync(string? category, int count = 8)
+    {
+        try
+        {
+            var foods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
+            if (!string.IsNullOrWhiteSpace(category) && Enum.TryParse<FoodCategory>(category, true, out var categoryEnum))
+            {
+                foods = foods.Where(f => f.Category == categoryEnum).ToList();
+            }
+            
+            foods = foods.Where(f => f.IsActive).ToList();
+            if (!foods.Any()) return new List<FoodResponseDto>();
+            
+            var random = new Random();
+            var shuffled = foods.OrderBy(x => random.Next()).Take(count).ToList();
+            
+            return shuffled.Select(MapToDto);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException($"Error retrieving wheel foods: {ex.Message}", ex);
+        }
+    }
+
     private async Task<FoodResponseDto> PickRandomFoodAsync(IEnumerable<Food> sourceFoods, string sessionId, SuggestionType type)
     {
         var foods = sourceFoods.Where(f => f.IsActive).ToList();

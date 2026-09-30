@@ -13,7 +13,6 @@ public class FoodMatchDbContext : DbContext
     public DbSet<Food> Foods => Set<Food>();
     public DbSet<FoodTag> FoodTags => Set<FoodTag>();
     public DbSet<FoodFoodTag> FoodFoodTags => Set<FoodFoodTag>();
-    public DbSet<Restaurant> Restaurants => Set<Restaurant>();
     public DbSet<TempUser> TempUsers => Set<TempUser>();
     public DbSet<MatchRequest> MatchRequests => Set<MatchRequest>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();

@@ -104,7 +104,7 @@ export default function HomePage() {
               </span>
               <span className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-space-xs">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
-                Sài Gòn
+                Khu vực của bạn
               </span>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function HomePage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') navigate('/map');
+                    if (e.key === 'Enter') navigate(`/map?search=${encodeURIComponent(searchQuery)}`);
                   }}
                 />
                 <button 

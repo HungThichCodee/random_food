@@ -15,4 +15,13 @@ export const foodApi = {
     const response = await apiClient.post<unknown, FoodResponseDto>('/foods/suggest', request);
     return response;
   },
+  getWheelFoods: async (category?: string, count: number = 8): Promise<FoodResponseDto[]> => {
+    const params = new URLSearchParams();
+    params.append('count', count.toString());
+    if (category) {
+      params.append('category', category);
+    }
+    const response = await apiClient.get<unknown, FoodResponseDto[]>(`/foods/wheel?${params.toString()}`);
+    return response;
+  },
 };

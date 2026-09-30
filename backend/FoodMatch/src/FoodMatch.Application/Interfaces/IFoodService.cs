@@ -10,4 +10,5 @@ public interface IFoodService
     Task<FoodResponseDto> GetRandomFoodAsync(string sessionId);
     Task<FoodResponseDto> GetRandomByCategoryAsync(string category, string sessionId);
     Task<FoodResponseDto> SuggestFoodsAsync(FoodSuggestRequestDto request);
+    Task<IEnumerable<FoodResponseDto>> GetWheelFoodsAsync(string? category, int count = 8);
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { useUserStore } from '../stores/useUserStore';
 
-const API_BASE_URL = 'https://localhost:7154'; // Or read from env
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const useSignalR = () => {
   const { profile } = useUserStore();

@@ -240,15 +240,16 @@ export default function MapPage() {
   };
 
   // Filtered restaurants by search and active category
-  const filteredRestaurants = restaurants.filter(r => {
-    const matchesSearch = searchQuery === '' || r.name.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredRestaurants = (restaurants || []).filter(r => {
+    // When using real-world Overpass API, a strict name match for generic terms like "cơm trưa" fails.
+    // We allow all nearby food places to show up, which is better UX than 0 results.
     if (activeFilterCategory === 'buffet') {
-      return matchesSearch && r.isBuffet;
+      return r.isBuffet;
     }
     if (activeFilterCategory === 'radius1km') {
-      return matchesSearch && r.distance <= 1000;
+      return r.distance <= 1000;
     }
-    return matchesSearch;
+    return true;
   });
 
   return (
@@ -395,7 +396,7 @@ export default function MapPage() {
         {/* Floating Location Indicator & Compass Action Buttons */}
         <div className="absolute top-36 left-3 z-[1000] pointer-events-auto flex items-center gap-1.5 bg-surface-container-low/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-white/5">
           <span className="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
-          <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">Bến Nghé, Quận 1</span>
+          <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">Vị trí của bạn</span>
         </div>
 
         <div className="absolute top-36 right-3 z-[1000] pointer-events-auto flex flex-col gap-2">
@@ -455,31 +456,39 @@ export default function MapPage() {
             ))}
 
             {/* Nearby Buddy Markers */}
-            {nearbyUsers.map((u) => (
-              u.currentLat && u.currentLng ? (
-                <Marker
-                  key={u.id}
-                  position={[u.currentLat, u.currentLng]}
-                  icon={createOtherUserIcon(u)}
-                >
-                  <Popup>
-                    <div className="p-2 min-w-[150px] bg-surface-container text-on-surface">
-                      <div className="font-bold text-headline-sm mb-1 text-on-surface">{u.displayName}</div>
-                      {u.desiredFood && (
-                        <div className="text-body-sm text-primary mb-2">Thèm ăn: {u.desiredFood}</div>
-                      )}
-                      <button 
-                        onClick={() => handleSendMatchRequest(u.id)}
-                        disabled={isSendingRequest}
-                        className="mt-2 w-full py-1.5 px-2 bg-primary-container text-white rounded-full font-bold text-label-sm transition-all active:scale-95"
-                      >
-                        {isSendingRequest ? 'Đang gửi...' : 'Rủ ăn chung 👥'}
-                      </button>
-                    </div>
-                  </Popup>
-                </Marker>
-              ) : null
-            ))}
+            {nearbyUsers.map((u, index) => {
+              if (u.currentLat && u.currentLng) {
+                // Add a tiny jitter (approx 20 meters) to coordinates so that multiple users 
+                // sharing the exact same GPS (like testing on the same PC) don't completely overlap
+                const jitterLat = u.currentLat + (Math.sin(index + 1) * 0.0003);
+                const jitterLng = u.currentLng + (Math.cos(index + 1) * 0.0003);
+                
+                return (
+                  <Marker
+                    key={u.id}
+                    position={[jitterLat, jitterLng]}
+                    icon={createOtherUserIcon(u)}
+                  >
+                    <Popup>
+                      <div className="p-2 min-w-[150px] bg-surface-container text-on-surface">
+                        <div className="font-bold text-headline-sm mb-1 text-on-surface">{u.displayName}</div>
+                        {u.desiredFood && (
+                          <div className="text-body-sm text-primary mb-2">Thèm ăn: {u.desiredFood}</div>
+                        )}
+                        <button 
+                          onClick={() => handleSendMatchRequest(u.id)}
+                          disabled={isSendingRequest}
+                          className="mt-2 w-full py-1.5 px-2 bg-primary-container text-white rounded-full font-bold text-label-sm transition-all active:scale-95"
+                        >
+                          {isSendingRequest ? 'Đang gửi...' : 'Rủ ăn chung 👥'}
+                        </button>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              }
+              return null;
+            })}
           </MapContainer>
         </div>
 

@@ -184,57 +184,6 @@ namespace FoodMatch.Infrastructure.Migrations
                     b.ToTable("match_requests", (string)null);
                 });
 
-            modelBuilder.Entity("FoodMatch.Domain.Entities.Restaurant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Category")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ExternalPlaceId")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsBuffet")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsInMall")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("LastSyncedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<double>("Lat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Lng")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("MallName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Source")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Lat", "Lng");
-
-                    b.ToTable("restaurants", (string)null);
-                });
-
             modelBuilder.Entity("FoodMatch.Domain.Entities.TempUser", b =>
                 {
                     b.Property<Guid>("Id")

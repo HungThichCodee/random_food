@@ -11,16 +11,13 @@ namespace FoodMatch.Application.Services
 {
     public class RestaurantService : IRestaurantService
     {
-        private readonly IRepository<Restaurant> _restaurantRepository;
         private readonly IOverpassApiService _overpassApiService;
         private readonly ILogger<RestaurantService> _logger;
 
         public RestaurantService(
-            IRepository<Restaurant> restaurantRepository,
             IOverpassApiService overpassApiService,
             ILogger<RestaurantService> logger)
         {
-            _restaurantRepository = restaurantRepository;
             _overpassApiService = overpassApiService;
             _logger = logger;
         }
@@ -49,35 +46,9 @@ namespace FoodMatch.Application.Services
                     throw new ArgumentException("Radius must be between 100 and 5000 meters", nameof(request.Radius));
                 }
 
-                // Check DB first
-                var allRestaurants = await _restaurantRepository.GetAllAsync();
-                
-                var nearbyDb = allRestaurants
-                    .Select(r => new { Restaurant = r, Distance = CalculateDistance(request.Latitude, request.Longitude, r.Lat, r.Lng) })
-                    .Where(x => x.Distance <= request.Radius)
-                    .OrderBy(x => x.Distance)
-                    .ToList();
-
-                if (nearbyDb.Any())
-                {
-                    _logger.LogInformation("Returning {Count} restaurants from database.", nearbyDb.Count);
-                    return nearbyDb.Select(x => MapToDto(x.Restaurant, x.Distance)).ToList();
-                }
-
-                // Fallback to Overpass API
-                _logger.LogInformation("No restaurants found in DB, querying Overpass API.");
+                // Call Overpass API directly without DB caching
+                _logger.LogInformation("Querying Overpass API for nearby restaurants.");
                 var overpassRestaurants = await _overpassApiService.FetchNearbyRestaurantsAsync(request.Latitude, request.Longitude, request.Radius);
-
-                // Cache them in DB
-                foreach (var r in overpassRestaurants)
-                {
-                    // Check if exists to avoid duplicates
-                    var existing = allRestaurants.FirstOrDefault(x => x.Lat == r.Lat && x.Lng == r.Lng);
-                    if (existing == null)
-                    {
-                        await _restaurantRepository.AddAsync(r);
-                    }
-                }
 
                 var nearbyApi = overpassRestaurants
                     .Select(r => new { Restaurant = r, Distance = CalculateDistance(request.Latitude, request.Longitude, r.Lat, r.Lng) })

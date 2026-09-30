@@ -3,15 +3,12 @@ import type { MatchRequestDto, CreateMatchRequestDto } from '../types/match';
 
 export const matchApi = {
   sendRequest: async (dto: CreateMatchRequestDto): Promise<MatchRequestDto> => {
-    const res = await apiClient.post<MatchRequestDto>('/MatchRequests', dto);
-    return res.data;
+    return await apiClient.post<MatchRequestDto, MatchRequestDto>('/MatchRequests', dto);
   },
   respond: async (requestId: number, accept: boolean): Promise<MatchRequestDto> => {
-    const res = await apiClient.put<MatchRequestDto>(`/MatchRequests/${requestId}/respond`, { accept });
-    return res.data;
+    return await apiClient.put<MatchRequestDto, MatchRequestDto>(`/MatchRequests/${requestId}/respond`, { accept });
   },
   getPending: async (): Promise<MatchRequestDto[]> => {
-    const res = await apiClient.get<MatchRequestDto[]>('/MatchRequests/pending');
-    return res.data;
+    return await apiClient.get<MatchRequestDto[], MatchRequestDto[]>('/MatchRequests/pending');
   },
 };

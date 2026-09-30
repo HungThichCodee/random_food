@@ -3,25 +3,22 @@ import type { CreateTempUserDto, TempUserDto } from '../types/tempUser';
 
 export const tempUserApi = {
   create: async (dto: CreateTempUserDto): Promise<TempUserDto> => {
-    const response = await apiClient.post<TempUserDto>('/tempusers', dto);
-    return response.data;
+    return await apiClient.post<TempUserDto, TempUserDto>('/tempusers', dto);
   },
   getMe: async (sessionToken: string): Promise<TempUserDto> => {
-    const response = await apiClient.get<TempUserDto>('/tempusers/me', {
+    return await apiClient.get<TempUserDto, TempUserDto>('/tempusers/me', {
       headers: {
         'X-Session-Token': sessionToken,
       },
     });
-    return response.data;
   },
   updateLocation: async (userId: string, lat: number, lng: number): Promise<void> => {
     await apiClient.put(`/tempusers/${userId}/location`, { lat, lng });
   },
   getNearby: async (lat: number, lng: number, radius?: number): Promise<TempUserDto[]> => {
-    const response = await apiClient.get<TempUserDto[]>('/tempusers/nearby', {
+    return await apiClient.get<TempUserDto[], TempUserDto[]>('/tempusers/nearby', {
       params: { lat, lng, radiusKm: radius },
     });
-    return response.data;
   },
   setVisibility: async (userId: string, visible: boolean): Promise<void> => {
     await apiClient.put(`/tempusers/${userId}/visibility`, visible, {

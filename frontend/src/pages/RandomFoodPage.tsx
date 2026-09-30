@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFoodStore } from '../stores/useFoodStore';
@@ -148,7 +148,7 @@ export default function RandomFoodPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { profile } = useUserStore();
-  const { fetchRandomFood } = useFoodStore();
+  const { fetchRandomFood, wheelFoods, fetchWheelFoods } = useFoodStore();
 
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedFood, setSelectedFood] = useState<WheelItem>(WHEEL_ITEMS[0]);
@@ -157,22 +157,46 @@ export default function RandomFoodPage() {
 
   const wheelRef = useRef<SVGSVGElement | null>(null);
 
+  useEffect(() => {
+    const backendCategory = activeFilter === 'all' ? undefined : (activeFilter === 'kho' ? 'Kho' : (activeFilter === 'nuoc' ? 'Nuoc' : undefined));
+    fetchWheelFoods(backendCategory, 8).catch(() => {});
+  }, [activeFilter, fetchWheelFoods]);
+
+  const wheelItems = useMemo<WheelItem[]>(() => {
+    if (!wheelFoods || wheelFoods.length === 0) return WHEEL_ITEMS;
+    return wheelFoods.map((f, idx) => ({
+      id: f.id.toString(),
+      name: f.name,
+      shortName: f.name.length > 15 ? f.name.substring(0, 15) + '...' : f.name,
+      category: f.category,
+      angle: idx * (360 / Math.max(1, wheelFoods.length)),
+      desc: f.tags && f.tags.length > 0 ? f.tags.join(', ') : 'Món ngon mỗi ngày',
+      price: f.avgPriceRange || 'Vừa',
+      mealTime: f.mealTime || 'Cả ngày',
+      rating: 4.8,
+      imageUrl: WHEEL_ITEMS[idx % WHEEL_ITEMS.length].imageUrl,
+      tags: f.tags || [],
+      nearbyCount: Math.floor(Math.random() * 20) + 5
+    }));
+  }, [wheelFoods]);
+
+  useEffect(() => {
+    if (wheelItems.length > 0 && !isSpinning) {
+      setSelectedFood(wheelItems[0]);
+    }
+  }, [wheelItems, isSpinning]);
+
   const changeLanguage = () => {
     const nextLang = i18n.language === 'en' ? 'vi' : 'en';
     i18n.changeLanguage(nextLang);
   };
-
-  const filteredItems = WHEEL_ITEMS.filter(item => {
-    if (activeFilter === 'all') return true;
-    return item.category === activeFilter;
-  });
 
   const triggerSpin = () => {
     if (isSpinning) return;
     setIsSpinning(true);
 
     // Pick random target from current filtered or full pool
-    const pool = filteredItems.length > 0 ? filteredItems : WHEEL_ITEMS;
+    const pool = wheelItems;
     const targetIdx = Math.floor(Math.random() * pool.length);
     const chosen = pool[targetIdx];
 
@@ -223,7 +247,7 @@ export default function RandomFoodPage() {
               </span>
               <span className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-space-xs">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
-                Sài Gòn
+                Khu vực của bạn
               </span>
             </div>
           </div>
@@ -275,7 +299,7 @@ export default function RandomFoodPage() {
               <span className="font-label-lg text-label-lg text-on-surface">Bộ lọc thực đơn</span>
             </div>
             <span className="font-label-sm text-label-sm text-secondary px-2.5 py-1 rounded-full bg-secondary-container/15">
-              {filteredItems.length} món đang mở
+              {wheelItems.length} món đang mở
             </span>
           </div>
 
@@ -338,10 +362,12 @@ export default function RandomFoodPage() {
                     </radialGradient>
                   </defs>
 
-                  {/* 8 Segments */}
-                  {WHEEL_ITEMS.map((item, idx) => {
+                  {/* Segments */}
+                  {wheelItems.map((item, idx) => {
                     const isEven = idx % 2 === 0;
                     const textFill = idx % 3 === 0 ? '#FFE256' : idx % 3 === 1 ? '#FFB59D' : '#70F8E8';
+                    const sliceAngle = 360 / wheelItems.length;
+                    // Calculate SVG path for arbitrary slices (currently assumed 8 for perfect fit)
                     return (
                       <g key={item.id} transform={`rotate(${item.angle} 160 160)`}>
                         <path 
@@ -459,7 +485,10 @@ export default function RandomFoodPage() {
                 <span>Quay lại</span>
               </button>
               <button 
-                onClick={() => navigate(`/map?search=${encodeURIComponent(selectedFood.name)}`)}
+                onClick={() => {
+                  const cleanName = selectedFood.name.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
+                  navigate(`/map?search=${encodeURIComponent(cleanName)}`);
+                }}
                 className="col-span-3 h-12 rounded-full bg-gradient-to-r from-primary-container to-surface-tint text-white shadow-[0_4px_22px_rgba(255,107,53,0.45)] hover:shadow-[0_6px_28px_rgba(255,107,53,0.6)] active:scale-95 flex items-center justify-center gap-1.5 font-label-lg text-label-lg transition-all duration-200"
               >
                 <span>Chốt & Tìm quán</span>
