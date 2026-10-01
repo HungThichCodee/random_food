@@ -123,7 +123,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// TODO: Map SignalR hubs
 app.MapHub<FoodMatch.Api.Hubs.LocationHub>("/hubs/location");
 app.MapHub<FoodMatch.Api.Hubs.MatchHub>("/hubs/match");
 app.MapHub<FoodMatch.Api.Hubs.ChatHub>("/hubs/chat");

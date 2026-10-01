@@ -21,7 +21,7 @@ public class CleanupExpiredUsersService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // TODO: Implement periodic cleanup (every 30 minutes)
+        // Periodic cleanup is implemented in Api.HostedServices.ExpiredUserCleanupService
         // 1. Create scope
         // 2. Get ITempUserService
         // 3. Call CleanupExpiredUsersAsync()

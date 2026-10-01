@@ -252,6 +252,6 @@
 | P15 | Routing + Report | 7 | ✅ Hoàn thành |
 | P16 | Error Handling | 4 | ✅ Hoàn thành |
 | P17 | Unit Tests | 5 | ✅ Hoàn thành |
-| P18 | Polish + Final | 5 | ⬜ Chưa bắt đầu |
+| P18 | Polish + Final | 5 | ✅ Hoàn thành |
 | P19 | Cố định Bug MVP (Overpass, Jitter) | 4 | ✅ Hoàn thành |
 | **TOTAL** | | **~143 bước** | |

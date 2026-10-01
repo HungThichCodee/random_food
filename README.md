@@ -107,4 +107,4 @@ Dự án này sử dụng **Google Stitch** để thiết kế giao diện Mobil
 5. Lúc này, AI có thể tự động đọc Design System, mã màu, và các màn hình (screens) từ Stitch để lập trình giao diện.
 
 ---
-*Dự án đang trong quá trình phát triển.*
+*Dự án Food Match phiên bản MVP 1.0.0 đã hoàn thành.*
