@@ -1,10 +1,10 @@
 # Food Match — Project Memory
 
 ## Last Updated
-- **Date:** 2026-10-01T13:30:00+07:00
-- **Action:** Hoàn thành Phase 17 (Unit Tests). Đã code các bài test (sử dụng xUnit và Moq) cho FoodService, MatchService, TempUserService và sửa các lỗi compile test. Tất cả 8 bài test đã PASSED bằng môi trường .NET cục bộ.
+- **Date:** 2026-10-01T13:34:00+07:00
+- **Action:** Hoàn thành Phase 16 (Error Handling). Đã tạo GlobalExceptionMiddleware và đăng ký trong Program.cs để trả về JSON chuẩn cho mọi unhandled exceptions.
 
-## Current Status: 🟢 PHASE 17 COMPLETE — READY FOR PHASE 16 (Error Handling) OR PHASE 18 (Polish)
+## Current Status: 🟢 PHASE 16 COMPLETE — READY FOR PHASE 18 (Polish + Final)
 
 - Frontend Hot Reload: ✅ 0 errors, running on http://localhost:5173
 - Backend: ✅ Running on https://localhost:7154

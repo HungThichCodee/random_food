@@ -250,7 +250,7 @@
 | P13 | Chat System (Backend) | 5 | ✅ Hoàn thành |
 | P14 | Match + Chat Frontend | 8 | ✅ Hoàn thành |
 | P15 | Routing + Report | 7 | ✅ Hoàn thành |
-| P16 | Error Handling | 4 | ⬜ Chưa bắt đầu |
+| P16 | Error Handling | 4 | ✅ Hoàn thành |
 | P17 | Unit Tests | 5 | ✅ Hoàn thành |
 | P18 | Polish + Final | 5 | ⬜ Chưa bắt đầu |
 | P19 | Cố định Bug MVP (Overpass, Jitter) | 4 | ✅ Hoàn thành |
