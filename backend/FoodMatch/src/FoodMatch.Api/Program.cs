@@ -76,6 +76,11 @@ builder.Services.AddRateLimiter(options =>
         opt.PermitLimit = 10;
         opt.Window = TimeSpan.FromMinutes(1);
     });
+    options.AddFixedWindowLimiter("ReportApi", opt =>
+    {
+        opt.PermitLimit = 3;
+        opt.Window = TimeSpan.FromMinutes(1);
+    });
 });
 
 

@@ -18,6 +18,7 @@ public class ReportsController : ControllerBase
     }
 
     [HttpPost]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("ReportApi")]
     public async Task<ActionResult<UserReportDto>> ReportUser([FromBody] CreateReportDto dto)
     {
         try

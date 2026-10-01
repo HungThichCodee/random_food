@@ -18,10 +18,17 @@ public class RoutesController : ControllerBase
     }
 
     [HttpGet]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("GeneralApi")]
     public async Task<ActionResult<RouteDto>> GetRoute([FromQuery] double fromLat, [FromQuery] double fromLng, [FromQuery] double toLat, [FromQuery] double toLng)
     {
         try
         {
+            // Validation
+            if (fromLat < -90 || fromLat > 90 || toLat < -90 || toLat > 90)
+                return BadRequest("Invalid latitude.");
+            if (fromLng < -180 || fromLng > 180 || toLng < -180 || toLng > 180)
+                return BadRequest("Invalid longitude.");
+
             var route = await _routingService.GetRouteAsync(fromLat, fromLng, toLat, toLng);
             if (route == null)
             {
