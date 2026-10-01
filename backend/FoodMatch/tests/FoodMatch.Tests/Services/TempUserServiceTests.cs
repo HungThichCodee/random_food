@@ -1,3 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using FoodMatch.Application.DTOs.TempUser;
+using FoodMatch.Application.Interfaces;
+using FoodMatch.Application.Services;
+using FoodMatch.Domain.Entities;
+using Moq;
 using Xunit;
 
 namespace FoodMatch.Tests.Services;
@@ -7,17 +17,47 @@ namespace FoodMatch.Tests.Services;
 /// </summary>
 public class TempUserServiceTests
 {
+    private readonly Mock<IRepository<TempUser>> _mockUserRepo;
+    private readonly TempUserService _service;
+
+    public TempUserServiceTests()
+    {
+        _mockUserRepo = new Mock<IRepository<TempUser>>();
+        _service = new TempUserService(_mockUserRepo.Object);
+    }
+
     [Fact]
     public async Task CreateUser_SetsExpiry3Hours()
     {
-        // TODO: Arrange, Act, Assert
-        throw new NotImplementedException();
+        // Arrange
+        var dto = new CreateTempUserDto { DisplayName = "Alice" };
+
+        // Act
+        var result = await _service.CreateTempUserAsync(dto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Alice", result.DisplayName);
+        Assert.True(result.ExpiresAt > DateTime.UtcNow.AddHours(2) && result.ExpiresAt <= DateTime.UtcNow.AddHours(3.1));
+        _mockUserRepo.Verify(r => r.AddAsync(It.Is<TempUser>(u => u.DisplayName == "Alice")), Times.Once);
     }
 
     [Fact]
     public async Task CleanupExpired_RemovesOldUsers()
     {
-        // TODO: Arrange, Act, Assert
-        throw new NotImplementedException();
+        // Arrange
+        var expiredUsers = new List<TempUser>
+        {
+            new TempUser { Id = Guid.NewGuid(), ExpiresAt = DateTime.UtcNow.AddHours(-1) },
+            new TempUser { Id = Guid.NewGuid(), ExpiresAt = DateTime.UtcNow.AddHours(-2) }
+        };
+        _mockUserRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<TempUser, bool>>>()))
+            .ReturnsAsync(expiredUsers);
+
+        // Act
+        await _service.CleanupExpiredUsersAsync();
+
+        // Assert
+        _mockUserRepo.Verify(r => r.DeleteAsync(It.IsAny<TempUser>()), Times.Exactly(2));
     }
 }
