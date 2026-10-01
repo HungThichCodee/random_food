@@ -17,6 +17,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IFoodService, FoodMatch.Application.Services.FoodService>();
 builder.Services.AddScoped<IRestaurantService, FoodMatch.Application.Services.RestaurantService>();
 builder.Services.AddScoped<ITempUserService, FoodMatch.Application.Services.TempUserService>();
+builder.Services.AddScoped<IReportService, FoodMatch.Application.Services.ReportService>();
 builder.Services.AddScoped<FoodMatch.Api.Services.IJwtTokenGenerator, FoodMatch.Api.Services.JwtTokenGenerator>();
 
 // JWT Authentication
@@ -59,7 +60,7 @@ builder.Services.AddHostedService<FoodMatch.Api.HostedServices.ExpiredUserCleanu
 
 // 8. HttpClient for external APIs
 builder.Services.AddHttpClient<IOverpassApiService, FoodMatch.Infrastructure.Services.OverpassApiService>();
-
+builder.Services.AddHttpClient<IRoutingService, FoodMatch.Infrastructure.ExternalApis.OsrmRoutingService>();
 
 // Rate Limiting (Anti-spam)
 builder.Services.AddRateLimiter(options =>

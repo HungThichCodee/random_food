@@ -195,13 +195,13 @@
 ---
 
 ## Phase 15 — Routing + Report (Group C — C4, C5)
-- [ ] P15.1 — Code `IRoutingService` + `OsrmRoutingService` — gọi OSRM API lấy route
-- [ ] P15.2 — Code `RoutingController` — GET route between 2 points
+- [x] P15.1 — Code `IRoutingService` + `OsrmRoutingService` — gọi OSRM API lấy route
+- [x] P15.2 — Code `RoutingController` — GET route between 2 points
 - [x] P15.3 — Code vẽ route trên Leaflet map (polyline) (✅ UI Done)
-- [ ] P15.4 — Code `IReportService` + `ReportService` — báo cáo/chặn user
-- [ ] P15.5 — Code `ReportsController` — POST report
+- [x] P15.4 — Code `IReportService` + `ReportService` — báo cáo/chặn user
+- [x] P15.5 — Code `ReportsController` — POST report
 - [x] P15.6 — Code UI nút báo cáo/chặn user (✅ UI Done)
-- [ ] P15.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P15.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
@@ -248,9 +248,10 @@
 | P11 | SignalR Setup | 6 | ✅ Hoàn thành |
 | P12 | Match System | 7 | ✅ Hoàn thành |
 | P13 | Chat System (Backend) | 5 | ✅ Hoàn thành |
-| P14 | Match + Chat Frontend | 8 | 🟡 Đang làm (UI done) |
-| P15 | Routing + Report | 7 | 🟡 Đang làm (UI done) |
+| P14 | Match + Chat Frontend | 8 | ✅ Hoàn thành |
+| P15 | Routing + Report | 7 | ✅ Hoàn thành |
 | P16 | Error Handling | 4 | ⬜ Chưa bắt đầu |
 | P17 | Unit Tests | 5 | ⬜ Chưa bắt đầu |
 | P18 | Polish + Final | 5 | ⬜ Chưa bắt đầu |
-| **TOTAL** | | **~139 bước** | |
+| P19 | Cố định Bug MVP (Overpass, Jitter) | 4 | ✅ Hoàn thành |
+| **TOTAL** | | **~143 bước** | |

@@ -1,14 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FoodMatch.Application.Interfaces;
 using FoodMatch.Application.DTOs.Report;
 
 namespace FoodMatch.Api.Controllers;
 
-/// <summary>
-/// API controller for reporting inappropriate behavior.
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ReportsController : ControllerBase
 {
     private readonly IReportService _reportService;
@@ -19,9 +18,30 @@ public class ReportsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<UserReportDto>> Create([FromHeader(Name = "X-User-Id")] Guid reporterUserId, [FromBody] CreateReportDto dto)
+    public async Task<ActionResult<UserReportDto>> ReportUser([FromBody] CreateReportDto dto)
     {
-        // TODO: Call _reportService.ReportUserAsync
-        throw new NotImplementedException();
+        try
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var reporterId))
+            {
+                return Unauthorized("Invalid user token.");
+            }
+
+            var report = await _reportService.ReportUserAsync(reporterId, dto);
+            return Ok(report);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 }

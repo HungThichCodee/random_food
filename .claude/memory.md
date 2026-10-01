@@ -1,15 +1,15 @@
 # Food Match — Project Memory
 
 ## Last Updated
-- **Date:** 2026-09-29T12:48:00+07:00
-- **Action:** Tổng hợp báo cáo UI/UX redesign (8/8 screens 100% matched). Cập nhật progress tracker, tài liệu, và anti-regression guidelines.
+- **Date:** 2026-10-01T12:29:00+07:00
+- **Action:** Hoàn thành Phase 15 (Routing + Report). Đã code OsrmRoutingService gọi OSRM, ReportService, và các Controllers (RoutesController, ReportsController).
 
-## Current Status: 🟢 UI/UX REDESIGN COMPLETE — READY FOR PHASE 13
+## Current Status: 🟢 PHASE 15 COMPLETE — READY FOR PHASE 16 (Error Handling)
 
 - Frontend Hot Reload: ✅ 0 errors, running on http://localhost:5173
 - Backend: ✅ Running on https://localhost:7154
 - Database: ✅ PostgreSQL Docker container active
-- Stitch UI Match: ✅ 100% identical for all 8 screens
+- Code Pushed: ✅ All MVP bug fixes committed and pushed via `git.exe`
 - UI/UX Report: See `.gemini/antigravity-ide/brain/.../ui_ux_final_report.md`
 
 ## Progress Tracker
