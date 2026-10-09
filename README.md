@@ -79,15 +79,18 @@ Food Match là một ứng dụng Web (Web App) kết hợp giữa "khám phá �
    ```
 
 3. **Cài đặt & Chạy Backend:**
+   > **Yêu cầu:** Máy tính cần cài đặt sẵn [.NET 10 SDK](https://dotnet.microsoft.com/download).
+
    ```bash
-   # BẮT BUỘC: Di chuyển vào thư mục backend trước khi chạy lệnh
+   # Di chuyển vào thư mục backend
    cd backend/FoodMatch
    
-   # Build và chạy dự án (Sử dụng dotnet nội bộ của project)
-   ..\..\.dotnet\dotnet.exe build
-   ..\..\.dotnet\dotnet.exe run --project src/FoodMatch.Api
+   # Build và chạy dự án
+   dotnet build
+   dotnet run --project src/FoodMatch.Api
    ```
    *API sẽ chạy tại: `http://localhost:5000` hoặc `https://localhost:5001`*
+
 
 4. **Cài đặt & Chạy Frontend:**
    ```bash
