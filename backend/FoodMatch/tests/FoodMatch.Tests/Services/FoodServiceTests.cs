@@ -79,13 +79,14 @@ public class FoodServiceTests
         _mockFoodRepo.Setup(r => r.GetAllWithIncludesAsync(It.IsAny<string>()))
             .ReturnsAsync(foods);
 
-        var request = new FoodSuggestRequestDto { SessionId = "test", MealTime = "Trua" };
+        var request = new FoodSuggestRequestDto { SessionId = "test", MealTimes = new List<string> { "Trua" } };
 
         // Act
         var result = await _service.SuggestFoodsAsync(request);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("Cơm Tấm", result.Name);
+        Assert.NotEmpty(result.Items);
+        Assert.Equal("Cơm Tấm", result.Items.First().Name);
     }
 }

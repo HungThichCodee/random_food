@@ -19,3 +19,11 @@ export interface TempUserDto {
   status: string;
   expiresAt: string;
 }
+
+export interface NearbyUserDto {
+  id: string;
+  displayName: string;
+  gender?: string;
+  desiredFood?: string;
+  distanceLabel: string;
+}

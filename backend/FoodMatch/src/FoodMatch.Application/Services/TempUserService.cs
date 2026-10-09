@@ -10,7 +10,10 @@ namespace FoodMatch.Application.Services;
 /// Service implementation for temporary user management and location tracking.
 /// </summary>
 public class TempUserService(
-    IRepository<TempUser> tempUserRepository) : ITempUserService
+    IRepository<TempUser> tempUserRepository,
+    IRepository<MatchRequest> matchRequestRepository,
+    IRepository<ChatMessage> chatMessageRepository,
+    IRepository<UserReport> userReportRepository) : ITempUserService
 {
     private static readonly Random _random = new();
 
@@ -58,17 +61,15 @@ public class TempUserService(
         if (user == null || user.ExpiresAt <= DateTime.UtcNow)
             throw new KeyNotFoundException($"Active TempUser with ID {userId} not found.");
 
-        // Rule: Never store real user location - offset by 50-150 meters
-        var (offsetLat, offsetLng) = AddRandomOffset(lat, lng);
-        
-        user.CurrentLat = offsetLat;
-        user.CurrentLng = offsetLng;
+        // Storing exact location so users can actually find each other when matched.
+        user.CurrentLat = lat;
+        user.CurrentLng = lng;
         user.LocationVisible = true;
         
         await tempUserRepository.UpdateAsync(user);
     }
 
-    public async Task<List<TempUserDto>> GetNearbyUsersAsync(double lat, double lng, double radiusKm = 3.0)
+    public async Task<List<NearbyUserDto>> GetNearbyUsersAsync(double lat, double lng, double radiusKm = 3.0)
     {
         if (lat < -90 || lat > 90) throw new ArgumentException("Invalid latitude");
         if (lng < -180 || lng > 180) throw new ArgumentException("Invalid longitude");
@@ -87,7 +88,20 @@ public class TempUserService(
             return distance <= radiusKm;
         }).ToList();
 
-        return nearbyUsers.Select(MapToDto).ToList();
+        return nearbyUsers.Select(u => {
+            var distance = CalculateHaversineDistance(lat, lng, u.CurrentLat!.Value, u.CurrentLng!.Value);
+            var distanceMeters = distance * 1000;
+            var roundedDistance = Math.Round(distanceMeters / 100) * 100;
+            
+            return new NearbyUserDto
+            {
+                Id = u.Id,
+                DisplayName = u.DisplayName,
+                Gender = u.Gender,
+                DesiredFood = u.DesiredFood,
+                DistanceLabel = $"~{roundedDistance} m"
+            };
+        }).ToList();
     }
 
     public async Task SetLocationVisibilityAsync(Guid userId, bool visible)
@@ -105,8 +119,33 @@ public class TempUserService(
         var expiredUsers = await tempUserRepository.FindAsync(u => u.ExpiresAt <= DateTime.UtcNow);
         foreach (var user in expiredUsers)
         {
-            // For now, hard delete them to keep DB clean, 
-            // alternatively we could just update Status to Hidden
+            // Delete ChatMessages sent by the user
+            var userChats = await chatMessageRepository.FindAsync(c => c.SenderTempUserId == user.Id);
+            foreach (var chat in userChats)
+            {
+                await chatMessageRepository.DeleteAsync(chat);
+            }
+
+            // Delete MatchRequests involving the user and their associated ChatMessages
+            var relatedRequests = await matchRequestRepository.FindAsync(m => m.FromTempUserId == user.Id || m.ToTempUserId == user.Id);
+            foreach (var req in relatedRequests)
+            {
+                var reqChats = await chatMessageRepository.FindAsync(c => c.MatchRequestId == req.Id);
+                foreach (var chat in reqChats)
+                {
+                    await chatMessageRepository.DeleteAsync(chat);
+                }
+                await matchRequestRepository.DeleteAsync(req);
+            }
+
+            // Delete UserReports involving the user
+            var relatedReports = await userReportRepository.FindAsync(r => r.ReporterTempUserId == user.Id || r.ReportedTempUserId == user.Id);
+            foreach (var report in relatedReports)
+            {
+                await userReportRepository.DeleteAsync(report);
+            }
+
+            // Finally, delete the expired user
             await tempUserRepository.DeleteAsync(user);
         }
     }

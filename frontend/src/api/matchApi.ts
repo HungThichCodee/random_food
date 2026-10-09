@@ -11,4 +11,13 @@ export const matchApi = {
   getPending: async (): Promise<MatchRequestDto[]> => {
     return await apiClient.get<MatchRequestDto[], MatchRequestDto[]>('/MatchRequests/pending');
   },
+  getActive: async (): Promise<MatchRequestDto> => {
+    return await apiClient.get<MatchRequestDto, MatchRequestDto>('/MatchRequests/active');
+  },
+  shareLocation: async (requestId: number): Promise<MatchRequestDto> => {
+    return await apiClient.post<MatchRequestDto, MatchRequestDto>(`/MatchRequests/${requestId}/share-location`, {});
+  },
+  stopSharingLocation: async (requestId: number): Promise<MatchRequestDto> => {
+    return await apiClient.post<MatchRequestDto, MatchRequestDto>(`/MatchRequests/${requestId}/stop-sharing-location`, {});
+  },
 };

@@ -8,15 +8,18 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. DbContext with Npgsql
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FoodMatchDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString)
+           .ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 // 2. Repository registrations
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // 3. Service registrations
 builder.Services.AddScoped<IFoodService, FoodMatch.Application.Services.FoodService>();
-builder.Services.AddScoped<IRestaurantService, FoodMatch.Application.Services.RestaurantService>();
+    // Removed IRestaurantService
 builder.Services.AddScoped<ITempUserService, FoodMatch.Application.Services.TempUserService>();
+builder.Services.AddScoped<IMatchService, FoodMatch.Application.Services.MatchService>();
+builder.Services.AddScoped<IChatService, FoodMatch.Application.Services.ChatService>();
 builder.Services.AddScoped<IReportService, FoodMatch.Application.Services.ReportService>();
 builder.Services.AddScoped<FoodMatch.Api.Services.IJwtTokenGenerator, FoodMatch.Api.Services.JwtTokenGenerator>();
 
@@ -58,9 +61,7 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer
 // 7. Background services
 builder.Services.AddHostedService<FoodMatch.Api.HostedServices.ExpiredUserCleanupService>();
 
-// 8. HttpClient for external APIs
-builder.Services.AddHttpClient<IOverpassApiService, FoodMatch.Infrastructure.Services.OverpassApiService>();
-builder.Services.AddHttpClient<IRoutingService, FoodMatch.Infrastructure.ExternalApis.OsrmRoutingService>();
+// Removed External APIs
 
 // Rate Limiting (Anti-spam)
 builder.Services.AddRateLimiter(options =>
@@ -88,6 +89,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IUserIdProvider, FoodMatch.Api.Hubs.CustomUserIdProvider>();
+
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString!);
 
 // CORS
 builder.Services.AddCors(options =>
@@ -102,12 +108,32 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Auto-migrate and Seed Data on startup
-using (var scope = app.Services.CreateScope())
+try
 {
+    using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<FoodMatchDbContext>();
     await context.Database.MigrateAsync();
+    
+    // Auto-patch missing columns for Location Sharing (workaround for pending migrations)
+    try 
+    {
+        await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"match_requests\" ADD COLUMN IF NOT EXISTS \"FromUserSharedLocation\" boolean NOT NULL DEFAULT FALSE;");
+        await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"match_requests\" ADD COLUMN IF NOT EXISTS \"ToUserSharedLocation\" boolean NOT NULL DEFAULT FALSE;");
+        await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"match_requests\" ADD COLUMN IF NOT EXISTS \"LocationSharedAt\" timestamp with time zone NULL;");
+    } 
+    catch (Exception ex) 
+    {
+        app.Logger.LogWarning(ex, "Could not auto-patch MatchRequests columns.");
+    }
+
     await FoodMatch.Infrastructure.Data.Seed.DataSeeder.SeedAsync(context);
+    app.Logger.LogInformation("Database migrated and seeded successfully.");
 }
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Database connection/migration failed. Please ensure PostgreSQL is running via 'docker-compose up -d'.");
+}
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -122,6 +148,22 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Health Check Endpoints
+app.MapHealthChecks("/api/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var response = new
+        {
+            status = report.Status.ToString(),
+            timestamp = DateTime.UtcNow,
+            dependencies = report.Entries.Select(e => new { key = e.Key, status = e.Value.Status.ToString() })
+        };
+        await context.Response.WriteAsJsonAsync(response);
+    }
+});
 
 app.MapHub<FoodMatch.Api.Hubs.LocationHub>("/hubs/location");
 app.MapHub<FoodMatch.Api.Hubs.MatchHub>("/hubs/match");

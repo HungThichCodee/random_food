@@ -8,6 +8,13 @@ export interface FoodResponseDto {
   tags: string[];
 }
 
+export interface SuggestResponseDto {
+  items: FoodResponseDto[];
+  matchLevel: 'exact' | 'relaxed' | 'dishTypeOnly' | 'empty';
+  relaxed: string[];
+  message: string;
+}
+
 export interface FoodRandomRequestDto {
   category?: string;
   sessionId: string;
@@ -15,8 +22,9 @@ export interface FoodRandomRequestDto {
 
 export interface FoodSuggestRequestDto {
   sessionId: string;
-  mealTime?: string;
+  mealTimes?: string[];
   priceRange?: string;
+  category?: string;
   includedTags?: string[];
   excludedTags?: string[];
 }

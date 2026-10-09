@@ -1,5 +1,5 @@
 import apiClient from './axiosClient';
-import type { CreateTempUserDto, TempUserDto } from '../types/tempUser';
+import type { CreateTempUserDto, TempUserDto, NearbyUserDto } from '../types/tempUser';
 
 export const tempUserApi = {
   create: async (dto: CreateTempUserDto): Promise<TempUserDto> => {
@@ -15,8 +15,8 @@ export const tempUserApi = {
   updateLocation: async (userId: string, lat: number, lng: number): Promise<void> => {
     await apiClient.put(`/tempusers/${userId}/location`, { lat, lng });
   },
-  getNearby: async (lat: number, lng: number, radius?: number): Promise<TempUserDto[]> => {
-    return await apiClient.get<TempUserDto[], TempUserDto[]>('/tempusers/nearby', {
+  getNearby: async (lat: number, lng: number, radius?: number): Promise<NearbyUserDto[]> => {
+    return await apiClient.get<NearbyUserDto[], NearbyUserDto[]>('/tempusers/nearby', {
       params: { lat, lng, radiusKm: radius },
     });
   },

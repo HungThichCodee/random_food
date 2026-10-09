@@ -5,12 +5,17 @@ import { foodApi } from '../api/foodApi';
 interface FoodState {
   currentFood: FoodResponseDto | null;
   suggestedFoods: FoodResponseDto[];
+  suggestMatchLevel: 'exact' | 'relaxed' | 'dishTypeOnly' | 'empty';
+  suggestRelaxed: string[];
+  suggestMessage: string;
   wheelFoods: FoodResponseDto[];
   isLoading: boolean;
   error: string | null;
+  tagCounts: Record<string, number>;
   
   fetchRandomFood: (request: FoodRandomRequestDto) => Promise<void>;
   fetchSuggestedFoods: (request: FoodSuggestRequestDto) => Promise<void>;
+  fetchTagCounts: (request: FoodSuggestRequestDto) => Promise<void>;
   fetchWheelFoods: (category?: string, count?: number) => Promise<void>;
   clearCurrentFood: () => void;
   clearSuggestedFoods: () => void;
@@ -19,9 +24,13 @@ interface FoodState {
 export const useFoodStore = create<FoodState>((set) => ({
   currentFood: null,
   suggestedFoods: [],
+  suggestMatchLevel: 'exact',
+  suggestRelaxed: [],
+  suggestMessage: '',
   wheelFoods: [],
   isLoading: false,
   error: null,
+  tagCounts: {},
   
   fetchRandomFood: async (request: FoodRandomRequestDto) => {
     set({ isLoading: true, error: null });
@@ -36,10 +45,25 @@ export const useFoodStore = create<FoodState>((set) => ({
   fetchSuggestedFoods: async (request: FoodSuggestRequestDto) => {
     set({ isLoading: true, error: null });
     try {
-      const food = await foodApi.suggestFoods(request);
-      set({ suggestedFoods: [food], currentFood: food, isLoading: false });
+      const res = await foodApi.suggestFoods(request);
+      set({ 
+        suggestedFoods: res.items, 
+        suggestMatchLevel: res.matchLevel,
+        suggestRelaxed: res.relaxed,
+        suggestMessage: res.message,
+        isLoading: false 
+      });
     } catch (err: any) {
       set({ error: err.response?.data?.Error || err.message || 'Failed to suggest foods', isLoading: false });
+    }
+  },
+
+  fetchTagCounts: async (request: FoodSuggestRequestDto) => {
+    try {
+      const counts = await foodApi.getTagCounts(request);
+      set({ tagCounts: counts });
+    } catch (err: any) {
+      console.error('Failed to fetch tag counts', err);
     }
   },
 

@@ -1,5 +1,7 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import GlobalMatchListener from '../GlobalMatchListener';
+import { CustomToast } from '../CustomToast';
 
 export default function AppLayout() {
   const { t } = useTranslation();
@@ -18,9 +20,9 @@ export default function AppLayout() {
       icon: 'casino',
     },
     {
-      key: '/map',
-      title: t('Map', 'Bản đồ'),
-      icon: 'distance',
+      key: '/buddies',
+      title: t('Buddies', 'Bạn ăn'),
+      icon: 'group',
     },
     {
       key: '/profile',
@@ -33,6 +35,8 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-[100dvh] bg-background text-on-surface font-body-md w-full relative overflow-x-hidden">
+      <GlobalMatchListener />
+      <CustomToast />
       
       {/* Main Content Area */}
       <div className="w-full h-full">

@@ -66,9 +66,8 @@
 | ORM | Entity Framework Core | Code-first migration |
 | Frontend | ReactJS + TypeScript | Vite làm build tool cho nhẹ và nhanh |
 | State management | Zustand hoặc Context API | Nhẹ, đủ dùng cho scope này |
-| Bản đồ | Leaflet.js + OpenStreetMap | Miễn phí hoàn toàn, không cần API key |
-| Tra cứu quán ăn | Overpass API (OpenStreetMap) | Free, query theo bán kính + loại địa điểm |
-| Routing chỉ đường | OSRM (Open Source Routing Machine) | Free public demo server hoặc tự host |
+| Bản đồ & Tra cứu | Google Maps Embed API | Dùng chế độ `output=embed` miễn phí, không cần API Key. Khoá mục tiêu (`ll`) để tìm quán chính xác gần vị trí user. |
+| Routing chỉ đường | Google Maps Embed (Directions) | Chỉ đường `saddr` đến `daddr` ngay trên giao diện web app, mở link sang app Google Maps khi cần. |
 | Realtime location update | SignalR Hub + Geolocation API (trình duyệt) | Gửi toạ độ định kỳ khi user bật "tìm bạn ăn cùng" |
 | Deploy Backend | Render (free tier, Docker) | Chấp nhận cold-start ~30-60s sau khi ngủ |
 | Deploy Frontend | Vercel (free tier) | Deploy trực tiếp từ GitHub |
@@ -188,33 +187,31 @@ CREATE TABLE food_suggestion_logs (
 - [ ] Test thủ công toàn bộ luồng random
 
 ### Tuần 3 — Tích hợp bản đồ & tra cứu quán ăn
-- [ ] Tích hợp Leaflet.js hiển thị bản đồ + vị trí người dùng (Geolocation API)
-- [ ] Backend: service gọi Overpass API tra cứu quán ăn theo bán kính + lưu cache vào `restaurants`
-- [ ] API: `GET /api/restaurants/nearby?lat=&lng=&radius=`
-- [ ] API: `GET /api/restaurants/buffet-mall?lat=&lng=` (lọc buffet trong TTTM)
-- [ ] Frontend: hiển thị marker quán ăn trên map, popup thông tin
+- [x] Tích hợp Google Maps Embed API hiển thị bản đồ + vị trí người dùng (Geolocation API fallback sang Profile lưu trữ)
+- [x] Áp dụng chiến lược khoá mục tiêu (`ll`) để ngăn chặn Google Maps nhảy ra khỏi khu vực lân cận khi tìm kiếm
+- [x] Frontend: hiển thị kết quả tìm kiếm quán ăn và điều hướng trên bản đồ Google.
 
 ### Tuần 4 — Hồ sơ tạm thời & Real-time cơ bản
-- [ ] API: `POST /api/temp-users` (tạo hồ sơ tạm)
-- [ ] Frontend: form nhập thông tin (họ tên, giới tính, sở thích, món muốn ăn)
-- [ ] Setup SignalR Hub trên backend (`LocationHub`)
-- [ ] Frontend: kết nối SignalR, gửi vị trí định kỳ khi bật "tìm bạn ăn cùng"
-- [ ] Hiển thị các `temp_users` khác đang `location_visible = true` trên map (làm lệch toạ độ ngẫu nhiên vài chục mét)
+- [x] API: `POST /api/temp-users` (tạo hồ sơ tạm)
+- [x] Frontend: form nhập thông tin (họ tên, giới tính, sở thích, món muốn ăn)
+- [x] Setup SignalR Hub trên backend (`LocationHub`)
+- [x] Frontend: kết nối SignalR, gửi vị trí định kỳ khi bật "tìm bạn ăn cùng"
+- [x] Hiển thị các `temp_users` khác đang `location_visible = true` trên danh sách gợi ý gần đây
 
 ### Tuần 5 — Ghép cặp & Chat real-time
-- [ ] API: `POST /api/match-requests` (gửi lời mời)
-- [ ] SignalR: push thông báo real-time khi có lời mời mới
-- [ ] API: `PUT /api/match-requests/{id}/respond` (đồng ý/từ chối)
-- [ ] SignalR Hub cho chat: `ChatHub`, lưu tin nhắn vào `chat_messages`
-- [ ] Frontend: giao diện chat popup khi match thành công
+- [x] API: `POST /api/match-requests` (gửi lời mời)
+- [x] SignalR: push thông báo real-time khi có lời mời mới
+- [x] API: `PUT /api/match-requests/{id}/respond` (đồng ý/từ chối)
+- [x] SignalR Hub cho chat: `ChatHub`, lưu tin nhắn vào `chat_messages`
+- [x] Frontend: giao diện chat popup/page khi match thành công
 
 ### Tuần 6 — Chỉ đường, hoàn thiện, kiểm thử, deploy
-- [ ] Tích hợp OSRM: gọi API routing khi match được `accepted`, vẽ route trên Leaflet
-- [ ] Chức năng báo cáo/chặn user (cập nhật `status = hidden`)
-- [ ] Viết job xoá `temp_users` hết hạn
-- [ ] Viết vài unit test cho service quan trọng (random logic, matching logic)
-- [ ] Polish UI/UX, responsive mobile
-- [ ] Deploy (xem mục 7)
+- [x] Tích hợp Google Maps Directions: Gọi trực tiếp URL parameters `saddr` & `daddr` để vẽ đường ngay trong iframe.
+- [x] Chức năng báo cáo/chặn/thoát ghép cặp (tối ưu hóa luồng SignalR)
+- [x] Đã xử lý lỗi dữ liệu ảo, tối ưu UI/UX giao diện Mobile-First, sử dụng Glassmorphism.
+- [x] Viết unit test & polish UI/UX toàn bộ ứng dụng
+- [x] Cập nhật luồng dữ liệu bảo mật (Không truyền lệch GPS nữa mà truyền chính xác sau khi đồng ý chia sẻ)
+- [ ] Deploy (Vercel/Render)
 - [ ] Quay video demo 2-3 phút, viết README
 
 ---

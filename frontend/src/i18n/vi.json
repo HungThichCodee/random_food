@@ -11,6 +11,65 @@
     "profile": "Hồ sơ",
     "findBuddy": "Tìm bạn ăn cùng"
   },
+  "home": {
+    "yourArea": "Khu vực của bạn",
+    "searchPlaceholder": "Tìm theo tâm trạng hoặc quận/huyện...",
+    "randomFood": "Random Món",
+    "randomFoodDesc": "Không cần nghĩ, quay là trúng món ngon đậm vị",
+    "spinNow": "Quay ngay",
+    "findRestaurant": "Tìm Quán",
+    "findRestaurantDesc": "Quán ngon gần bạn trên bản đồ sống động quanh đây",
+    "explore": "Khám phá",
+    "suggest": "Gợi Ý",
+    "suggestDesc": "Tùy chọn theo ngân sách & khẩu vị riêng của bạn",
+    "setup": "Thiết lập",
+    "findBuddy": "Tìm Bạn Ăn",
+    "findBuddyDesc": "Ghép đôi ăn uống tức thì & kết nối hội hè vui vẻ",
+    "joinTable": "Ghép bàn",
+    "quickMatch": "Ghép Nhanh 30 Giây",
+    "dontKnowWhereToGo": "Chưa biết đi đâu?",
+    "shakeToFind": "Lắc nhẹ điện thoại để chọn ngay điểm hẹn lý tưởng",
+    "shakeNow": "Lắc Ngay",
+    "trendingToday": "Đang thịnh hành hôm nay",
+    "seeAll": "Xem tất cả",
+    "recentMatch": "vừa ghép bàn thành công tại Chợ Bến Thành!",
+    "minhAndOthers": "Minh & 3 người khác"
+  },
+  "profile": {
+    "title": "Hồ Sơ Ẩm Thực",
+    "exploreTaste": "Khám phá khẩu vị của bạn",
+    "headline": "Bật mí gu ăn uống của bạn! 🔥",
+    "subHeadline": "Tạo hồ sơ để Food Match ghép đôi bạn ăn hợp cạ & gợi ý quán chuẩn vị ngay lập tức.",
+    "reset": "Làm mới",
+    "step2of3": "Bước 2 / 3",
+    "displayName": "Biệt danh khi đi ăn",
+    "randomName": "Random tên hay",
+    "displayNameDesc": "Hiển thị cho bạn bè xung quanh khi gửi lời mời ăn chung.",
+    "gender": "Giới tính",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác",
+    "desiredFood": "Hôm nay bạn thèm gì? (Tùy chọn)",
+    "desiredFoodPlaceholder": "Nhập món bạn đang rất muốn ăn ngay lúc này...",
+    "tastes": "Khẩu vị chân ái (Chọn từ 3 trở lên)",
+    "tastesDesc": "Chọn tối thiểu 3 khẩu vị bạn thích để tìm bạn chung mâm chuẩn gout:",
+    "nearbyCraving": "Đang có 14 bạn quanh bạn cùng thèm",
+    "connecting": "Đang kết nối bạn ăn...",
+    "enterApp": "Vào Food Match Ngay",
+    "skip": "Bỏ qua",
+    "updateSuccess": "Cập nhật hồ sơ thành công!",
+    "displayNameRequired": "Vui lòng nhập biệt danh khi đi ăn!",
+    "createSuccess": "Hồ sơ đã tạo thành công! Đang mở bản đồ...",
+    "matchAccurate": "Để ghép đôi chuẩn",
+    "nicknamePlaceholder": "Nhập biệt danh (vd: Phở Bò Nghiện Ớt, Bé Mập...)",
+    "preferences": "Sở thích ẩm thực",
+    "priorityMatch": "Ưu tiên ghép đôi",
+    "aiRecognized": "Food Match AI đã nhận diện:",
+    "submitBtn": "Hoàn Tất & Bắt Đầu Khám Phá",
+    "skipBtn": "Để sau, xem ứng dụng trước",
+    "create": "Tạo hồ sơ",
+    "expiryNote": "Hồ sơ tự hết hạn sau 3 giờ"
+  },
   "food": {
     "spinButton": "Quay ngay!",
     "spinning": "Đang quay...",
@@ -18,35 +77,61 @@
     "category": {
       "all": "Tất cả",
       "kho": "Món khô",
-      "nuoc": "Món nước"
+      "nuoc": "Món nước",
+      "an_vat": "Ăn vặt",
+      "healthy": "Healthy/Chay"
     },
     "price": {
       "re": "Rẻ (<30k)",
       "vua": "Vừa (30-80k)",
+      "dat": "Cao (>80k)",
       "cao": "Cao (>80k)"
     },
     "mealTime": {
       "sang": "Sáng",
       "trua": "Trưa",
       "toi": "Tối",
-      "khuya": "Khuya"
+      "khuya": "Khuya",
+      "ca_ngay": "Cả ngày"
+    },
+    "tags": {
+      "chay": "Chay",
+      "healthy": "Healthy",
+      "rau": "Rau",
+      "mặn": "Mặn",
+      "thịt": "Thịt",
+      "cá": "Cá",
+      "hải sản": "Hải sản",
+      "ngọt": "Ngọt",
+      "khô": "Khô",
+      "nước": "Nước",
+      "cay": "Cay",
+      "chiên": "Chiên",
+      "hấp": "Hấp",
+      "nướng": "Nướng",
+      "đồ uống": "Đồ uống"
     }
   },
-  "profile": {
-    "title": "Tạo hồ sơ tạm",
-    "displayName": "Tên hiển thị",
-    "gender": "Giới tính",
-    "preferences": "Sở thích ẩm thực",
-    "desiredFood": "Hôm nay muốn ăn gì?",
-    "create": "Tạo hồ sơ",
-    "expiryNote": "Hồ sơ tự hết hạn sau 3 giờ"
+  "randomPage": {
+    "filterTitle": "Bộ lọc thực đơn",
+    "itemsAvailable": "{{count}} món đang mở",
+    "spin": "QUAY",
+    "spinning": "...",
+    "selectedToday": "MÓN ĐƯỢC CHỌN HÔM NAY",
+    "nearbyCount": "{{count}} quán gần đây",
+    "respin": "Quay lại",
+    "confirm": "Chốt & Tìm quán"
   },
   "match": {
     "invite": "Rủ ăn cùng",
     "accept": "Đồng ý",
     "decline": "Từ chối",
     "pending": "Đang chờ...",
-    "matched": "Đã ghép cặp!"
+    "matched": "Đã ghép cặp!",
+    "newRequest": "Yêu cầu ghép đôi mới!",
+    "wantToEat": "Muốn rủ bạn đi ăn",
+    "wantToEatTogether": "Muốn rủ bạn đi ăn cùng!",
+    "acceptDine": "Đồng Ý Ăn Cùng"
   },
   "chat": {
     "placeholder": "Nhập tin nhắn...",
@@ -67,8 +152,9 @@
     "inviteBuddy": "Mời Bạn",
     "nearbyGems": "Gần bạn nhất",
     "restaurantsCount": "({{count}} quán)",
-    "notFound": "Không tìm thấy quán ăn nào.",
-    "searching": "Đang tìm kiếm..."
+    "notFound": "Không tìm thấy quán phù hợp quanh đây.",
+    "searching": "Đang quét quán ngon gần bạn...",
+    "radiusText": "Trong bán kính {{km}}km"
   },
   "report": {
     "title": "Báo cáo người dùng",
@@ -82,6 +168,24 @@
     "retry": "Thử lại",
     "cancel": "Hủy",
     "confirm": "Xác nhận",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "required": "Bắt buộc",
+    "selected": "đã chọn"
+  },
+  "route": {
+    "noDestination": "Chưa chọn quán",
+    "noDestinationDesc": "Vui lòng quay lại trang bản đồ và chọn một quán ăn để xem chỉ đường.",
+    "backToMap": "Quay lại bản đồ",
+    "title": "Chỉ Đường Quán",
+    "navigation": "Điều hướng",
+    "ready": "Sẵn sàng",
+    "startNav": "Bắt Đầu Điều Hướng (GPS)",
+    "startingNav": "Đang Mở Điều Hướng...",
+    "callRestaurant": "Gọi Quán",
+    "arrived": "Đã Đến Nơi",
+    "arrivedSuccess": "Đã Đến! 🎉",
+    "share": "Chia Sẻ",
+    "yourLocation": "Vị trí của bạn",
+    "gettingAddress": "Đang xác định địa chỉ..."
   }
 }

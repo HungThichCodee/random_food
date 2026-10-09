@@ -6,6 +6,11 @@ export interface MatchRequestDto {
   toUserName: string;
   status: string;
   createdAt: string;
+  hasSharedLocation?: boolean;
+  buddyHasSharedLocation?: boolean;
+  locationSharedAt?: string;
+  buddyLat?: number;
+  buddyLng?: number;
 }
 
 export interface CreateMatchRequestDto {

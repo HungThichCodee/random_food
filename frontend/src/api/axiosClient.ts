@@ -11,7 +11,18 @@ const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // We can add auth tokens here later if needed
+    const storageStr = localStorage.getItem('foodmatch-user-storage');
+    if (storageStr) {
+      try {
+        const storage = JSON.parse(storageStr);
+        const token = storage?.state?.profile?.token;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (e) {
+        console.error('Error parsing token from storage', e);
+      }
+    }
     return config;
   },
   (error) => {

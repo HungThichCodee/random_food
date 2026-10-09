@@ -11,6 +11,65 @@
     "profile": "Profile",
     "findBuddy": "Find Dining Buddy"
   },
+  "home": {
+    "yourArea": "Your Area",
+    "searchPlaceholder": "Search by mood or district...",
+    "randomFood": "Random Food",
+    "randomFoodDesc": "No need to think, spin to get delicious food",
+    "spinNow": "Spin Now",
+    "findRestaurant": "Find Places",
+    "findRestaurantDesc": "Great places nearby on a lively map",
+    "explore": "Explore",
+    "suggest": "Suggestions",
+    "suggestDesc": "Customized to your budget & taste",
+    "setup": "Setup",
+    "findBuddy": "Find Buddies",
+    "findBuddyDesc": "Instant dining matches & fun connections",
+    "joinTable": "Join Table",
+    "quickMatch": "30s Quick Match",
+    "dontKnowWhereToGo": "Don't know where to go?",
+    "shakeToFind": "Shake your phone to find the perfect spot",
+    "shakeNow": "Shake Now",
+    "trendingToday": "Trending Today",
+    "seeAll": "See All",
+    "recentMatch": "just successfully matched at Ben Thanh Market!",
+    "minhAndOthers": "Minh & 3 others"
+  },
+  "profile": {
+    "title": "Food Profile",
+    "exploreTaste": "Explore your taste",
+    "headline": "Reveal your dining style! 🔥",
+    "subHeadline": "Create a profile so Food Match can instantly pair you with dining buddies & suggest perfect spots.",
+    "reset": "Reset",
+    "step2of3": "Step 2 / 3",
+    "displayName": "Dining Nickname",
+    "randomName": "Random Name",
+    "displayNameDesc": "Displayed to nearby friends when sending dining invites.",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "desiredFood": "What are you craving today? (Optional)",
+    "desiredFoodPlaceholder": "Enter what you really want to eat right now...",
+    "tastes": "Favorite Tastes (Select 3 or more)",
+    "tastesDesc": "Select at least 3 tastes you like to find matching dining buddies:",
+    "nearbyCraving": "14 buddies nearby are also craving",
+    "connecting": "Connecting dining buddies...",
+    "enterApp": "Enter Food Match Now",
+    "skip": "Skip",
+    "updateSuccess": "Profile updated successfully!",
+    "displayNameRequired": "Please enter a dining nickname!",
+    "createSuccess": "Profile created successfully! Opening map...",
+    "matchAccurate": "For accurate matching",
+    "nicknamePlaceholder": "Enter nickname (e.g. Spicy Noodle Lover, Chonky...)",
+    "preferences": "Food Preferences",
+    "priorityMatch": "Match Priority",
+    "aiRecognized": "Food Match AI recognized:",
+    "submitBtn": "Complete & Start Exploring",
+    "skipBtn": "Skip for now, preview app",
+    "create": "Create Profile",
+    "expiryNote": "Profile auto-expires after 3 hours"
+  },
   "food": {
     "spinButton": "Spin Now!",
     "spinning": "Spinning...",
@@ -18,35 +77,80 @@
     "category": {
       "all": "All",
       "kho": "Dry Dishes",
-      "nuoc": "Soup/Noodle"
+      "nuoc": "Soup/Noodle",
+      "an_vat": "Snacks",
+      "healthy": "Healthy/Veggie"
     },
     "price": {
       "re": "Budget (<30k)",
       "vua": "Medium (30-80k)",
+      "dat": "Premium (>80k)",
       "cao": "Premium (>80k)"
     },
     "mealTime": {
       "sang": "Breakfast",
       "trua": "Lunch",
       "toi": "Dinner",
-      "khuya": "Late Night"
+      "khuya": "Late Night",
+      "ca_ngay": "All day"
+    },
+    "tags": {
+      "chay": "Vegan",
+      "healthy": "Healthy",
+      "rau": "Veggies",
+      "mặn": "Savory",
+      "thịt": "Meat",
+      "cá": "Fish",
+      "hải sản": "Seafood",
+      "ngọt": "Sweet",
+      "khô": "Dry",
+      "nước": "Soup",
+      "cay": "Spicy",
+      "chiên": "Fried",
+      "hấp": "Steamed",
+      "nướng": "Grilled",
+      "đồ uống": "Drinks"
+    },
+    "foodNames": {
+      "Cơm Chiên Chay Dương Châu": "Veggie Yangzhou Fried Rice",
+      "Gỏi Cuốn Chay Nấm": "Mushroom Spring Rolls",
+      "Cháo Nấm Tràm Hạt Sen": "Lotus Mushroom Porridge",
+      "Chè Đậu Đen": "Black Bean Sweet Soup",
+      "Salad Bơ Trái Cây Sốt Mè": "Avocado Sesame Salad",
+      "Phở Bò Tái Lăn": "Stir-fried Rare Beef Pho",
+      "Bánh Mì Thịt": "Pork Banh Mi",
+      "Cơm Tấm": "Broken Rice",
+      "Bún Bò Huế": "Hue Beef Noodle Soup",
+      "Gỏi Cuốn": "Spring Rolls",
+      "Phở Bò": "Beef Pho",
+      "Cơm Chay": "Vegetarian Rice",
+      "Chè Khúc Bạch": "Almond Panna Cotta",
+      "Lẩu Thái": "Tom Yum Hotpot",
+      "Cơm Tấm Sườn Bì Chả Đặc Biệt": "Special Broken Rice with Pork Chop",
+      "Bún Bò Huế Chả Cua Cay Nồng": "Spicy Hue Beef Noodle Soup with Crab Roll",
+      "Gỏi Cuốn Tôm Thịt & Nước Chấm Tương": "Shrimp & Pork Spring Rolls with Peanut Sauce"
     }
   },
-  "profile": {
-    "title": "Create Temporary Profile",
-    "displayName": "Display Name",
-    "gender": "Gender",
-    "preferences": "Food Preferences",
-    "desiredFood": "What do you want to eat today?",
-    "create": "Create Profile",
-    "expiryNote": "Profile auto-expires after 3 hours"
+  "randomPage": {
+    "filterTitle": "Menu Filter",
+    "itemsAvailable": "{{count}} items open",
+    "spin": "SPIN",
+    "spinning": "...",
+    "selectedToday": "SELECTED TODAY",
+    "nearbyCount": "{{count}} nearby places",
+    "respin": "Spin Again",
+    "confirm": "Confirm & Find"
   },
   "match": {
     "invite": "Invite to Dine",
     "accept": "Accept",
     "decline": "Decline",
     "pending": "Pending...",
-    "matched": "Matched!"
+    "matched": "Matched!",
+    "newRequest": "New Match Request!",
+    "wantToEat": "Wants to eat",
+    "wantToEatTogether": "Wants to eat with you!",
+    "acceptDine": "Accept & Dine"
   },
   "chat": {
     "placeholder": "Type a message...",
@@ -67,8 +171,9 @@
     "inviteBuddy": "Invite Buddy",
     "nearbyGems": "Nearby Gems",
     "restaurantsCount": "({{count}} places)",
-    "notFound": "No restaurants found.",
-    "searching": "Searching..."
+    "notFound": "No suitable restaurants found nearby.",
+    "searching": "Scanning for good places...",
+    "radiusText": "Within {{km}}km radius"
   },
   "report": {
     "title": "Report User",
@@ -82,6 +187,24 @@
     "retry": "Retry",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "language": "Language"
+    "language": "Language",
+    "required": "Required",
+    "selected": "selected"
+  },
+  "route": {
+    "noDestination": "No Restaurant Selected",
+    "noDestinationDesc": "Please go back to the map and select a restaurant to view directions.",
+    "backToMap": "Back to Map",
+    "title": "Directions",
+    "navigation": "Navigation",
+    "ready": "Ready",
+    "startNav": "Start Navigation (GPS)",
+    "startingNav": "Starting Navigation...",
+    "callRestaurant": "Call Restaurant",
+    "arrived": "I've Arrived",
+    "arrivedSuccess": "Arrived! 🎉",
+    "share": "Share",
+    "yourLocation": "Your location",
+    "gettingAddress": "Getting address..."
   }
 }

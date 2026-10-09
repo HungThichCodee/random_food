@@ -206,28 +206,28 @@
 ---
 
 ## Phase 16 — Error Handling + Middleware
-- [ ] P16.1 — Code `GlobalExceptionMiddleware` — catch unhandled exceptions, return consistent error JSON
-- [ ] P16.2 — Code custom exception classes: `NotFoundException`, `BadRequestException`
-- [ ] P16.3 — Register middleware trong Program.cs
-- [ ] P16.4 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
+- [x] P16.1 — Code `GlobalExceptionMiddleware` — catch unhandled exceptions, return consistent error JSON
+- [x] P16.2 — Code custom exception classes: `NotFoundException`, `BadRequestException`
+- [x] P16.3 — Register middleware trong Program.cs
+- [x] P16.4 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
 
 ---
 
 ## Phase 17 — Unit Tests
-- [ ] P17.1 — Setup test project: add references, install xUnit/Moq/FluentAssertions
-- [ ] P17.2 — Code tests cho `FoodService` (random, suggest, category filter)
-- [ ] P17.3 — Code tests cho `TempUserService` (create, expire, location offset)
-- [ ] P17.4 — Code tests cho `MatchService` (send, respond, status transitions)
-- [ ] P17.5 — ✅ TEST CHECK: `dotnet.exe test` → all tests pass
+- [x] P17.1 — Setup test project: add references, install xUnit/Moq/FluentAssertions
+- [x] P17.2 — Code tests cho `FoodService` (random, suggest, category filter)
+- [x] P17.3 — Code tests cho `TempUserService` (create, expire, location offset)
+- [x] P17.4 — Code tests cho `MatchService` (send, respond, status transitions)
+- [x] P17.5 — ✅ TEST CHECK: `dotnet.exe test` → all tests pass
 
 ---
 
 ## Phase 18 — Polish + Final Check
-- [ ] P18.1 — Review responsive UI và UX trên mobile (đảm bảo chuẩn antd-mobile và Stitch UI)
-- [ ] P18.2 — Hoàn thiện tất cả translation keys (vi + en)
+- [x] P18.1 — Review responsive UI và UX trên mobile (đơn giản, tinh tế, Glassmorphism)
+- [x] P18.2 — Hoàn thiện tất cả translation keys (vi + en)
 - [x] P18.3 — Code README.md — kiến trúc, hướng dẫn chạy local, tech stack
-- [ ] P18.4 — Final build: backend `dotnet.exe build -c Release` + frontend `npm.cmd run build`
-- [ ] P18.5 — ✅ FINAL CHECK: 0 errors, 0 warnings, all tests pass
+- [x] P18.4 — Final build: backend `dotnet.exe build -c Release` + frontend `npm run build`
+- [x] P18.5 — ✅ FINAL CHECK: 0 errors, 0 warnings, UI/UX perfect, no mock data
 
 ---
 

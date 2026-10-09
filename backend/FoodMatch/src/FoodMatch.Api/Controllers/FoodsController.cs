@@ -63,7 +63,7 @@ public class FoodsController : ControllerBase
     }
 
     [HttpPost("suggest")]
-    public async Task<ActionResult<FoodResponseDto>> SuggestFoods([FromBody] FoodSuggestRequestDto request)
+    public async Task<ActionResult<SuggestResponseDto>> SuggestFoods([FromBody] FoodSuggestRequestDto request)
     {
         try
         {
@@ -80,6 +80,23 @@ public class FoodsController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { Error = $"Internal server error while suggesting foods: {ex.Message}" });
+        }
+    }
+
+    [HttpPost("tags-count")]
+    public async Task<ActionResult<Dictionary<string, int>>> GetTagCounts([FromBody] FoodSuggestRequestDto request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var tagCounts = await _foodService.GetTagCountsAsync(request);
+            return Ok(tagCounts);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Error = $"Internal server error: {ex.Message}" });
         }
     }
 }

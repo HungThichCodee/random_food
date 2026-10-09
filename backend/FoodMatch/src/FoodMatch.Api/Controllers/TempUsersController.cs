@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using FoodMatch.Application.Interfaces;
 using FoodMatch.Application.DTOs.TempUser;
+using System.Security.Claims;
 
 namespace FoodMatch.Api.Controllers;
 
@@ -86,7 +87,7 @@ public class TempUsersController : ControllerBase
 
     [HttpGet("nearby")]
     [EnableRateLimiting("GeneralApi")]
-    public async Task<ActionResult<List<TempUserDto>>> GetNearby([FromQuery] double lat, [FromQuery] double lng, [FromQuery] double radiusKm = 3.0)
+    public async Task<ActionResult<List<NearbyUserDto>>> GetNearby([FromQuery] double lat, [FromQuery] double lng, [FromQuery] double radiusKm = 3.0)
     {
         try
         {
@@ -96,6 +97,14 @@ public class TempUsersController : ControllerBase
             }
 
             var result = await _tempUserService.GetNearbyUsersAsync(lat, lng, radiusKm);
+            
+            // Filter out current user so they don't invite themselves
+            var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userIdString) && Guid.TryParse(userIdString, out var currentUserId))
+            {
+                result = result.Where(u => u.Id != currentUserId).ToList();
+            }
+            
             return Ok(result);
         }
         catch (ArgumentException ex)

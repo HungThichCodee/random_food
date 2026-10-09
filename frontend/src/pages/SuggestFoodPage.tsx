@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFoodStore } from '../stores/useFoodStore';
@@ -58,16 +58,68 @@ export default function SuggestFoodPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { profile } = useUserStore();
-  const { fetchSuggestedFoods, isLoading } = useFoodStore();
+  const { fetchSuggestedFoods, isLoading, suggestedFoods, suggestMatchLevel, suggestRelaxed, suggestMessage, error, fetchTagCounts, tagCounts } = useFoodStore();
 
   // Filters state
-  const [selectedMealTimes, setSelectedMealTimes] = useState<string[]>(['Trua', 'Toi']);
-  const [selectedDishType, setSelectedDishType] = useState<string>('com');
-  const [selectedBudget, setSelectedBudget] = useState<string>('vua');
-  const [selectedTastes, setSelectedTastes] = useState<string[]>(['healthy', 'dam_vi']);
+  const [selectedMealTimes, setSelectedMealTimes] = useState<string[]>([]);
+  const [selectedDishType, setSelectedDishType] = useState<string>('');
+  const [selectedBudget, setSelectedBudget] = useState<string>('');
+  const [selectedTastes, setSelectedTastes] = useState<string[]>([]);
 
-  const [suggestions, setSuggestions] = useState<SuggestionCard[]>(DEFAULT_SUGGESTIONS);
+  useEffect(() => {
+    let sessionId = localStorage.getItem('foodMatch_sessionId');
+    if (!sessionId) {
+      sessionId = uuidv4();
+      localStorage.setItem('foodMatch_sessionId', sessionId);
+    }
+    fetchTagCounts({
+      sessionId,
+      mealTimes: selectedMealTimes.length > 0 ? selectedMealTimes : undefined,
+      priceRange: selectedBudget === 're' ? 'Re' : selectedBudget === 'cao' ? 'Cao' : selectedBudget === 'vua' ? 'Vua' : undefined,
+      category: selectedDishType || undefined,
+    });
+  }, [selectedMealTimes, selectedDishType, selectedBudget, fetchTagCounts]);
+
+  // Auto-deselect tags that have count 0
+  useEffect(() => {
+    if (Object.keys(tagCounts).length > 0) {
+      setSelectedTastes(prev => prev.filter(t => (tagCounts[t] || 0) > 0));
+    }
+  }, [tagCounts]);
+
+  const progress = React.useMemo(() => {
+    let filled = 0;
+    if (selectedMealTimes.length > 0) filled++;
+    if (selectedDishType) filled++;
+    if (selectedBudget) filled++;
+    if (selectedTastes.length > 0) filled++;
+    return Math.round((filled / 4) * 100);
+  }, [selectedMealTimes, selectedDishType, selectedBudget, selectedTastes]);
+
+  const [suggestions, setSuggestions] = useState<SuggestionCard[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
+
+  useEffect(() => {
+    if (suggestedFoods) {
+      if (suggestedFoods.length > 0) {
+        const apiSuggestions: SuggestionCard[] = suggestedFoods.map((f, idx) => ({
+          id: f.id.toString(),
+          name: f.name,
+          desc: f.tags && f.tags.length > 0 ? f.tags.join(', ') : 'Món ngon mỗi ngày chuẩn vị',
+          matchScore: 95 - idx * 3,
+          rating: 0,
+          price: f.avgPriceRange || 'Bình dân',
+          location: 'Khám phá quán ngon quanh đây',
+          imageUrl: DEFAULT_SUGGESTIONS[idx % DEFAULT_SUGGESTIONS.length].imageUrl,
+          tags: f.tags || []
+        }));
+        setSuggestions(apiSuggestions);
+      } else {
+        setSuggestions([]);
+      }
+    }
+  }, [suggestedFoods]);
 
   const changeLanguage = () => {
     const nextLang = i18n.language === 'en' ? 'vi' : 'en';
@@ -88,6 +140,7 @@ export default function SuggestFoodPage() {
 
   const handleFindDishes = async () => {
     setIsSubmitting(true);
+    setNetworkError(false);
     let sessionId = localStorage.getItem('foodMatch_sessionId');
     if (!sessionId) {
       sessionId = uuidv4();
@@ -97,12 +150,15 @@ export default function SuggestFoodPage() {
     try {
       await fetchSuggestedFoods({
         sessionId,
-        mealTime: selectedMealTimes[0] || 'Trua',
-        priceRange: selectedBudget === 're' ? 'Re' : selectedBudget === 'cao' ? 'SangTrong' : 'TrungBinh',
+        mealTimes: selectedMealTimes.length > 0 ? selectedMealTimes : undefined,
+        priceRange: selectedBudget === 're' ? 'Re' : selectedBudget === 'cao' ? 'Cao' : selectedBudget === 'vua' ? 'Vua' : undefined,
+        category: selectedDishType || undefined,
         includedTags: selectedTastes,
       });
-    } catch {
-      // Keep rich fallback suggestions
+    } catch (e) {
+      console.error('Network or server error:', e);
+      setNetworkError(true);
+      setSuggestions(DEFAULT_SUGGESTIONS);
     }
 
     setTimeout(() => {
@@ -191,10 +247,13 @@ export default function SuggestFoodPage() {
                   <span className="material-symbols-outlined text-[16px]">tune</span>
                   Bước 3/4: Thiết lập khẩu vị
                 </span>
-                <span className="font-label-sm text-label-sm text-on-surface-variant font-bold">75% hoàn tất</span>
+                <span className="font-label-sm text-label-sm text-on-surface-variant font-bold">{progress}% hoàn tất</span>
               </div>
               <div className="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
-                <div className="h-full bg-primary-container rounded-full shadow-[0_0_12px_rgba(255,107,53,0.8)] w-3/4 transition-all duration-500"></div>
+                <div 
+                  className="h-full bg-primary-container rounded-full shadow-[0_0_12px_rgba(255,107,53,0.8)] transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                ></div>
               </div>
             </div>
 
@@ -304,19 +363,26 @@ export default function SuggestFoodPage() {
               </label>
               <div className="flex flex-wrap gap-2 pt-1" id="filter-taste">
                 {[
-                  { key: 'cay', emoji: '🌶️', label: 'Cay nồng' },
-                  { key: 'chay', emoji: '🥬', label: 'Ăn chay' },
-                  { key: 'healthy', emoji: '🥑', label: 'Ít dầu / Keto' },
-                  { key: 'chua_ngot', emoji: '🍋', label: 'Chua ngọt' },
-                  { key: 'dam_vi', emoji: '🧄', label: 'Đậm vị tỏi ớt' },
+                  { key: 'Cay', emoji: '🌶️', label: 'Cay nồng' },
+                  { key: 'Chay', emoji: '🥬', label: 'Ăn chay' },
+                  { key: 'Healthy', emoji: '🥑', label: 'Healthy / Ít béo' },
+                  { key: 'Ngọt', emoji: '🍰', label: 'Hảo ngọt' },
+                  { key: 'Mặn', emoji: '🧂', label: 'Đậm đà' },
+                  { key: 'Nướng', emoji: '🥩', label: 'Đồ nướng' },
                 ].map(item => {
                   const isActive = selectedTastes.includes(item.key);
+                  const hasData = Object.keys(tagCounts).length > 0;
+                  const count = hasData ? (tagCounts[item.key] || tagCounts[item.label] || 0) : null;
+                  const isDisabled = hasData && count === 0;
+
                   return (
                     <button
                       key={item.key}
-                      onClick={() => toggleTaste(item.key)}
+                      onClick={() => !isDisabled && toggleTaste(item.key)}
                       type="button"
-                      className={`px-3.5 py-2 rounded-full font-label-md text-label-md transition-all flex items-center gap-1.5 active:scale-95 ${
+                      disabled={isDisabled}
+                      title={isDisabled ? "Không có món nào khớp với lựa chọn hiện tại" : ""}
+                      className={`px-3.5 py-2 rounded-full font-label-md text-label-md transition-all flex items-center gap-1.5 ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'active:scale-95'} ${
                         isActive
                           ? 'bg-secondary-container text-on-secondary-container font-bold shadow-[0_0_14px_rgba(0,177,163,0.4)]'
                           : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-bright'
@@ -324,6 +390,7 @@ export default function SuggestFoodPage() {
                     >
                       <span>{item.emoji}</span>
                       <span>{item.label}</span>
+                      {count !== null && !isDisabled && <span className="ml-1 text-[11px] opacity-60">({count})</span>}
                     </button>
                   );
                 })}
@@ -344,29 +411,54 @@ export default function SuggestFoodPage() {
             <span>{isSubmitting || isLoading ? 'Đang Lọc Món...' : 'Tìm Món Chuẩn Gu Ngay'}</span>
           </button>
 
-          {/* Suggestions Section: Khớp Nhất Với Bạn */}
+          {/* Suggestions Section */}
           <div id="results-section" className="flex flex-col space-y-space-md pt-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-[22px]">auto_awesome</span>
-                <h2 className="font-headline-md text-headline-md text-on-surface font-bold">Khớp Nhất Với Bạn</h2>
+            
+            {networkError && (
+              <div className="bg-error/10 border border-error/20 p-3 rounded-lg flex items-start gap-2">
+                <span className="material-symbols-outlined text-error">wifi_off</span>
+                <p className="text-body-sm text-error font-medium">Không kết nối được với máy chủ. Đây là các gợi ý phổ biến cho bạn.</p>
               </div>
-              <span className="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-surface-container-high text-secondary font-semibold">
-                {suggestions.length} gợi ý hot
-              </span>
-            </div>
+            )}
 
-            {/* Recommendation Cards */}
-            <div className="flex flex-col space-y-space-md">
-              {suggestions.map(dish => (
-                <article
-                  key={dish.id}
-                  className="bg-surface-container/75 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg flex flex-col group border border-white/5"
-                >
-                  <div className="relative w-full h-44 overflow-hidden">
-                    <img
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      alt={dish.name}
+            {!networkError && suggestMatchLevel === 'empty' && (
+              <div className="bg-surface-container-high border border-white/5 p-6 rounded-2xl flex flex-col items-center justify-center text-center space-y-3">
+                <span className="material-symbols-outlined text-[48px] text-on-surface-variant">search_off</span>
+                <h3 className="font-title-md text-title-md text-on-surface font-bold">Không tìm thấy món</h3>
+                <p className="text-body-sm text-on-surface-variant">Rất tiếc, hệ thống không tìm thấy món nào khớp với loại món bạn chọn. Hãy thử đổi loại món khác nhé!</p>
+              </div>
+            )}
+
+            {!networkError && (suggestMatchLevel === 'relaxed' || suggestMatchLevel === 'dishTypeOnly') && (
+              <div className="bg-secondary-container/30 border border-secondary/30 p-3 rounded-lg flex items-start gap-2">
+                <span className="material-symbols-outlined text-secondary">info</span>
+                <p className="text-body-sm text-on-surface font-medium">{suggestMessage}</p>
+              </div>
+            )}
+
+            {suggestions.length > 0 && suggestMatchLevel !== 'empty' && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[22px]">auto_awesome</span>
+                    <h2 className="font-headline-md text-headline-md text-on-surface font-bold">Khớp Nhất Với Bạn</h2>
+                  </div>
+                  <span className="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-surface-container-high text-secondary font-semibold">
+                    {suggestions.length} gợi ý hot
+                  </span>
+                </div>
+
+                {/* Recommendation Cards */}
+                <div className="flex flex-col space-y-space-md">
+                  {suggestions.map(dish => (
+                    <article
+                      key={dish.id}
+                      className="bg-surface-container/75 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg flex flex-col group border border-white/5"
+                    >
+                      <div className="relative w-full h-44 overflow-hidden">
+                        <img
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          alt={dish.name}
                       src={dish.imageUrl}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-black/30"></div>
@@ -377,16 +469,18 @@ export default function SuggestFoodPage() {
                       <span>{dish.matchScore}% Hợp gu</span>
                     </div>
 
-                    {/* Rating Badge */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-surface-container-lowest/80 backdrop-blur-md text-tertiary-fixed font-label-md text-label-md px-2.5 py-1 rounded-full font-bold">
-                      <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                      <span>{dish.rating}</span>
-                    </div>
+                    {/* Rating Badge - Hidden if no real rating */}
+                    {dish.rating > 0 && (
+                      <div className="absolute top-3 right-3 flex items-center gap-1 bg-surface-container-lowest/80 backdrop-blur-md text-tertiary-fixed font-label-md text-label-md px-2.5 py-1 rounded-full font-bold">
+                        <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span>{dish.rating}</span>
+                      </div>
+                    )}
 
                     {/* Price and Distance */}
                     <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
                       <span className="font-label-lg text-label-lg text-primary font-bold bg-surface-container-lowest/80 px-2.5 py-1 rounded-full">
-                        {dish.price}
+                        {t(`price.${dish.price.toLowerCase()}`, { defaultValue: dish.price })}
                       </span>
                       <span className="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 bg-surface-container-lowest/70 backdrop-blur-sm px-2 py-0.5 rounded-full">
                         <span className="material-symbols-outlined text-[14px] text-primary">near_me</span>
@@ -398,7 +492,9 @@ export default function SuggestFoodPage() {
                   <div className="p-space-md flex flex-col space-y-space-sm">
                     <div>
                       <h3 className="font-title-md text-title-md text-on-surface line-clamp-1 font-bold">
-                        {dish.name}
+                        {i18n.language === 'en' && t(`foodNames.${dish.name}`, { defaultValue: dish.name }) !== dish.name 
+                          ? t(`foodNames.${dish.name}`) 
+                          : dish.name}
                       </h3>
                       <p className="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 pt-0.5">
                         {dish.desc}
@@ -412,7 +508,7 @@ export default function SuggestFoodPage() {
                             key={tag}
                             className="font-label-sm text-label-sm bg-surface-container-high text-on-surface px-2.5 py-0.5 rounded-full"
                           >
-                            {tag}
+                            {t(`tags.${tag.toLowerCase()}`, { defaultValue: tag })}
                           </span>
                         ))}
                       </div>
@@ -429,7 +525,9 @@ export default function SuggestFoodPage() {
                 </article>
               ))}
             </div>
-          </div>
+          </>
+        )}
+      </div>
 
         </div>
       </main>

@@ -14,8 +14,9 @@ public static class DataSeeder
     /// </summary>
     public static async Task SeedAsync(FoodMatchDbContext context)
     {
-        // 1. Check if data already exists
-        if (context.Foods.Any() || context.FoodTags.Any()) return;
+        // 1. Initial seed for tags and standard foods
+        if (!context.Foods.Any() && !context.FoodTags.Any())
+        {
 
         // 2. Seed Tags (P3.1)
         var tags = new Dictionary<string, FoodTag>
@@ -95,8 +96,38 @@ public static class DataSeeder
             CreateFood("Cơm Chay", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Re, FoodMatch.Domain.Enums.MealTime.Trua, tags["chay"], tags["healthy"], tags["rau"])
         };
 
-        await context.Foods.AddRangeAsync(foods);
-        await context.SaveChangesAsync();
+            await context.Foods.AddRangeAsync(foods);
+            await context.SaveChangesAsync();
+        }
+
+        // 2. Ensure Rich Vegetarian & Healthy Foods are seeded
+        if (!context.Foods.Any(f => f.Name == "Phở Chay Nấm Hương"))
+        {
+            var dbTags = context.FoodTags.ToList();
+            var chayTag = dbTags.FirstOrDefault(t => t.Name == "Chay") ?? new FoodTag { Name = "Chay" };
+            var healthyTag = dbTags.FirstOrDefault(t => t.Name == "Healthy") ?? new FoodTag { Name = "Healthy" };
+            var rauTag = dbTags.FirstOrDefault(t => t.Name == "Rau") ?? new FoodTag { Name = "Rau" };
+            var ngotTag = dbTags.FirstOrDefault(t => t.Name == "Ngọt") ?? new FoodTag { Name = "Ngọt" };
+
+            var newChayFoods = new List<Food>
+            {
+                CreateFood("Phở Chay Nấm Hương", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Sang, chayTag, healthyTag, rauTag),
+                CreateFood("Bún Riêu Chay Đậu Hũ", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Sang, chayTag, healthyTag, rauTag),
+                CreateFood("Hủ Tiếu Chay Rau Củ", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, healthyTag, rauTag),
+                CreateFood("Bún Bò Huế Chay", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, healthyTag, rauTag),
+                CreateFood("Gỏi Cuốn Chay Nấm", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Re, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, healthyTag, rauTag),
+                CreateFood("Bánh Mì Chay Pâté Nấm", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Re, FoodMatch.Domain.Enums.MealTime.Sang, chayTag, healthyTag),
+                CreateFood("Miến Xào Chay Nấm Đông Cô", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, healthyTag, rauTag),
+                CreateFood("Salad Bơ Trái Cây Sốt Mè", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, healthyTag, rauTag),
+                CreateFood("Cháo Nấm Tràm Hạt Sen", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Re, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, healthyTag),
+                CreateFood("Canh Nấm Đậu Hũ Rong Biển", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Toi, chayTag, healthyTag, rauTag),
+                CreateFood("Chè Hạt Sen Long Nhãn", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Re, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, ngotTag),
+                CreateFood("Cơm Chiên Chay Dương Châu", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Trua, chayTag, healthyTag, rauTag)
+            };
+
+            await context.Foods.AddRangeAsync(newChayFoods);
+            await context.SaveChangesAsync();
+        }
     }
 
     private static Food CreateFood(

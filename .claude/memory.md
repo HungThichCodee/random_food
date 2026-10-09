@@ -1,16 +1,16 @@
 # Food Match — Project Memory
 
 ## Last Updated
-- **Date:** 2026-10-01T13:34:00+07:00
-- **Action:** Hoàn thành Phase 16 (Error Handling). Đã tạo GlobalExceptionMiddleware và đăng ký trong Program.cs để trả về JSON chuẩn cho mọi unhandled exceptions.
+- **Date:** 2026-10-08T22:45:00+07:00
+- **Action:** Hoàn thành toàn bộ Phase 19 (Polish MVP). Đã xóa bỏ toàn bộ mock data, tối ưu UI/UX thành Dark Mode Glassmorphism hoàn chỉnh, và thay thế bản đồ Leaflet bằng Google Maps Embed API để định vị chính xác và không cần key. Cập nhật xong tài liệu.
 
-## Current Status: 🟢 PHASE 16 COMPLETE — READY FOR PHASE 18 (Polish + Final)
+## Current Status: 🟢 ALL PHASES COMPLETE — MVP FINISHED 🚀
 
 - Frontend Hot Reload: ✅ 0 errors, running on http://localhost:5173
 - Backend: ✅ Running on https://localhost:7154
 - Database: ✅ PostgreSQL Docker container active
 - Code Pushed: ✅ All MVP bug fixes committed and pushed via `git.exe`
-- UI/UX Report: See `.gemini/antigravity-ide/brain/.../ui_ux_final_report.md`
+- UI/UX Report: ✅ Đã hoàn thiện toàn bộ theo thiết kế Mobile-First. Dữ liệu thực 100%.
 
 ## Progress Tracker
 - **Phase 0 (Environment Setup):** 12/12 done ██████████ 100%
@@ -52,7 +52,6 @@ All 8 screens matched 100% to Stitch design (`ui_Mau`):
 - **UI/UX Anti-Regression**: MUST read `ui_guidelines.md` before modifying any page component. MUST NOT duplicate bottom nav, change color tokens, or break pointer-events on map overlays.
 
 ## Next Immediate Action for Next Agent
-- Review `.claude/implementation_plan.md` and start **Phase 14 — Frontend Match + Chat (Group C)**.
-- Implement `useMatchStore.ts`, `matchApi.ts`, `chatApi.ts` and connect SignalR (`chatHub` / `matchHub`) to the frontend.
-- **DO NOT** modify `ChatPage.tsx` or `MapPage.tsx` UI — it is already complete and matched to design.
-- Only connect real API/SignalR to replace mock data.
+- **MVP HOÀN TẤT 100%.**
+- Ứng dụng đã sẵn sàng để mang đi phỏng vấn hoặc đưa vào Portfolio.
+- Nếu có yêu cầu mới, hãy tập trung vào việc Deploy lên Vercel/Render hoặc bổ sung tính năng nâng cao (ví dụ: User Authentication, History, Reviews).

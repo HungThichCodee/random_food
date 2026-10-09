@@ -41,16 +41,26 @@ export default function CreateProfilePage() {
   const navigate = useNavigate();
   const { profile, setProfile, toggleVisibilityLocally, clearProfile } = useUserStore();
 
-  const [displayName, setDisplayName] = useState(profile?.displayName || 'Mì Gói Say Mê');
+  const [displayName, setDisplayName] = useState(profile?.displayName || '');
   const [gender, setGender] = useState<'Male' | 'Female' | 'Other'>((profile?.gender as any) || 'Female');
   const [selectedTags, setSelectedTags] = useState<string[]>(
-    profile?.foodPreferences?.length ? profile.foodPreferences : ['cay', 'nuong', 'cafe', 'nuoc_leo', 'che_ngot']
+    profile?.foodPreferences?.length ? profile.foodPreferences : []
   );
-  const [desiredFood, setDesiredFood] = useState(profile?.desiredFood || 'Phở bò sốt vang nóng hổi');
+  const [desiredFood, setDesiredFood] = useState(profile?.desiredFood || '');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [diceRolling, setDiceRolling] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
+
+  // Dynamic progress calculation based on form completion
+  const progress = React.useMemo(() => {
+    let filled = 0;
+    if (displayName.trim().length > 0) filled++;
+    if (gender) filled++;
+    if (selectedTags.length >= 3) filled++;
+    if (desiredFood.trim().length > 0) filled++;
+    return Math.round((filled / 4) * 100);
+  }, [displayName, gender, selectedTags, desiredFood]);
 
   const changeLanguage = () => {
     const nextLang = i18n.language === 'en' ? 'vi' : 'en';
@@ -112,10 +122,10 @@ export default function CreateProfilePage() {
 
   const handleReset = () => {
     clearProfile();
-    setDisplayName('Mì Gói Say Mê');
+    setDisplayName('');
     setGender('Female');
-    setSelectedTags(['cay', 'nuong', 'cafe', 'nuoc_leo', 'che_ngot']);
-    setDesiredFood('Phở bò sốt vang nóng hổi');
+    setSelectedTags([]);
+    setDesiredFood('');
   };
 
   return (
@@ -165,7 +175,7 @@ export default function CreateProfilePage() {
                   </button>
 
                   <div className="bg-surface-container-high px-3 py-1 rounded-full shadow-sm border border-white/5">
-                    <span className="font-label-sm text-label-sm text-primary font-bold">Bước 2 / 3</span>
+                    <span className="font-label-sm text-label-sm text-primary font-bold">{t('profile.step2of3')}</span>
                   </div>
                 </div>
               </div>
@@ -173,11 +183,14 @@ export default function CreateProfilePage() {
               {/* Glowing Neon Progress Bar */}
               <div className="flex flex-col space-y-1.5 w-full">
                 <div className="w-full bg-surface-container-highest/60 rounded-full h-2 p-0.5 overflow-hidden backdrop-blur-sm">
-                  <div className="h-full rounded-full bg-gradient-to-r from-primary-container via-primary to-tertiary w-2/3 shadow-[0_0_12px_rgba(255,107,53,0.7)] transition-all duration-700 ease-out"></div>
+                  <div 
+                    className="h-full rounded-full bg-gradient-to-r from-primary-container via-primary to-tertiary shadow-[0_0_12px_rgba(255,107,53,0.7)] transition-all duration-700 ease-out"
+                    style={{ width: `${progress}%` }}
+                  ></div>
                 </div>
                 <div className="flex justify-between items-center text-on-surface-variant font-body-sm text-body-sm px-0.5">
                   <span>{t('profile.exploreTaste', 'Khám phá khẩu vị của bạn')}</span>
-                  <span className="text-tertiary font-semibold font-label-sm text-label-sm">66%</span>
+                  <span className="text-tertiary font-semibold font-label-sm text-label-sm">{progress}%</span>
                 </div>
               </div>
 
@@ -185,22 +198,22 @@ export default function CreateProfilePage() {
               <div className="pt-1">
                 <div className="flex items-center justify-between">
                   <h1 className="font-headline-md text-headline-md text-on-surface tracking-tight leading-snug">
-                    Bật mí gu ăn uống của bạn! 🔥
+                    {t('profile.headline')}
                   </h1>
                   {profile && (
                     <button
                       type="button"
                       onClick={handleReset}
                       className="text-label-sm text-outline hover:text-error transition-colors flex items-center gap-1 active:scale-95"
-                      title="Xóa hồ sơ và tạo lại"
+                      title={t('profile.reset')}
                     >
                       <span className="material-symbols-outlined text-[15px]">refresh</span>
-                      <span>Làm mới</span>
+                      <span>{t('profile.reset')}</span>
                     </button>
                   )}
                 </div>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                  Tạo hồ sơ để Food Match ghép đôi bạn ăn hợp cạ &amp; gợi ý quán chuẩn vị ngay lập tức.
+                  {t('profile.subHeadline')}
                 </p>
               </div>
             </header>
@@ -217,7 +230,7 @@ export default function CreateProfilePage() {
             {successToast && (
               <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full bg-surface-container-highest/95 border border-primary-container text-primary-container font-bold text-body-md shadow-[0_0_24px_rgba(255,107,53,0.6)] flex items-center space-x-2 animate-bounce">
                 <span className="material-symbols-outlined text-xl text-primary">check_circle</span>
-                <span>Hồ sơ đã tạo thành công! Đang mở bản đồ...</span>
+                <span>{t('profile.createSuccess')}</span>
               </div>
             )}
 
@@ -233,14 +246,14 @@ export default function CreateProfilePage() {
                     </span>
                     <span>{t('profile.displayName', 'Biệt danh khi đi ăn')}</span>
                   </label>
-                  <span className="font-label-sm text-label-sm text-tertiary font-bold">Bắt buộc</span>
+                  <span className="font-label-sm text-label-sm text-tertiary font-bold">{t('common.required')}</span>
                 </div>
                 
                 <div className="relative flex items-center">
                   <input
                     id="nickname-input"
                     className="w-full bg-surface-container-high/90 text-on-surface placeholder:text-outline/70 font-body-md text-body-md px-4 py-3 pr-12 rounded-DEFAULT focus:outline-none focus:bg-surface-container-highest focus:ring-1 focus:ring-primary-container/60 transition-all shadow-inner border border-white/5"
-                    placeholder="Nhập biệt danh (vd: Phở Bò Nghiện Ớt, Bé Mập...)"
+                    placeholder={t('profile.nicknamePlaceholder')}
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
@@ -260,7 +273,7 @@ export default function CreateProfilePage() {
 
                 <p className="font-body-sm text-body-sm text-on-surface-variant flex items-center space-x-1">
                   <span className="material-symbols-outlined text-sm text-primary">diversity_1</span>
-                  <span>Hiển thị cho bạn bè xung quanh khi gửi lời mời ăn chung.</span>
+                  <span>{t('profile.displayNameDesc')}</span>
                 </p>
               </div>
 
@@ -273,7 +286,7 @@ export default function CreateProfilePage() {
                     </span>
                     <span>{t('profile.gender', 'Giới tính của bạn')}</span>
                   </span>
-                  <span className="font-label-sm text-label-sm text-outline">Để ghép đôi chuẩn</span>
+                  <span className="font-label-sm text-label-sm text-outline">{t('profile.matchAccurate')}</span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2.5" id="gender-group">
@@ -296,7 +309,7 @@ export default function CreateProfilePage() {
                       👨
                     </span>
                     <span className={`font-label-md text-label-md ${gender === 'Male' ? 'text-primary font-bold' : 'text-on-surface font-medium'}`}>
-                      Nam
+                      {t('profile.male')}
                     </span>
                   </button>
 
@@ -319,7 +332,7 @@ export default function CreateProfilePage() {
                       👩
                     </span>
                     <span className={`font-label-md text-label-md ${gender === 'Female' ? 'text-primary font-bold' : 'text-on-surface font-medium'}`}>
-                      Nữ
+                      {t('profile.female')}
                     </span>
                   </button>
 
@@ -342,7 +355,7 @@ export default function CreateProfilePage() {
                       🌈
                     </span>
                     <span className={`font-label-md text-label-md ${gender === 'Other' ? 'text-primary font-bold' : 'text-on-surface font-medium'}`}>
-                      Khác
+                      {t('profile.other')}
                     </span>
                   </button>
                 </div>
@@ -358,12 +371,12 @@ export default function CreateProfilePage() {
                     <span>{t('profile.preferences', 'Sở thích ẩm thực')}</span>
                   </span>
                   <span className="font-label-sm text-label-sm text-primary font-semibold" id="selected-count">
-                    {selectedTags.length} đã chọn
+                    {selectedTags.length} {t('common.selected')}
                   </span>
                 </div>
 
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Chọn tối thiểu 3 khẩu vị bạn thích để tìm bạn chung mâm chuẩn gout:
+                  {t('profile.tastesDesc')}
                 </p>
 
                 {/* Dynamic Filter Multi-Pills */}
@@ -413,7 +426,7 @@ export default function CreateProfilePage() {
                   </label>
                   <span className="font-label-sm text-label-sm text-secondary flex items-center">
                     <span className="w-1.5 h-1.5 rounded-full bg-secondary inline-block mr-1 animate-ping"></span>
-                    Ưu tiên ghép đôi
+                    {t('profile.priorityMatch')}
                   </span>
                 </div>
 
@@ -422,7 +435,7 @@ export default function CreateProfilePage() {
                   <input
                     id="crave-input"
                     className="w-full pl-10 pr-4 py-3 bg-surface-container-high/90 text-on-surface placeholder:text-outline/70 font-body-md text-body-md rounded-DEFAULT focus:outline-none focus:bg-surface-container-highest focus:ring-1 focus:ring-primary-container/60 transition-all shadow-inner border border-white/5"
-                    placeholder="vd: Bún đậu mắm tôm, Bò né hoa quả sơn..."
+                    placeholder={t('profile.desiredFoodPlaceholder')}
                     type="text"
                     value={desiredFood}
                     onChange={(e) => setDesiredFood(e.target.value)}
@@ -430,26 +443,6 @@ export default function CreateProfilePage() {
                 </div>
               </div>
 
-              {/* Interactive Food Card Inspiration Snippet */}
-              <div className="bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-high p-3.5 rounded-lg flex items-center space-x-3.5 shadow-sm border border-white/5">
-                <div className="w-12 h-12 rounded-DEFAULT overflow-hidden flex-shrink-0 relative">
-                  <img
-                    alt="Pho bo bowl"
-                    className="w-full h-full object-cover"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq5SI4dYnfAx5hbG1PoX8LunnBukU8TjKtGaI7dRIpiakUa5AKWjU0MneyoCozlT1lsCLRvj4s_5eT-cgzGZ0RRaAa-Jn1EGJ7xjjlwh19U3i9_SuP-bto0W5MDPKZ9dqU9osysMolSvy4Z51IKgCMl0hrk_ESjXU6nVvHzHmo_0LD6miixmHuVhDIS-FjUFzriwhWR6VVmdkigKFN_YlFPnxz0XqqvLZocDPEHWqNsXkrXufCVAScdw"
-                  />
-                  <div className="absolute inset-0 bg-primary-container/10"></div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-label-md text-label-md text-primary font-semibold flex items-center">
-                    <span className="material-symbols-outlined text-sm mr-1 text-secondary">magic_button</span>
-                    Food Match AI đã nhận diện:
-                  </p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant truncate">
-                    Đang có 14 bạn quanh bạn cùng thèm “{desiredFood || 'Phở Bò & Món Nóng'}”!
-                  </p>
-                </div>
-              </div>
 
               {/* Actions & CTA Section */}
               <div className="flex flex-col w-full pt-2 space-y-3">
@@ -463,11 +456,11 @@ export default function CreateProfilePage() {
                   {loading ? (
                     <>
                       <span className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></span>
-                      <span>Đang kết nối bạn ăn...</span>
+                      <span>{t('profile.connecting')}</span>
                     </>
                   ) : (
                     <>
-                      <span>{t('profile.submitBtn', 'Hoàn Tất & Bắt Đầu Khám Phá')}</span>
+                      <span>{t('profile.submitBtn')}</span>
                       <span className="material-symbols-outlined text-xl">auto_awesome</span>
                     </>
                   )}
@@ -479,7 +472,7 @@ export default function CreateProfilePage() {
                   onClick={handleSkip}
                   className="w-full py-2.5 text-center font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors active:scale-95"
                 >
-                  {t('profile.skipBtn', 'Để sau, xem ứng dụng trước')}
+                  {t('profile.skipBtn')}
                 </button>
               </div>
 

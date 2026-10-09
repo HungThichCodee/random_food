@@ -12,15 +12,15 @@
 - Code features one function at a time
 - Each function must be reviewed before proceeding to next
 - Follow the 67-item execution order in implementation_plan.md
-- Run `dotnet.exe build` after every backend change
+- Run `.dotnet\dotnet.exe build` after every backend change
 - Run `npm.exe run dev` for frontend hot reload
 
 ## Self-Check After Every Step (MANDATORY)
 After completing EACH step in the implementation plan:
 0. **Rule Check**: Đảm bảo mọi method vừa viết đã có BỌC `try-catch` và các DTO/tham số đầu vào đã có VALIDATION (Data Annotations / Guard Clauses). Nếu thiếu, PHẢI SỬA NGAY.
-1. **Backend**: Run `dotnet.exe build backend/FoodMatch/FoodMatch.sln` — MUST pass with 0 errors
+1. **Backend**: Run `.dotnet\dotnet.exe build backend/FoodMatch/FoodMatch.sln` — MUST pass with 0 errors
 2. **Frontend**: Run `npx.cmd tsc --noEmit` in `frontend/` — MUST pass with 0 type errors
-3. **If tests exist**: Run `dotnet.exe test` — MUST pass
+3. **If tests exist**: Run `.dotnet\dotnet.exe test` — MUST pass
 4. **If build fails**: FIX the error immediately before marking the step as done
 5. **Update memory.md**: Record completed step and any issues found
 6. **NEVER skip** this verification — a step is NOT done until build passes
@@ -31,7 +31,7 @@ After completing EACH step in the implementation plan:
 - Use conventional commits: feat:, fix:, refactor:, docs:, test:
 - Branch naming: feature/{batch}-{item-number}-{short-description}
 - **PRE-PUSH MANDATORY CHECKLIST**: Trước khi yêu cầu user cho phép `git.exe push`, Agent **BẮT BUỘC** phải tự chạy và xác nhận 4 điều kiện sau:
-  1. **Build Check**: Chạy `dotnet.exe build` (0 lỗi) và `npx.cmd tsc --noEmit` (0 lỗi).
+  1. **Build Check**: Chạy `.dotnet\dotnet.exe build` (0 lỗi) và `npx.cmd tsc --noEmit` (0 lỗi).
   2. **Test Check**: Chạy test của chức năng vừa làm (nếu có).
   3. **UI/UX Check**: Rà soát thiết kế của phase hiện tại (đảm bảo chuẩn Mobile-First, đúng màu/font Stitch, có micro-interactions).
   4. **Standard Web App Review**: Xác nhận code vừa viết đã tuân thủ: 
@@ -147,12 +147,12 @@ public async Task<TempUserResponseDto> CreateAsync(CreateTempUserDto dto)
 
 ## AI Code Review — Open Code Review (MANDATORY)
 - Sau khi hoàn thành **MỖI Phase** trong `implementation_plan.md`, BẮT BUỘC chạy kiểm toán mã nguồn bằng công cụ Open Code Review.
-- Công cụ Open Code Review đã được cài đặt (`@alibaba-group/open-code-review`).
+- Công cụ Open Code Review được clone tại `F:\random_food\CodeReview`.
 - **Sử dụng Chế độ Ủy quyền (Delegation Mode) cho AI Agent:**
   - KHÔNG DÙNG lệnh `ocr review` (vì yêu cầu API Key bên thứ 3).
   - THAY VÀO ĐÓ, AI Agent (tức là tôi) sẽ tự review bằng cách chạy:
     ```bash
-    ocr delegate preview
+    node.exe F:\random_food\CodeReview\bin\ocr.js delegate preview
     ```
   - Lệnh này sẽ thu thập các file thay đổi. AI Agent sẽ tự đọc nội dung các file đó và đối chiếu với mục tiêu dự án (bảo mật, Clean Architecture, mobile-first UX...).
 - Nếu phát hiện lỗi nghiêm trọng (Critical/High) từ việc tự review, **AI Agent PHẢI tự sửa** trước khi chuyển sang Phase tiếp theo.

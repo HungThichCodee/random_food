@@ -8,31 +8,41 @@ Food Match là một ứng dụng Web (Web App) kết hợp giữa "khám phá �
 - Tạo ra những kết nối xã hội nhẹ nhàng, an toàn bằng cách hiển thị người dùng lân cận trên bản đồ.
 - Hỗ trợ chat thời gian thực (real-time) và chỉ đường trực tiếp sau khi ghép cặp thành công.
 
-## 🚀 Chức Năng Chính
-1. **Khám Phá & Gợi Ý Món Ăn:**
-   - Quay random ngẫu nhiên toàn bộ món ăn hoặc theo loại (khô/nước).
-   - Gợi ý món ăn theo tiêu chí (chay, mặn, ngân sách, giờ ăn).
-   - Random và tìm kiếm các quán ăn (hoặc buffet/TTTM) xung quanh vị trí hiện tại.
+## 🚀 Chức Năng Chính & Lợi Ích
+1. **Khám Phá & Gợi Ý Món Ăn (Giải Quyết "Hôm nay ăn gì?"):**
+   - Quay random ngẫu nhiên món ăn bằng giao diện "Slot Machine" mượt mà.
+   - Trải nghiệm nhanh chóng, **không cần đăng ký tài khoản** hay mật khẩu rườm rà.
+   - Tìm kiếm quán ăn siêu tốc, khóa chặt vị trí chính xác của bạn qua Google Maps (không bị nhảy bản đồ đi xa).
+   - *Lợi ích:* Quyết định món ăn trong 3 giây, tiết kiệm thời gian đau đầu suy nghĩ.
 
-2. **Hồ Sơ Tạm Thời (Temp Profile):**
-   - Tạo hồ sơ nhanh (tên, giới tính, món muốn ăn) không cần mật khẩu.
-   - Tự động hủy/xóa hồ sơ sau 3 giờ không hoạt động để bảo mật thông tin.
+2. **Hồ Sơ Tạm Thời & Quyền Riêng Tư An Toàn:**
+   - Tạo hồ sơ "dùng 1 lần" (tên, giới tính, món muốn ăn).
+   - Tự động hủy/xóa hồ sơ sau 3 giờ không hoạt động để bảo vệ quyền riêng tư tuyệt đối.
+   - *Lợi ích:* Không lo lộ thông tin cá nhân, không bị spam, hoàn toàn ẩn danh cho đến khi bạn quyết định chia sẻ.
 
-3. **Ghép Cặp & Bản Đồ (Real-time):**
-   - Hiển thị những người dùng đang tìm bạn ăn trên bản đồ (vị trí được làm lệch ngẫu nhiên để bảo mật).
-   - Gửi lời mời "rủ đi ăn cùng".
-   - Mở khung Chat thời gian thực (real-time) khi đối phương đồng ý.
-   - Chỉ đường trực tiếp (Routing) từ vị trí của bạn đến đối phương.
+3. **Kết Nối Xã Hội & Ghép Cặp (Đi ăn không còn một mình):**
+   - Hiển thị những người dùng đang tìm bạn ăn xung quanh trên một danh sách gợi ý siêu đẹp.
+   - Gửi lời mời và mở khung Chat thời gian thực (SignalR) ngay lập tức khi đối phương đồng ý.
+   - *Lợi ích:* Mở rộng vòng tròn xã hội, tìm cạ cứng ăn uống chung khẩu vị một cách tự nhiên và an toàn.
+
+4. **Chỉ Đường & Bản Đồ Google Maps:**
+   - Chỉ đường trực tiếp (Routing) ngay trong web app từ vị trí của bạn đến đối phương hoặc đến quán ăn.
+   - Nút chia sẻ toạ độ GPS chính xác 100% trong phòng chat.
+   - *Lợi ích:* Gặp mặt dễ dàng không lo lạc đường, không cần thoát app để mở app bản đồ khác.
+
+5. **Thiết Kế UI/UX Mobile-First Hiện Đại:**
+   - Hoàn toàn làm sạch dữ liệu giả (mock data), ứng dụng chạy 100% dữ liệu thật.
+   - Giao diện Dark Mode sử dụng Glassmorphism (Kính mờ) mang lại cảm giác app hẹn hò cao cấp.
+   - Hỗ trợ đa ngôn ngữ (Tiếng Việt / Tiếng Anh) chuyển đổi mượt mà.
 
 ## 💻 Công Nghệ Sử Dụng
 
 ### 🎨 Frontend & UI/UX
 - **Framework:** React 19 + TypeScript + Vite 6
-- **UI Library:** Ant Design Mobile (antd-mobile)
+- **UI Library:** Ant Design Mobile (antd-mobile) + Tailwind CSS
 - **State Management:** Zustand 5
 - **Maps & Routing:** Leaflet.js, React-Leaflet, OSRM
-- **Real-time:** `@microsoft/signalr`
-- **Design System & AI Tools:** [Google Stitch](https://stitch.withgoogle.com) kết hợp **Model Context Protocol (MCP)** để đồng bộ thiết kế từ AI tạo sinh (Text-to-UI) trực tiếp vào IDE.
+- **Đa ngôn ngữ:** `react-i18next`
 
 ### ⚙️ Backend
 - **Framework:** ASP.NET Core Web API (.NET 10), C# 12
@@ -40,19 +50,19 @@ Food Match là một ứng dụng Web (Web App) kết hợp giữa "khám phá �
 - **Real-time:** SignalR
 - **ORM:** Entity Framework Core 10 (Code-first)
 - **Database:** PostgreSQL 16
-- **External APIs:** Overpass API (OpenStreetMap)
+- **Khác:** `AspNetCore.HealthChecks.Npgsql`
 
 ### ☁️ Nền Tảng Deploy (Dự Kiến)
-- **Frontend:** [Vercel](https://vercel.com) (Free tier)
-- **Backend:** [Render](https://render.com) (Docker deploy, Free tier)
-- **Database:** [Supabase](https://supabase.com) (PostgreSQL Free tier)
+- **Frontend:** [Vercel](https://vercel.com)
+- **Backend:** [Render](https://render.com) (Docker deploy)
+- **Database:** [Supabase](https://supabase.com) (PostgreSQL)
 
 ## 🛠️ Hướng Dẫn Cài Đặt (Local Development)
 
 ### Yêu Cầu Cần Có
 - [Node.js](https://nodejs.org/) (v22+)
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) (để chạy PostgreSQL local)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
 - Git
 
 ### Các Bước Khởi Chạy
@@ -70,14 +80,14 @@ Food Match là một ứng dụng Web (Web App) kết hợp giữa "khám phá �
 
 3. **Cài đặt & Chạy Backend:**
    ```bash
-   # Di chuyển vào thư mục sln
+   # BẮT BUỘC: Di chuyển vào thư mục backend trước khi chạy lệnh
    cd backend/FoodMatch
    
-   # Build và chạy Migration (nếu đã tạo)
-   dotnet build
-   dotnet run --project src/FoodMatch.Api
+   # Build và chạy dự án (Sử dụng dotnet nội bộ của project)
+   ..\..\.dotnet\dotnet.exe build
+   ..\..\.dotnet\dotnet.exe run --project src/FoodMatch.Api
    ```
-   *API sẽ chạy tại: `https://localhost:5001` hoặc `http://localhost:5000`*
+   *API sẽ chạy tại: `http://localhost:5000` hoặc `https://localhost:5001`*
 
 4. **Cài đặt & Chạy Frontend:**
    ```bash
@@ -107,4 +117,4 @@ Dự án này sử dụng **Google Stitch** để thiết kế giao diện Mobil
 5. Lúc này, AI có thể tự động đọc Design System, mã màu, và các màn hình (screens) từ Stitch để lập trình giao diện.
 
 ---
-*Dự án Food Match phiên bản MVP 1.0.0 đã hoàn thành.*
+*Dự án Food Match đang phát triển.*

@@ -16,6 +16,11 @@ public class MatchRequest
     public MatchStatus Status { get; set; } = MatchStatus.Pending;  // pending / accepted / declined / expired
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    // Location sharing state
+    public bool FromUserSharedLocation { get; set; }
+    public bool ToUserSharedLocation { get; set; }
+    public DateTime? LocationSharedAt { get; set; }
+
     // Navigation
     public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
 }

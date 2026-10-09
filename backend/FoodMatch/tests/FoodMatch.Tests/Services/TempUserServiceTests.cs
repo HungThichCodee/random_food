@@ -18,12 +18,30 @@ namespace FoodMatch.Tests.Services;
 public class TempUserServiceTests
 {
     private readonly Mock<IRepository<TempUser>> _mockUserRepo;
+    private readonly Mock<IRepository<MatchRequest>> _mockMatchRepo;
+    private readonly Mock<IRepository<ChatMessage>> _mockChatRepo;
+    private readonly Mock<IRepository<UserReport>> _mockReportRepo;
     private readonly TempUserService _service;
 
     public TempUserServiceTests()
     {
         _mockUserRepo = new Mock<IRepository<TempUser>>();
-        _service = new TempUserService(_mockUserRepo.Object);
+        _mockMatchRepo = new Mock<IRepository<MatchRequest>>();
+        _mockChatRepo = new Mock<IRepository<ChatMessage>>();
+        _mockReportRepo = new Mock<IRepository<UserReport>>();
+
+        _mockMatchRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<MatchRequest, bool>>>()))
+            .ReturnsAsync(new List<MatchRequest>());
+        _mockChatRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<ChatMessage, bool>>>()))
+            .ReturnsAsync(new List<ChatMessage>());
+        _mockReportRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<UserReport, bool>>>()))
+            .ReturnsAsync(new List<UserReport>());
+
+        _service = new TempUserService(
+            _mockUserRepo.Object, 
+            _mockMatchRepo.Object, 
+            _mockChatRepo.Object, 
+            _mockReportRepo.Object);
     }
 
     [Fact]

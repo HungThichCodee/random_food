@@ -40,8 +40,7 @@ public class FoodService(
                 throw new ArgumentException("SessionId is required", nameof(sessionId));
 
             var foods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
-            var categoryEnum = Enum.Parse<FoodCategory>(category, true);
-            foods = foods.Where(f => f.Category == categoryEnum).ToList();
+            foods = ApplyCategoryFilter(foods, category).ToList();
             
             return await PickRandomFoodAsync(foods, sessionId, SuggestionType.RandomByType);
         }
@@ -52,7 +51,7 @@ public class FoodService(
         }
     }
 
-    public async Task<FoodResponseDto> SuggestFoodsAsync(FoodSuggestRequestDto request)
+    public async Task<SuggestResponseDto> SuggestFoodsAsync(FoodSuggestRequestDto request)
     {
         try
         {
@@ -61,29 +60,96 @@ public class FoodService(
             if (string.IsNullOrWhiteSpace(request.SessionId))
                 throw new ArgumentException("SessionId is required", nameof(request.SessionId));
 
-            var foods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
+            var allFoods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
+            var activeFoods = allFoods.Where(f => f.IsActive).ToList();
 
-            if (!string.IsNullOrEmpty(request.MealTime) && Enum.TryParse<MealTime>(request.MealTime, true, out var mealTime))
+            // 0. Hard Filter: DishType (Category)
+            var baseFoods = ApplyCategoryFilter(activeFoods, request.Category).ToList();
+            if (!baseFoods.Any())
             {
-                foods = foods.Where(f => f.MealTime == mealTime).ToList();
+                return new SuggestResponseDto { MatchLevel = "empty", Message = "Không có món nào thuộc loại này." };
             }
 
-            if (!string.IsNullOrEmpty(request.PriceRange) && Enum.TryParse<PriceRange>(request.PriceRange, true, out var priceRange))
-            {
-                foods = foods.Where(f => f.AvgPriceRange == priceRange).ToList();
-            }
-
-            if (request.IncludedTags != null && request.IncludedTags.Any())
-            {
-                foods = foods.Where(f => request.IncludedTags.All(t => f.FoodFoodTags.Any(ft => ft.Tag.Name.Equals(t, StringComparison.OrdinalIgnoreCase)))).ToList();
-            }
-            
+            // Excluded tags always apply
             if (request.ExcludedTags != null && request.ExcludedTags.Any())
             {
-                foods = foods.Where(f => !request.ExcludedTags.Any(t => f.FoodFoodTags.Any(ft => ft.Tag.Name.Equals(t, StringComparison.OrdinalIgnoreCase)))).ToList();
+                baseFoods = baseFoods.Where(f => !request.ExcludedTags.Any(t => f.FoodFoodTags.Any(ft => ft.Tag.Name.Equals(t, StringComparison.OrdinalIgnoreCase)))).ToList();
             }
 
-            return await PickRandomFoodAsync(foods, request.SessionId, SuggestionType.ByCriteria);
+            int CountMatchingTags(Food f)
+            {
+                if (request.IncludedTags == null || !request.IncludedTags.Any()) return 0;
+                return request.IncludedTags.Count(t => f.FoodFoodTags.Any(ft => ft.Tag.Name.Equals(t, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            var mealTimesToMatch = new List<MealTime>();
+            if (request.MealTimes != null)
+            {
+                foreach (var mt in request.MealTimes)
+                {
+                    if (Enum.TryParse<MealTime>(mt, true, out var mte)) mealTimesToMatch.Add(mte);
+                }
+            }
+            bool hasMealFilter = mealTimesToMatch.Any();
+            
+            bool hasBudgetFilter = !string.IsNullOrEmpty(request.PriceRange) && Enum.TryParse<PriceRange>(request.PriceRange, true, out var _);
+            PriceRange budgetVal = hasBudgetFilter ? Enum.Parse<PriceRange>(request.PriceRange!, true) : PriceRange.Vua;
+            
+            bool hasTagFilter = request.IncludedTags != null && request.IncludedTags.Any();
+
+            // Tầng 1: khớp đủ (loại món + ngân sách + buổi + vị/tag)
+            var level1 = baseFoods.Where(f => 
+                (!hasMealFilter || (f.MealTime.HasValue && mealTimesToMatch.Contains(f.MealTime.Value))) &&
+                (!hasBudgetFilter || f.AvgPriceRange == budgetVal) &&
+                (!hasTagFilter || request.IncludedTags!.All(t => f.FoodFoodTags.Any(ft => ft.Tag.Name.Equals(t, StringComparison.OrdinalIgnoreCase))))
+            ).ToList();
+
+            if (level1.Any())
+            {
+                return new SuggestResponseDto {
+                    Items = level1.OrderByDescending(CountMatchingTags).Select(MapToDto).ToList(),
+                    MatchLevel = "exact"
+                };
+            }
+
+            // Tầng 2: bỏ vị/tag, giữ loại món + ngân sách + buổi
+            var level2 = baseFoods.Where(f => 
+                (!hasMealFilter || (f.MealTime.HasValue && mealTimesToMatch.Contains(f.MealTime.Value))) &&
+                (!hasBudgetFilter || f.AvgPriceRange == budgetVal)
+            ).ToList();
+
+            if (level2.Any())
+            {
+                return new SuggestResponseDto {
+                    Items = level2.OrderByDescending(CountMatchingTags).Select(MapToDto).ToList(),
+                    MatchLevel = "relaxed",
+                    Relaxed = new List<string> { "tastes" },
+                    Message = "Không có món khớp hoàn toàn vị, hiển thị món khớp ngân sách và buổi ăn."
+                };
+            }
+
+            // Tầng 3: nới buổi ăn, nới ngân sách lên một mức, giữ loại món
+            var level3 = baseFoods.Where(f => 
+                (!hasBudgetFilter || !f.AvgPriceRange.HasValue || f.AvgPriceRange == budgetVal || (int)f.AvgPriceRange.Value == (int)budgetVal + 1 || (int)f.AvgPriceRange.Value == (int)budgetVal - 1)
+            ).ToList();
+
+            if (level3.Any())
+            {
+                return new SuggestResponseDto {
+                    Items = level3.OrderByDescending(CountMatchingTags).Select(MapToDto).ToList(),
+                    MatchLevel = "relaxed",
+                    Relaxed = new List<string> { "tastes", "mealTime", "budget" },
+                    Message = "Đã nới lỏng ngân sách và buổi ăn."
+                };
+            }
+
+            // Tầng 4: chỉ giữ loại món
+            return new SuggestResponseDto {
+                Items = baseFoods.OrderByDescending(CountMatchingTags).Select(MapToDto).ToList(),
+                MatchLevel = "dishTypeOnly",
+                Relaxed = new List<string> { "tastes", "mealTime", "budget" },
+                Message = "Chỉ lọc theo loại món."
+            };
         }
         catch (ArgumentException) { throw; }
         catch (Exception ex)
@@ -92,15 +158,53 @@ public class FoodService(
         }
     }
 
+    public async Task<Dictionary<string, int>> GetTagCountsAsync(FoodSuggestRequestDto request)
+    {
+        var allFoods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
+        var activeFoods = allFoods.Where(f => f.IsActive).ToList();
+
+        // 0. Hard Filter: DishType (Category)
+        var baseFoods = ApplyCategoryFilter(activeFoods, request.Category).ToList();
+
+        var mealTimesToMatch = new List<MealTime>();
+        if (request.MealTimes != null)
+        {
+            foreach (var mt in request.MealTimes)
+            {
+                if (Enum.TryParse<MealTime>(mt, true, out var mte)) mealTimesToMatch.Add(mte);
+            }
+        }
+        bool hasMealFilter = mealTimesToMatch.Any();
+        
+        bool hasBudgetFilter = !string.IsNullOrEmpty(request.PriceRange) && Enum.TryParse<PriceRange>(request.PriceRange, true, out var _);
+        PriceRange budgetVal = hasBudgetFilter ? Enum.Parse<PriceRange>(request.PriceRange!, true) : PriceRange.Vua;
+
+        var filteredFoods = baseFoods.Where(f => 
+            (!hasMealFilter || (f.MealTime.HasValue && mealTimesToMatch.Contains(f.MealTime.Value))) &&
+            (!hasBudgetFilter || f.AvgPriceRange == budgetVal)
+        ).ToList();
+
+        var tagCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var food in filteredFoods)
+        {
+            foreach (var ft in food.FoodFoodTags)
+            {
+                var tagName = ft.Tag.Name;
+                if (!tagCounts.ContainsKey(tagName))
+                    tagCounts[tagName] = 0;
+                tagCounts[tagName]++;
+            }
+        }
+
+        return tagCounts;
+    }
+
     public async Task<IEnumerable<FoodResponseDto>> GetWheelFoodsAsync(string? category, int count = 8)
     {
         try
         {
             var foods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
-            if (!string.IsNullOrWhiteSpace(category) && Enum.TryParse<FoodCategory>(category, true, out var categoryEnum))
-            {
-                foods = foods.Where(f => f.Category == categoryEnum).ToList();
-            }
+            foods = ApplyCategoryFilter(foods, category).ToList();
             
             foods = foods.Where(f => f.IsActive).ToList();
             if (!foods.Any()) return new List<FoodResponseDto>();
@@ -154,5 +258,68 @@ public class FoodService(
             MealTime = food.MealTime.ToString() ?? string.Empty,
             Tags = food.FoodFoodTags?.Select(ft => ft.Tag?.Name ?? string.Empty).ToList() ?? new List<string>()
         };
+    }
+
+    private static IEnumerable<Food> ApplyCategoryFilter(IEnumerable<Food> foods, string? category)
+    {
+        if (string.IsNullOrWhiteSpace(category) || category.Equals("all", StringComparison.OrdinalIgnoreCase))
+            return foods;
+
+        if (category.Equals("kho", StringComparison.OrdinalIgnoreCase))
+            return foods.Where(f => f.Category == FoodCategory.Kho);
+
+        if (category.Equals("nuoc", StringComparison.OrdinalIgnoreCase))
+            return foods.Where(f => f.Category == FoodCategory.Nuoc);
+
+        if (category.Equals("an_vat", StringComparison.OrdinalIgnoreCase) || 
+            category.Equals("anvat", StringComparison.OrdinalIgnoreCase))
+        {
+            var snackNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Bánh Tráng Trộn", "Bánh Tráng Nướng", "Bánh Khọt", "Bánh Bèo", "Bánh Xèo", "Chả Giò (Nem Rán)", 
+                "Bún Đậu Mắm Tôm", "Nem Nướng", "Bánh Mì Thịt", "Chè Khúc Bạch", "Chè Đậu Đen"
+            };
+            return foods.Where(f => snackNames.Contains(f.Name) ||
+                f.FoodFoodTags.Any(ft => 
+                    ft.Tag.Name.Equals("Chiên", StringComparison.OrdinalIgnoreCase) ||
+                    ft.Tag.Name.Equals("Ngọt", StringComparison.OrdinalIgnoreCase) ||
+                    ft.Tag.Name.Equals("Đồ Uống", StringComparison.OrdinalIgnoreCase)
+                ) || f.AvgPriceRange == PriceRange.Re);
+        }
+
+        if (category.Equals("healthy", StringComparison.OrdinalIgnoreCase) || 
+            category.Equals("chay", StringComparison.OrdinalIgnoreCase))
+        {
+            var meatWords = new[] { "thịt", "bò", "gà", "heo", "lợn", "cá", "lươn", "cua", "ốc", "tôm", "mực", "sườn", "mắm", "lòng" };
+            return foods.Where(f => 
+                !f.FoodFoodTags.Any(ft => 
+                    ft.Tag.Name.Equals("Thịt", StringComparison.OrdinalIgnoreCase) ||
+                    ft.Tag.Name.Equals("Hải Sản", StringComparison.OrdinalIgnoreCase) ||
+                    ft.Tag.Name.Equals("Mặn", StringComparison.OrdinalIgnoreCase)
+                ) &&
+                (
+                    f.Name.Contains("Chay", StringComparison.OrdinalIgnoreCase) ||
+                    (
+                        !meatWords.Any(w => f.Name.Contains(w, StringComparison.OrdinalIgnoreCase)) &&
+                        (
+                            f.FoodFoodTags.Any(ft => 
+                                ft.Tag.Name.Equals("Chay", StringComparison.OrdinalIgnoreCase) ||
+                                ft.Tag.Name.Equals("Healthy", StringComparison.OrdinalIgnoreCase) ||
+                                ft.Tag.Name.Equals("Rau", StringComparison.OrdinalIgnoreCase)
+                            ) ||
+                            f.Name.Contains("Salad", StringComparison.OrdinalIgnoreCase) ||
+                            f.Name.Contains("Nấm", StringComparison.OrdinalIgnoreCase)
+                        )
+                    )
+                )
+            );
+        }
+
+        if (Enum.TryParse<FoodCategory>(category, true, out var categoryEnum))
+        {
+            return foods.Where(f => f.Category == categoryEnum);
+        }
+
+        return foods;
     }
 }

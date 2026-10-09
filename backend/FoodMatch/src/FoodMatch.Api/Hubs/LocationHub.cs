@@ -35,8 +35,11 @@ public class LocationHub : Hub
             // For now, we just update the DB.
             var nearbyUsers = await _tempUserService.GetNearbyUsersAsync(lat, lng, 3.0);
             
+            // Filter out current user
+            var filteredNearbyUsers = nearbyUsers.Where(u => u.Id != userId).ToList();
+            
             // Push to the user who just updated their location
-            await Clients.Caller.SendAsync("NearbyUsersUpdated", nearbyUsers);
+            await Clients.Caller.SendAsync("NearbyUsersUpdated", filteredNearbyUsers);
         }
         catch (Exception ex)
         {

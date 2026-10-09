@@ -11,4 +11,6 @@ public interface IMatchService
     Task<MatchRequestDto> RespondToRequestAsync(int requestId, bool accept);
     Task<List<MatchRequestDto>> GetPendingRequestsAsync(Guid userId);
     Task<MatchRequestDto?> GetActiveMatchAsync(Guid userId);
+    Task<MatchRequestDto> ShareLocationAsync(int requestId, Guid userId);
+    Task<MatchRequestDto> StopSharingLocationAsync(int requestId, Guid userId);
 }

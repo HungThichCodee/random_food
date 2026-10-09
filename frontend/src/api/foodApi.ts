@@ -1,5 +1,5 @@
 import apiClient from './axiosClient';
-import type { FoodResponseDto, FoodRandomRequestDto, FoodSuggestRequestDto } from '../types/food';
+import type { FoodResponseDto, FoodRandomRequestDto, FoodSuggestRequestDto, SuggestResponseDto } from '../types/food';
 
 export const foodApi = {
   getRandomFood: async (request: FoodRandomRequestDto): Promise<FoodResponseDto> => {
@@ -11,8 +11,12 @@ export const foodApi = {
     const response = await apiClient.get<unknown, FoodResponseDto>(`/foods/random?${params.toString()}`);
     return response;
   },
-  suggestFoods: async (request: FoodSuggestRequestDto): Promise<FoodResponseDto> => {
-    const response = await apiClient.post<unknown, FoodResponseDto>('/foods/suggest', request);
+  suggestFoods: async (request: FoodSuggestRequestDto): Promise<SuggestResponseDto> => {
+    const response = await apiClient.post<unknown, SuggestResponseDto>('/foods/suggest', request);
+    return response;
+  },
+  getTagCounts: async (request: FoodSuggestRequestDto): Promise<Record<string, number>> => {
+    const response = await apiClient.post<unknown, Record<string, number>>('/foods/tags-count', request);
     return response;
   },
   getWheelFoods: async (category?: string, count: number = 8): Promise<FoodResponseDto[]> => {

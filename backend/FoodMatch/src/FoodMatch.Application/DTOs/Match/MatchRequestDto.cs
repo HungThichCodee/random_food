@@ -12,4 +12,12 @@ public class MatchRequestDto
     public string ToUserName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+
+    public bool HasSharedLocation { get; set; } // Did the current user share?
+    public bool BuddyHasSharedLocation { get; set; } // Did the buddy share?
+    public DateTime? LocationSharedAt { get; set; }
+    
+    // Only populated when BOTH have shared
+    public double? BuddyLat { get; set; }
+    public double? BuddyLng { get; set; }
 }

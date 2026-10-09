@@ -121,4 +121,70 @@ public class MatchRequestsController : ControllerBase
             return StatusCode(500, new { Message = "An error occurred.", Detailed = ex.Message });
         }
     }
+
+    [HttpPost("{id}/share-location")]
+    [EnableRateLimiting("GeneralApi")]
+    public async Task<ActionResult<MatchRequestDto>> ShareLocation(int id)
+    {
+        try
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                return Unauthorized();
+
+            var result = await _matchService.ShareLocationAsync(id, userId);
+            
+            // Notify other user to update their state
+            var buddyId = result.FromUserId == userId ? result.ToUserId : result.FromUserId;
+            await _matchHubContext.Clients.User(buddyId.ToString())
+                .SendAsync("LocationSharingUpdated", result);
+
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(403, new { Message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "An error occurred.", Detailed = ex.Message });
+        }
+    }
+
+    [HttpPost("{id}/stop-sharing-location")]
+    [EnableRateLimiting("GeneralApi")]
+    public async Task<ActionResult<MatchRequestDto>> StopSharingLocation(int id)
+    {
+        try
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                return Unauthorized();
+
+            var result = await _matchService.StopSharingLocationAsync(id, userId);
+            
+            // Notify other user to update their state
+            var buddyId = result.FromUserId == userId ? result.ToUserId : result.FromUserId;
+            await _matchHubContext.Clients.User(buddyId.ToString())
+                .SendAsync("LocationSharingUpdated", result);
+
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(403, new { Message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "An error occurred.", Detailed = ex.Message });
+        }
+    }
 }
