@@ -1,7 +1,7 @@
-# Trạng thái hiện hành — 2026-10-21
+# Trạng thái hiện hành — 2026-10-23
 
 - Mục tiêu: hoàn thiện Food Match, thêm gợi ý điểm hẹn cho cặp đã match, bảo mật và kiểm chứng trước deploy. Người dùng đã chọn tính năng điểm hẹn.
-- Chưa triển khai; các checklist mới mặc định chưa đạt cho đến khi có bằng chứng. Worktree có nhiều thay đổi chưa commit, không reset hay push tự động.
+- Chưa triển khai staging/production; chỉ đánh dấu cổng đã có bằng chứng. Chủ dự án đã duyệt đưa thay đổi lên nhánh `review/maps-embed-ci-20261023`; commit `f811b19` đã push, [Verify đầu](https://github.com/HungThichCodee/random_food/actions/runs/39984638973) đạt cả frontend/backend. Cần CI của commit tài liệu cuối, review diff trước merge và duyệt riêng bước staging.
 - Vị trí: lưu đúng lat/lng; nearby chỉ trả “Trong 3 km” và không nhận bán kính client. Chủ dự án chấp nhận tín hiệu gần đúng này trước khi chia sẻ. Mỗi người trong match accepted chia sẻ độc lập vị trí chính xác của mình tối đa 60 phút; người kia thấy ngay dù chưa chia sẻ lại. Điểm hẹn cần cả hai còn chia sẻ. Đã xóa helper offset cũ và thêm test độ chính xác + NaN/Infinity.
 - Mốc quyền chia sẻ được lưu riêng từng người. Bật lại sau 60 phút chỉ gia hạn quyền của người bật; người kia phải tự bật lại nếu muốn chia sẻ vị trí của họ. Backend migration giờ fail-fast; đã thêm Vercel SPA rewrite.
 - Đã tích hợp Turnstile cho tạo hồ sơ: BE xác minh Siteverify và hostname, production yêu cầu secret/hostname thật; FE có widget; local Development có thể bỏ qua khi không cấu hình. Chưa kiểm thử end-to-end với khóa production. Đã thêm `ASPNETCORE_ENVIRONMENT=Development` vào local `.env` nếu trước đó không có.

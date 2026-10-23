@@ -7,7 +7,7 @@
 - ASP.NET Core 10 + EF Core/Npgsql/PostgreSQL; React 19 + Vite/TypeScript; JWT cho hồ sơ tạm; SignalR; Google Maps iframe.
 - Vòng quay món, gợi ý món, tìm người gần, match và chat đã có. Chưa có đơn hàng, thanh toán, tài khoản mật khẩu, email hay cookie đăng nhập. Các quy tắc dành cho chúng trong `rules/security.md` là cổng bắt buộc khi thêm chức năng, không phải đã triển khai.
 - Backend lưu tọa độ đầu vào chính xác. Nearby chỉ cho biết hồ sơ hiển thị ở trong 3 km, không trả tọa độ hay khoảng cách chi tiết; chủ dự án chấp nhận tín hiệu gần đúng này trước khi chia sẻ. Trong match accepted, mỗi người tự quyết định chia sẻ tọa độ của mình cho người kia tối đa 60 phút; người nhận không cần chia sẻ lại. Gợi ý điểm hẹn cần cả hai còn chia sẻ. Không offset hoặc jitter tọa độ.
-- Worktree có nhiều thay đổi chưa commit. Không reset, ghi đè hoặc push khi chưa xem diff và có sự đồng ý của người dùng.
+- Chủ dự án đã duyệt đưa diff lớn lên nhánh `review/maps-embed-ci-20261023` để chạy CI; run đầu đạt cả frontend/backend. Không reset, ghi đè, merge hoặc phát hành khi chưa xem diff và có sự đồng ý của người dùng cho bước tương ứng.
 
 ## Luồng làm việc
 
