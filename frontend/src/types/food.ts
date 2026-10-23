@@ -1,6 +1,7 @@
 export interface FoodResponseDto {
   id: number;
   name: string;
+  imageUrl?: string | null;
   category: string;
   cuisineType: string;
   avgPriceRange: string;

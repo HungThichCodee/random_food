@@ -14,8 +14,9 @@ public static class DataSeeder
     /// </summary>
     public static async Task SeedAsync(FoodMatchDbContext context)
     {
+        await using var transaction = await context.Database.BeginTransactionAsync();
         // 1. Initial seed for tags and standard foods
-        if (!context.Foods.Any() && !context.FoodTags.Any())
+        if (!context.Foods.Any())
         {
 
         // 2. Seed Tags (P3.1)
@@ -34,7 +35,16 @@ public static class DataSeeder
             {"rau", new FoodTag { Name = "Rau" }},
             {"do_uong", new FoodTag { Name = "Đồ Uống" }}
         };
-        await context.FoodTags.AddRangeAsync(tags.Values);
+        var existingTags = context.FoodTags.ToList();
+        foreach (var key in tags.Keys.ToArray())
+        {
+            var existing = existingTags.FirstOrDefault(tag =>
+                tag.Name.Equals(tags[key].Name, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+                tags[key] = existing;
+            else
+                await context.FoodTags.AddAsync(tags[key]);
+        }
         await context.SaveChangesAsync();
 
         // 3. Seed 50 Foods (P3.2 & P3.3)
@@ -128,6 +138,8 @@ public static class DataSeeder
             await context.Foods.AddRangeAsync(newChayFoods);
             await context.SaveChangesAsync();
         }
+
+        await transaction.CommitAsync();
     }
 
     private static Food CreateFood(

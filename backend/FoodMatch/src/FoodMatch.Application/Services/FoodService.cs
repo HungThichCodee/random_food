@@ -8,22 +8,19 @@ using FoodMatch.Domain.Enums;
 /// <summary>
 /// Service implementation for food recommendations and suggestions.
 /// </summary>
-public class FoodService(
-    IRepository<Food> foodRepository,
-    IRepository<FoodSuggestionLog> suggestionLogRepository,
-    IRepository<TempUser> tempUserRepository) : IFoodService
+public class FoodService(IRepository<Food> foodRepository) : IFoodService
 {
     public async Task<FoodResponseDto> GetRandomFoodAsync(string sessionId)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(sessionId))
-                throw new ArgumentException("SessionId is required", nameof(sessionId));
+            ValidateSessionId(sessionId);
 
             var foods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
-            return await PickRandomFoodAsync(foods, sessionId, SuggestionType.RandomAll);
+            return PickRandomFood(foods);
         }
         catch (ArgumentException) { throw; }
+        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
             throw new ApplicationException($"Error retrieving random food: {ex.Message}", ex);
@@ -36,15 +33,16 @@ public class FoodService(
         {
             if (string.IsNullOrWhiteSpace(category))
                 throw new ArgumentException("Category is required", nameof(category));
-            if (string.IsNullOrWhiteSpace(sessionId))
-                throw new ArgumentException("SessionId is required", nameof(sessionId));
+            ValidateCategory(category);
+            ValidateSessionId(sessionId);
 
             var foods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
             foods = ApplyCategoryFilter(foods, category).ToList();
             
-            return await PickRandomFoodAsync(foods, sessionId, SuggestionType.RandomByType);
+            return PickRandomFood(foods);
         }
         catch (ArgumentException) { throw; }
+        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
             throw new ApplicationException($"Error retrieving random food by category: {ex.Message}", ex);
@@ -55,10 +53,7 @@ public class FoodService(
     {
         try
         {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
-            if (string.IsNullOrWhiteSpace(request.SessionId))
-                throw new ArgumentException("SessionId is required", nameof(request.SessionId));
+            ValidateSuggestRequest(request);
 
             var allFoods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
             var activeFoods = allFoods.Where(f => f.IsActive).ToList();
@@ -160,6 +155,7 @@ public class FoodService(
 
     public async Task<Dictionary<string, int>> GetTagCountsAsync(FoodSuggestRequestDto request)
     {
+        ValidateSuggestRequest(request);
         var allFoods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
         var activeFoods = allFoods.Where(f => f.IsActive).ToList();
 
@@ -199,10 +195,13 @@ public class FoodService(
         return tagCounts;
     }
 
-    public async Task<IEnumerable<FoodResponseDto>> GetWheelFoodsAsync(string? category, int count = 8)
+    public async Task<IEnumerable<FoodResponseDto>> GetWheelFoodsAsync(string? category, int? count = null)
     {
         try
         {
+            ValidateCategory(category);
+            if (count.HasValue && count.Value is < 1 or > 100)
+                throw new ArgumentException("Count must be between 1 and 100.", nameof(count));
             var foods = await foodRepository.GetAllWithIncludesAsync("FoodFoodTags.Tag");
             foods = ApplyCategoryFilter(foods, category).ToList();
             
@@ -210,38 +209,26 @@ public class FoodService(
             if (!foods.Any()) return new List<FoodResponseDto>();
             
             var random = new Random();
-            var shuffled = foods.OrderBy(x => random.Next()).Take(count).ToList();
+            var shuffled = foods.OrderBy(_ => random.Next()).ToList();
+            if (count.HasValue)
+                shuffled = shuffled.Take(Math.Max(0, count.Value)).ToList();
             
             return shuffled.Select(MapToDto);
         }
+        catch (ArgumentException) { throw; }
         catch (Exception ex)
         {
             throw new ApplicationException($"Error retrieving wheel foods: {ex.Message}", ex);
         }
     }
 
-    private async Task<FoodResponseDto> PickRandomFoodAsync(IEnumerable<Food> sourceFoods, string sessionId, SuggestionType type)
+    private static FoodResponseDto PickRandomFood(IEnumerable<Food> sourceFoods)
     {
         var foods = sourceFoods.Where(f => f.IsActive).ToList();
-        if (!foods.Any()) throw new Exception("No foods found matching criteria.");
+        if (!foods.Any()) throw new KeyNotFoundException("No foods found matching criteria.");
 
         var random = new Random();
         var selectedFood = foods[random.Next(foods.Count)];
-
-        if (Guid.TryParse(sessionId, out var userId))
-        {
-            var userExists = await tempUserRepository.GetByIdAsync(userId) != null;
-            if (userExists)
-            {
-                await suggestionLogRepository.AddAsync(new FoodSuggestionLog
-                {
-                    TempUserId = userId,
-                    FoodId = selectedFood.Id,
-                    SuggestionType = type,
-                    SuggestedAt = DateTime.UtcNow
-                });
-            }
-        }
 
         return MapToDto(selectedFood);
     }
@@ -252,6 +239,7 @@ public class FoodService(
         {
             Id = food.Id,
             Name = food.Name ?? string.Empty,
+            ImageUrl = food.ImageUrl,
             Category = food.Category.ToString() ?? string.Empty,
             CuisineType = food.CuisineType ?? string.Empty,
             AvgPriceRange = food.AvgPriceRange.ToString() ?? string.Empty,
@@ -271,6 +259,22 @@ public class FoodService(
         if (category.Equals("nuoc", StringComparison.OrdinalIgnoreCase))
             return foods.Where(f => f.Category == FoodCategory.Nuoc);
 
+        if (category.Equals("man", StringComparison.OrdinalIgnoreCase) ||
+            category.Equals("ngot", StringComparison.OrdinalIgnoreCase) ||
+            category.Equals("chay", StringComparison.OrdinalIgnoreCase))
+        {
+            static bool HasTag(Food food, string name) => food.FoodFoodTags.Any(ft =>
+                ft.Tag != null && ft.Tag.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            // A sweet vegetarian dish belongs to Ngọt; a savory vegetarian dish to Chay.
+            // Keep the three roulette filters mutually exclusive, including for mixed tags.
+            if (category.Equals("ngot", StringComparison.OrdinalIgnoreCase))
+                return foods.Where(f => HasTag(f, "Ngọt"));
+            if (category.Equals("chay", StringComparison.OrdinalIgnoreCase))
+                return foods.Where(f => HasTag(f, "Chay") && !HasTag(f, "Ngọt"));
+            return foods.Where(f => !HasTag(f, "Chay") && !HasTag(f, "Ngọt"));
+        }
+
         if (category.Equals("an_vat", StringComparison.OrdinalIgnoreCase) || 
             category.Equals("anvat", StringComparison.OrdinalIgnoreCase))
         {
@@ -287,8 +291,7 @@ public class FoodService(
                 ) || f.AvgPriceRange == PriceRange.Re);
         }
 
-        if (category.Equals("healthy", StringComparison.OrdinalIgnoreCase) || 
-            category.Equals("chay", StringComparison.OrdinalIgnoreCase))
+        if (category.Equals("healthy", StringComparison.OrdinalIgnoreCase))
         {
             var meatWords = new[] { "thịt", "bò", "gà", "heo", "lợn", "cá", "lươn", "cua", "ốc", "tôm", "mực", "sườn", "mắm", "lòng" };
             return foods.Where(f => 
@@ -322,4 +325,39 @@ public class FoodService(
 
         return foods;
     }
+
+    private static void ValidateSessionId(string sessionId)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId) || sessionId.Length > 64)
+            throw new ArgumentException("SessionId must contain 1 to 64 characters.", nameof(sessionId));
+    }
+
+    private static void ValidateCategory(string? category)
+    {
+        if (string.IsNullOrWhiteSpace(category)) return;
+        if (category.Length > 50 ||
+            !(new[] { "all", "kho", "nuoc", "man", "ngot", "chay", "an_vat", "anvat", "healthy" })
+                .Contains(category, StringComparer.OrdinalIgnoreCase))
+            throw new ArgumentException("Invalid category.", nameof(category));
+    }
+
+    private static void ValidateSuggestRequest(FoodSuggestRequestDto request)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+        ValidateSessionId(request.SessionId);
+        ValidateCategory(request.Category);
+        if (request.PriceRange != null &&
+            !Enum.GetNames<PriceRange>().Contains(request.PriceRange, StringComparer.OrdinalIgnoreCase))
+            throw new ArgumentException("Invalid price range.", nameof(request));
+        if (request.MealTimes?.Count > 4 ||
+            request.MealTimes?.Any(meal => string.IsNullOrWhiteSpace(meal) ||
+                !Enum.GetNames<MealTime>().Contains(meal, StringComparer.OrdinalIgnoreCase)) == true)
+            throw new ArgumentException("Invalid meal times.", nameof(request));
+        if (InvalidTags(request.IncludedTags) || InvalidTags(request.ExcludedTags))
+            throw new ArgumentException("Invalid tags.", nameof(request));
+    }
+
+    private static bool InvalidTags(List<string>? tags) =>
+        tags?.Count > 20 || tags?.Any(tag =>
+            string.IsNullOrWhiteSpace(tag) || tag.Length > 50) == true;
 }

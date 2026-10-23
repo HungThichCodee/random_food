@@ -6,7 +6,6 @@ namespace FoodMatch.Application.DTOs.TempUser;
 public class TempUserDto
 {
     public Guid Id { get; set; }
-    public string SessionToken { get; set; } = string.Empty;
     public string Token { get; set; } = string.Empty; // JWT Token
     public string DisplayName { get; set; } = string.Empty;
     public string? Gender { get; set; }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FoodMatch.Application.Interfaces;
 using FoodMatch.Application.DTOs.Report;
+using System.Security.Claims;
 
 namespace FoodMatch.Api.Controllers;
 
@@ -23,7 +24,7 @@ public class ReportsController : ControllerBase
     {
         try
         {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var reporterId))
             {
                 return Unauthorized("Invalid user token.");
@@ -40,9 +41,13 @@ public class ReportsController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch (Exception ex)
+        catch (UnauthorizedAccessException)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return Forbid();
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An internal error occurred.");
         }
     }
 }

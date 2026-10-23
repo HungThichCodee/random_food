@@ -25,7 +25,8 @@ public class ExpiredUserCleanupService(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while cleaning up expired TempUsers.");
+                logger.LogError("Expired user cleanup failed: {ErrorType} at {UtcTime:o}",
+                    ex.GetType().Name, DateTime.UtcNow);
             }
 
             // Run every 10 minutes

@@ -11,6 +11,11 @@ public class MatchRequestConfiguration : IEntityTypeConfiguration<MatchRequest>
         builder.ToTable("match_requests");
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Status).HasConversion<string>();
+        builder.Property(m => m.MeetingPlaceId).HasMaxLength(64);
+        builder.Property(m => m.MeetingPlaceName).HasMaxLength(120);
+        builder.Property(m => m.MeetingPlaceCategory).HasMaxLength(32);
+        builder.Property(m => m.MeetingPlaceGoogleMapsUrl).HasMaxLength(2048);
+        builder.Property(m => m.Version).IsRowVersion();
 
         builder.HasOne(m => m.FromTempUser)
                .WithMany(u => u.SentMatchRequests)

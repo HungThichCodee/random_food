@@ -4,6 +4,7 @@ public class FoodResponseDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
     public string Category { get; set; } = string.Empty;
     public string CuisineType { get; set; } = string.Empty;
     public string AvgPriceRange { get; set; } = string.Empty;

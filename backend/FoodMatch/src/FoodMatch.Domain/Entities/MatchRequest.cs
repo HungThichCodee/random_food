@@ -19,7 +19,20 @@ public class MatchRequest
     // Location sharing state
     public bool FromUserSharedLocation { get; set; }
     public bool ToUserSharedLocation { get; set; }
+    public DateTime? FromUserSharedAt { get; set; }
+    public DateTime? ToUserSharedAt { get; set; }
     public DateTime? LocationSharedAt { get; set; }
+
+    // A meeting place proposed by one participant and confirmed by the other.
+    public string? MeetingPlaceId { get; set; }
+    public string? MeetingPlaceName { get; set; }
+    public string? MeetingPlaceCategory { get; set; }
+    public double? MeetingPlaceLat { get; set; }
+    public double? MeetingPlaceLng { get; set; }
+    public string? MeetingPlaceGoogleMapsUrl { get; set; }
+    public Guid? MeetingPlaceProposedBy { get; set; }
+    public DateTime? MeetingPlaceAgreedAt { get; set; }
+    public uint Version { get; set; }
 
     // Navigation
     public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();

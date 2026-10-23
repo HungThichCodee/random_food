@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Security.Claims;
 
 namespace FoodMatch.Api.Middlewares;
 
@@ -7,13 +8,11 @@ public class GlobalExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionMiddleware> _logger;
-    private readonly IHostEnvironment _env;
 
-    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger, IHostEnvironment env)
+    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
-        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -24,7 +23,10 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception has occurred.");
+            var claimedId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var actor = Guid.TryParse(claimedId, out var id) ? id.ToString() : "anonymous";
+            _logger.LogError("Unhandled {ExceptionType} for actor {ActorId} at {UtcTime:o}",
+                ex.GetType().Name, actor, DateTime.UtcNow);
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -41,13 +43,18 @@ public class GlobalExceptionMiddleware
         else if (exception is KeyNotFoundException)
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
         else if (exception is UnauthorizedAccessException)
-            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 
         var response = new
         {
             statusCode = context.Response.StatusCode,
-            message = exception.Message,
-            details = _env.IsDevelopment() ? exception.StackTrace : "An unexpected error occurred. Please try again later."
+            message = context.Response.StatusCode switch
+            {
+                400 => "Invalid request.",
+                403 => "Access denied.",
+                404 => "Resource not found.",
+                _ => "An unexpected error occurred."
+            }
         };
 
         var jsonResponse = JsonSerializer.Serialize(response);

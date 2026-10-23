@@ -1,257 +1,47 @@
-# 📋 Food Match — Implementation Plan (Chi Tiết Từng Bước)
+# Kế hoạch hoàn thiện trước deploy
 
-> Mỗi bước (~30 phút) là 1 đơn vị code nhỏ. Sau mỗi bước PHẢI self-check: build, fix lỗi, update memory.
-> **QUY TẮC BẮT BUỘC TRƯỚC KHI PUSH CODE (Pre-Push Checklist)**:
-> 1. Build project thành công (không lỗi).
-> 2. Chạy test từng chức năng của phase đang tiến hành.
-> 3. Kiểm tra UI/UX đảm bảo khớp hoàn toàn với thiết kế Stitch MCP.
-> 4. Rà soát đánh giá các quy chuẩn web app (Try-Catch, Validate, Rate Limit, SEO...).
-> Chỉ khi thoả mãn tất cả các điều kiện trên mới được push code.
+Trạng thái: **preflight local đạt, có thể bắt đầu deploy staging sau khi duyệt diff; production chưa được xác nhận**. Mỗi ô [x] cần bằng chứng từ mã, test và chạy thực tế; không kế thừa tiến độ cũ.
 
----
+## P0 — baseline và mô hình đe dọa
 
-## Phase 0 — Environment Setup
-- [x] P0.1 — Tạo cấu trúc monorepo (backend + frontend folders) ✅
-- [x] P0.1b — Khởi tạo Git repo (`git.exe init`, initial commit)
-- [x] P0.2 — Setup .gitignore, docker-compose.yml ✅
-- [x] P0.3 — Setup React project (Vite + TS), package.json, cấu trúc thư mục ✅
-- [x] P0.4 — Setup .NET solution, 4 projects Clean Architecture + test project ✅
-- [x] P0.5 — Cấu hình project references (.csproj) ✅
-- [x] P0.6 — Setup .claude configs (CLAUDE.md, memory.md, rules, agents, skills) ✅
-- [x] P0.7 — npm install frontend dependencies (274 packages) ✅
-- [x] P0.8 — Docker compose up PostgreSQL local (container running) ✅
-- [x] P0.9 — Cài .NET 10 SDK (v10.0.401) ✅
-- [x] P0.10 — Verify `dotnet.exe build` passes (0 errors, 9 warnings — stubs) ✅
-- [x] P0.11 — Verify `npm.cmd run dev` starts Vite dev server ✅
+- [x] Ghi danh sách REST/SignalR, dữ liệu vào/ra, danh tính, quyền sở hữu và đường đi của tọa độ/JWT trong [`api_inventory.md`](api_inventory.md), đối chiếu controller/hub/DTO/service ngày 20/10/2026. Kiểm thử runtime trên production vẫn là cổng riêng.
+- [x] Chạy backend Release build + tests, frontend lint/build và audit. Bằng chứng mới nhất 23/10/2026: backend **85/85 test, 0 skip** trên PostgreSQL thử nâng cấp; frontend `npm ci`, lint, release build với key, hai audit 0 lỗ hổng và Edge 390×844 đạt. NuGet không báo gói dễ tổn thương ở lần rà trước; trình duyệt thật vẫn là cổng riêng.
+- [x] Kiểm tra migration trên PostgreSQL thử sạch và DB thử nâng từ `AddMeetingPlaceChoice` đến `AddGoogleMeetingPlaceLink` (2026-10-20); thêm phép thử nâng từ `AddGoogleMeetingPlaceLink` lên `IndependentLocationConsent` ngày 21/10/2026, xác nhận mốc hết hạn cũ được giữ và trạng thái một phía không rõ thời điểm bị đặt lại. API startup/health đã đạt ở bước trước. Cần review lại trên bản sao DB production trước deploy; không áp dụng SQL thủ công trùng EF migrations.
 
----
+## P1 — backend và dữ liệu
 
-> **Lưu ý Phase 1:** Entities đã có file nhưng dùng `string` cho Category/Status/MealTime/PriceRange thay vì enum type. Phase 1 cần review và chuyển sang dùng enum đã định nghĩa trong Enums/.
-> **Lưu ý Phase 2:** EF Configs có file nhưng thiếu enum conversion, geo indexes. Repository.cs là stub (throw NotImplementedException). Services cũng là stub.
+- [ ] Xác minh quyền owner/member và thời hạn hồ sơ tạm trên mọi endpoint/hub nhạy cảm; test A/B/người thứ ba và token hết hạn. Smoke A/B/C trên REST/WebSocket ngày 21–22/10/2026 đạt: C không sửa GPS/visibility A, không đọc match/chat, không dùng share/stop/gợi ý/đề xuất/xác nhận quán, không gửi báo cáo ngoài cặp; pending/active list không lộ match cho C; A không phản hồi lời mời của chính mình hoặc tự xác nhận điểm hẹn. Khi A hết hạn và B còn hạn, API match detail/active trả 404, chat history trả 403; pending không còn lời mời từ người hết hạn. Edge 390×844 ngày 23/10 xác nhận B đang mở chat tự chuyển về `/buddies`, gỡ nội dung chat và iframe điểm hẹn khi A hết hạn trên máy chủ. JWT ngắn tự đóng WebSocket, không reconnect bằng token cũ và REST trả 401. Cần thử reconnect và hồ sơ hết hạn trên hai điện thoại thật, kiểm tra mọi endpoint trên production.
+- [ ] Validate kiểu, độ dài, phạm vi, số hữu hạn, ID, kích thước request ở DTO và service: đã giới hạn body 64 KiB, danh sách tag/sở thích, session ID; thiếu lat/lng trả 400 thay vì dùng 0. Đã sửa `RespondMatchDto.Accept` thành bool nullable + required để `{}` trả 400, lời mời còn Pending trong smoke API thật ngày 20/10/2026. Lời mời match giờ yêu cầu GPS đã lưu của cả hai và người nhận ở trong 3 km; test service + smoke API thật ngày 23/10 đạt. Cần rà hết các endpoint còn lại.
+- [ ] DTO trả đúng các trường FE cần; tách token/session token khỏi response thông thường; test JSON và không lộ tọa độ sai quyền. Smoke API/WebSocket thật xác nhận nearby không có lat/lng, không còn khoảng cách chi tiết hay bán kính query tùy ý; match trả buddy lat/lng ngay khi riêng buddy chia sẻ, và response match/chat/nearby/điểm hẹn không chứa trường token/sessionToken/JWT secret; match không trả tọa độ của chính caller. Chủ dự án chấp nhận tín hiệu gần đúng “Trong 3 km” trước khi chia sẻ. Edge 390×844 ngày 23/10 đã xác nhận nhãn này trên danh sách B, không hiện tọa độ hoặc tràn ngang; vẫn cần kiểm tra FE trên hai điện thoại.
+- [x] Rà truy vấn và thao tác nhiều bản ghi trong source ngoài migrations: chỉ dùng EF LINQ/repository; không có raw SQL nhận input. Xóa hồ sơ và seed nhiều bản ghi đều dùng transaction; PostgreSQL test xác nhận rollback, `xmin` từ chối ghi cũ, seed khôi phục trạng thái chỉ có tag và chạy lại không nhân đôi (2026-10-20). Migrations production vẫn cần backup/review riêng.
+- [ ] Lỗi trả status thống nhất; audit log có actor/thời gian/lý do, không log secret, vị trí hoặc chat. Middleware đã trả mã lỗi chung và log actor/type/time không kèm exception; FE không log nguyên Axios/SignalR error. API quay món trả 404 khi bộ lọc hợp lệ nhưng không có món đang hoạt động; bật/tắt chia sẻ vị trí cũng trả 404 nếu match đã bị xóa. Đã có test controller cho các trường hợp này. Cần rà handler còn lại và log production.
+- [ ] Review chiến lược phiên: JWT hiện ở sessionStorage, không còn persist GPS; JavaScript vẫn đọc được token. App xóa hồ sơ đúng hạn, kể cả khi tab trở lại từ nền; guard gỡ chat và đường đi riêng tư khỏi DOM, listener đóng popup. Edge 390×844 đã xác nhận phiên giả lập hết hạn khi đang ở chat và route đều về trang hồ sơ; chưa kiểm tra hành vi tab bị hệ điều hành treo trên điện thoại thật. Smoke WebSocket local ngày 21/10/2026 không thấy `access_token=` trong log stdout/stderr API. Cần xác minh CSP/XSS và log query token SignalR ở tầng Render trên domain triển khai. Nếu chuyển cookie thì có Secure/HttpOnly/SameSite và CSRF.
 
-## Phase 1 — Domain Layer (Entities + Enums)
-- [x] P1.1 — Review/hoàn thiện entity `Food.cs` (properties, navigation props) ✅
-- [x] P1.2 — Review/hoàn thiện entity `FoodTag.cs` + `FoodFoodTag.cs` (many-to-many) ✅
-- [x] P1.3 — Review/hoàn thiện entity `Restaurant.cs` ✅
-- [x] P1.4 — Review/hoàn thiện entity `TempUser.cs` (UUID PK, expires_at, status) ✅
-- [x] P1.5 — Review/hoàn thiện entity `MatchRequest.cs` ✅
-- [x] P1.6 — Review/hoàn thiện entity `ChatMessage.cs` ✅
-- [x] P1.7 — Review/hoàn thiện entity `FoodSuggestionLog.cs` ✅
-- [x] P1.8 — Review/hoàn thiện entity `UserReport.cs` ✅
-- [x] P1.9 — Review/hoàn thiện tất cả Enums (FoodCategory, MealTime, PriceRange, UserStatus, MatchStatus) ✅
-- [x] P1.10 — ✅ BUILD CHECK: `dotnet.exe build` → 0 errors ✅
+## P2 — vị trí và tính năng nổi bật
 
----
+- [x] Loại bỏ helper offset cũ, giữ đúng tọa độ đã đo; test tọa độ nhiều chữ số thập phân và từ chối NaN/Infinity. GPS đầu tiên cho phép xuất hiện ở nearby; các lần cập nhật tiếp theo không bật lại hồ sơ người dùng đã ẩn. Unit test và smoke API thật đã xác nhận lựa chọn ẩn/hiện được giữ. Bằng chứng: `TempUserService.cs`, `TempUserServiceTests.cs`, bộ 74/74 test trên PostgreSQL thử (2026-10-22).
+- [x] Test REST/SignalR chỉ trả tọa độ của người tự chia sẻ khi match accepted, quyền của người đó còn hạn và người nhận thuộc match. Smoke WebSocket và REST trên PostgreSQL thử ngày 21/10/2026 đạt: B thấy đúng GPS A khi chỉ A chia sẻ; A chưa thấy B; sau khi B chia sẻ, cả hai thấy nhau; A thu hồi thì B mất A nhưng A vẫn thấy B. Script mô phỏng A hết hạn riêng khi B vẫn còn chia sẻ: A tiếp tục thấy B, B mất A, điểm hẹn bị ẩn; sau đó mô phỏng cả hai hết hạn. Gợi ý quán yêu cầu cả hai. Người thứ ba không nhận tọa độ. Cổng hai điện thoại và production ở ô riêng.
+- [x] Gỡ tọa độ đối phương khỏi FE state/route khi thu hồi hoặc hết hạn: route chỉ giữ match ID; route và chat tải lại quyền qua API mỗi 10 giây và nhận SignalR. Guard yêu cầu hồ sơ còn hạn cho chat và route riêng, gỡ DOM ngay khi App xóa phiên; Edge viewport 390×844 đã xác nhận chat, route iframe và popup lời mời biến mất sau thời hạn giả lập. Chưa kiểm chứng trên hai máy thật.
+- [x] Trang bản đồ và chỉ đường ưu tiên GPS đang đo của chính thiết bị thay vì giữ tọa độ hồ sơ lúc mở trang; không làm tròn/offset số đo. Edge 390×844 ngày 22/10/2026 xác nhận cả hai iframe đổi đúng tâm/điểm xuất phát khi GPS giả lập thay đổi, kể cả khi hồ sơ lưu tọa độ cũ. Cần kiểm tra tần suất tải lại iframe khi di chuyển trên điện thoại thật.
+- [ ] Xây **gợi ý điểm hẹn cho cặp đã match**: Google Maps iframe hiển thị quán quanh điểm giữa; A dán tên và liên kết quán, B xác nhận. Danh sách OSM chỉ bổ sung khi cấu hình Overpass riêng; mặc định mọi môi trường không gọi Overpass công khai và endpoint mặc định `overpass-api.de` bị từ chối. Đề xuất chỉ hiển thị khi hai bên còn chia sẻ. API/SignalR thật đã kiểm chứng đề xuất, xác nhận và xóa sau thu hồi trên PostgreSQL thử. URL Google Maps được tính lại từ GPS mới nhất sau khi nguồn gợi ý trả về; nếu GPS đổi trong lúc chờ, danh sách OSM theo tâm cũ bị bỏ. Test controller xác nhận điểm giữa mới. Edge viewport 390×844 ngày 22/10/2026 đã tải iframe với query/tâm đúng điểm giữa, zoom 15 khi không cấu hình Overpass; nút mở Google Maps cũng dùng đúng query điểm giữa, không tràn ngang; ảnh `docs/screenshots/mobile-meeting.png`. Ngày 23/10 thêm chế độ Google Maps Embed API search chính thức khi có key giới hạn theo domain; unit test URL/điểm giữa đạt, nhưng key thật và kết quả quán trên hai điện thoại chưa được kiểm chứng. Cần kiểm tra danh sách Google Maps, sao chép liên kết và xác nhận trên hai điện thoại trước khi đánh dấu hoàn tất.
+- [ ] Kiểm thử hai điện thoại: tọa độ và điểm hẹn đồng bộ; GPS đổi, thu hồi, hết hạn, mạng gián đoạn, SignalR reconnect. FE hiện làm mới iframe/gợi ý quán mỗi khoảng 30 giây khi hai bên còn chia sẻ, có nút làm mới thủ công. Provider SignalR đã bỏ nhánh skip làm hỏng React StrictMode; tự thử lại khi khởi động offline và reconnect mỗi 5 giây khi JWT còn hạn. Edge headless với viewport 390×844 đã xác nhận vòng quay đủ bốn bộ lọc, lọc Ngọt, quay ra kết quả, món dưới kim trùng món trong modal và không tràn ngang; ảnh lưu trong `docs/screenshots/` ngày 21/10/2026. Vòng quay 62 món giờ dựng 4 bản sao (248 thẻ) thay vì 5 (310); các trang tải theo route, gói JS đầu giảm khoảng 629 xuống 534 KB trước nén. Cùng phép thử đã đổi GPS B qua API thật và đợi URL iframe A chuyển đúng điểm giữa mới; sau khi A thu hồi chia sẻ, iframe và thẻ đề xuất biến mất trên UI. Ngắt mạng tab A và đóng cả hai WebSocket, B gửi tin và C gửi lời mời match khi A offline: sau khi mạng trở lại, A tự nối lại, tải bù tin bị lỡ, hiện popup lời mời và nhận tin mới qua hub mà không tải lại trang. Chạy lại Edge ngày 22/10/2026: popup lời mời từ C tự biến mất sau khi hồ sơ C hết hạn, không cần reload. Vẫn cần hai thiết bị thật và kiểm tra giới hạn request trên production.
 
-## Phase 2 — Infrastructure Layer (Database + EF Core)
-- [x] P2.1 — Hoàn thiện `FoodMatchDbContext.cs` (DbSets, OnModelCreating) ✅
-- [x] P2.2 — Hoàn thiện EF Config: `FoodConfiguration.cs` (indexes, constraints, enum conversion) ✅
-- [x] P2.3 — Hoàn thiện EF Config: `FoodTagConfiguration.cs` + `FoodFoodTagConfiguration.cs` ✅
-- [x] P2.4 — Hoàn thiện EF Config: `RestaurantConfiguration.cs` (geo indexes) ✅
-- [x] P2.5 — Hoàn thiện EF Config: `TempUserConfiguration.cs` (UUID, geo indexes, status) ✅
-- [x] P2.6 — Hoàn thiện EF Config: `MatchRequestConfiguration.cs` ✅
-- [x] P2.7 — Hoàn thiện EF Config: `ChatMessageConfiguration.cs` ✅
-- [x] P2.8 — Hoàn thiện EF Config: `FoodSuggestionLogConfiguration.cs` + `UserReportConfiguration.cs` ✅
-- [x] P2.9 — Tạo EF Migration: `dotnet.exe ef migrations add InitialCreate` ✅
-- [x] P2.10 — Apply Migration: `dotnet.exe ef database update` ✅
-- [x] P2.11 — Hoàn thiện `Repository.cs` (Generic CRUD: GetAll, GetById, Add, Update, Delete) ✅
-- [x] P2.12 — Register DbContext + Repository trong DI (Program.cs hoặc extension method) ✅
-- [x] P2.13 — ✅ BUILD CHECK + DB CHECK: build passes, database created with tables ✅
+## P3 — chống lạm dụng và FE
 
----
+- [ ] Rate limit theo IP sau proxy tin cậy và theo account/session phù hợp cho tạo hồ sơ, match, chat, report, cập nhật vị trí và SignalR; 429 + Retry-After. Ngày 23/10/2026 đã thêm hạn mức IP chung 240 request/phút/instance cho mọi request trừ health, bên cạnh policy theo hồ sơ/endpoint. Hai test xác nhận nhiều hồ sơ cùng IP chia sẻ bucket, IP khác có bucket riêng và health không tiêu hao hạn mức; smoke local năm policy vẫn đạt trên API thật. Trên public Render, `CF-Connecting-IP` do edge ghi đè; vẫn cần thử proxy với hai IP thật và dùng kho giới hạn phân tán trước khi tăng nhiều instance.
+- [ ] CAPTCHA/Turnstile cho tạo hồ sơ hoặc thao tác dễ bị bot: backend đã hỗ trợ allowlist hostname chính xác cho Production/staging, từ chối wildcard/URL/IP; 15 test verifier đạt. Smoke API/SignalR local và full suite 85/85 trên PostgreSQL thử đạt 23/10/2026. Cần thử widget và khóa thật trên HTTPS, kể cả token hết hạn/dùng lại.
+- [ ] CORS allowlist chính xác, HTTPS/WSS, security headers và CSP: đã cấu hình allowlist, kiểm tra Origin của WebSocket, HSTS/header và CSP Vercel cho Turnstile/Google Maps. `frontend/vercel.mjs` sinh `connect-src` từ origin HTTPS chính xác của API/SignalR, từ chối URL HTTP/path; `img-src` và bộ lọc ảnh món cùng dùng hai nguồn mặc định và các origin HTTPS được cấu hình. `npm run check:vercel`, lint/build đạt với CDN mẫu; origin HTTP có path bị từ chối. Smoke local ngày 21/10/2026 xác nhận preflight origin được duyệt có `Access-Control-Allow-Origin` đúng, origin ngoài allowlist không có header này và WebSocket `Upgrade` từ origin lạ nhận 403. Cần xác minh trình duyệt và response header trên HTTPS thật.
+- [x] Rà React text rendering, URL/iframe từ dữ liệu ngoài: không có `dangerouslySetInnerHTML`, `innerHTML`, `eval` trong frontend; React escape nội dung chat/tên; URL iframe được tạo với tiền tố Google Maps cố định và query mã hóa; link quán do người dùng dán được backend giới hạn HTTPS + Google Maps; ảnh món động được FE giới hạn HTTPS (2026-10-20). CSP trên domain thật vẫn cần kiểm tra riêng.
+- [ ] Secret chỉ trong kho biến môi trường; nếu phát hiện đã lộ thì thu hồi/rotate và kiểm tra log/history. Rà local ngày 20/10/2026: `.env`/`frontend/.env` nằm trong `.gitignore`, không có đường dẫn này trong lịch sử Git hiện có; scan mẫu token phổ biến trên file đã track không tìm thấy chuỗi khớp. Chưa kiểm tra log Render/Vercel hoặc kho secret production.
+- [x] Xử lý audit dependency build-time: `follow-redirects` production đã vá lên 1.16.1, Vite lên 6.4.5, frontend chính nâng Tailwind 4.3.3 và `@tailwindcss/postcss` 4.3.3; bỏ Autoprefixer không còn dùng. CSS reset chuyển vào `@layer base`, màu liên kết Google Maps được đặt rõ khi Ant Design Mobile ghi đè. Ngày 22/10/2026, `npm ci`, lint/build, Edge 390×844 và audit đầy đủ/production đều đạt với 0 lỗ hổng. Vẫn phải xác nhận điện thoại mục tiêu chạy Safari 16.4+, Chrome 111+ hoặc Firefox 128+; xem [`docs/release-review.md`](../docs/release-review.md).
+- [ ] Nếu thêm đơn hàng/mật khẩu/email: áp dụng đầy đủ các quy tắc điều kiện trong `rules/security.md` trước khi merge.
 
-## Phase 3 — Seed Data (50 Món Ăn Việt Nam)
-- [x] P3.1 — Code seed food tags: cay, chay, healthy, ngot, man, chien, hap, nuong, hai_san, thit, rau, do_uong ✅
-- [x] P3.2 — Code seed 25 món ăn đầu tiên (phở, bún bò, cơm tấm, bánh mì...) ✅
-- [x] P3.3 — Code seed 25 món ăn còn lại ✅
-- [x] P3.4 — Code seed food-tag relationships (mỗi món gắn 2-4 tags) ✅
-- [x] P3.5 — Gọi DataSeeder.SeedAsync() trong Program.cs khi startup ✅
-- [x] P3.6 — ✅ BUILD CHECK + SEED CHECK: verify database có 50 foods + tags ✅
+## P4 — cổng phát hành
 
----
+Maps Embed và CI/CD cập nhật 23/10/2026: đã thêm `view/search/directions` cho các trang Bản đồ/Đường đi, lọc tìm quán ở Chat, release build bắt buộc key và workflow `release.yml` thủ công cho staging/production. Local Release build 0 warning/error, PostgreSQL migration + 85/85 test 0 skip, `npm ci`, lint, build, hai audit 0 lỗ hổng và `check:vercel` với origin HTTPS mẫu đạt; YAML hai workflow parse được. GitHub Actions, Render/Vercel, Turnstile thật và hai điện thoại trên staging vẫn chưa được kiểm chứng. Quy trình tại [`skills/deploy.md`](skills/deploy.md), phạm vi tại [`../docs/maps-embed-plan.md`](../docs/maps-embed-plan.md).
 
-## Phase 4 — Application Layer Services (Group A — Food)
-- [x] P4.1 — Code DTOs: `FoodResponseDto`, `FoodRandomRequestDto`, `FoodSuggestRequestDto` ✅
-- [x] P4.2 — Code `IFoodService` interface (nếu cần update) ✅
-- [x] P4.3 — Code `FoodService.GetRandomFoodAsync()` — random toàn bộ, tránh trùng trong phiên ✅
-- [x] P4.4 — Code `FoodService.GetRandomByCategoryAsync(category)` — random theo khô/nước ✅
-- [x] P4.5 — Code `FoodService.SuggestFoodsAsync(criteria)` — lọc theo tag, giá, giờ ăn ✅
-- [x] P4.6 — Code `FoodSuggestionLog` logging — lưu lịch sử random tránh trùng ✅
-- [x] P4.7 — ✅ BUILD CHECK ✅
-
----
-
-## Phase 5 — API Layer Controllers (Group A — Food)
-- [x] P5.1 — Code `FoodsController.GetRandom()` — `GET /api/foods/random` ✅
-- [x] P5.2 — Code `FoodsController.GetRandomByCategory()` — `GET /api/foods/random?category=kho|nuoc` ✅
-- [x] P5.3 — Code `FoodsController.Suggest()` — `POST /api/foods/suggest` ✅
-- [x] P5.4 — Register FoodService trong DI ✅
-- [x] P5.5 — ✅ BUILD CHECK + SWAGGER TEST: verify 3 endpoints hoạt động qua Swagger ✅
-
----
-
-## Phase 6 — Frontend (Group A — Random Món Ăn)
-- [x] P6.1 — Code `axiosClient.ts` — base URL, interceptors, error handling ✅
-- [x] P6.2 — Code `foodApi.ts` — gọi 3 API endpoints food ✅
-- [x] P6.3 — Code `useFoodStore.ts` — Zustand store cho food state ✅
-- [x] P6.4 — Tích hợp **Stitch MCP Design System** — cài đặt mã màu, font, CSS variables theo chuẩn Mobile-First (Glassmorphism, Neon). ✅
-- [x] P6.5 — Code `AppLayout.tsx` — layout chung, TabBar (Bottom Navigation) dùng antd-mobile ✅
-- [x] P6.6 — Code `HomePage.tsx` — landing page, navigation cards (tuân thủ UI/UX từ Stitch) ✅
-- [x] P6.7 — Code `RandomFoodPage.tsx` — spin wheel animation, hiển thị kết quả dạng Card (antd-mobile) ✅
-- [x] P6.8 — Code `SuggestFoodPage.tsx` — form chọn tiêu chí, hiển thị gợi ý (dùng Form, Button, Selector của antd-mobile) ✅
-- [x] P6.8 — Setup i18n config (`i18n/index.ts`) ✅
-- [x] P6.9 — Thêm translation keys cho pages đã code (vi.json + en.json) ✅
-- [x] P6.10 — ✅ BUILD CHECK: `npx.cmd tsc --noEmit` passes ✅
-
----
-
-## Phase 7 — Restaurant Service + Map (Group A — A3, A4)
-- [x] P7.1 — Code DTOs: `RestaurantResponseDto`, `NearbyRequestDto`
-- [x] P7.2 — Code `IOverpassApiService` + `OverpassApiService` — gọi Overpass API tra quán ăn
-- [x] P7.3 — Code `IRestaurantService` + `RestaurantService` — lưu cache vào DB, query nearby
-- [x] P7.4 — Code `RestaurantService.GetNearbyAsync(lat, lng, radius)`
-- [x] P7.5 — Code `RestaurantService.GetBuffetInMallAsync(lat, lng)`
-- [x] P7.6 — Code `RestaurantsController` — `GET /api/restaurants/nearby`, `GET /api/restaurants/buffet-mall`
-- [x] P7.7 — Register services trong DI + HttpClient cho Overpass
-- [x] P7.8 — ✅ BUILD CHECK + SWAGGER TEST
-- [x] P7.9 — 🔧 FIX BẮT BUỘC: Thêm strict validation và try-catch toàn bộ cho Controller/Service (lỗi lặp lại)
-
----
-
-## Phase 8 — Frontend Map + Restaurant (Group A)
-- [x] P8.1 — Code `useGeolocation.ts` hook — request browser location
-- [x] P8.2 — Code `MapPage.tsx` — Leaflet map, user location marker
-- [x] P8.3 — Code component hiển thị restaurant markers trên map
-- [x] P8.4 — Code popup thông tin quán ăn khi click marker
-- [x] P8.5 — Code `restaurantApi.ts` — gọi API nearby + buffet
-- [x] P8.6 — Thêm translation keys cho Map (vi.json + en.json)
-- [x] P8.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 9 — Temp User Profile (Group B)
-- [x] P9.1 — Code DTOs: `CreateTempUserDto`, `TempUserResponseDto`, `UpdateLocationDto`
-- [x] P9.2 — Code `ITempUserService` + `TempUserService.CreateAsync()` — tạo profile tạm
-- [x] P9.3 — Code `TempUserService.UpdateLocationAsync()` — cập nhật vị trí (offset ngẫu nhiên)
-- [x] P9.4 — Code `TempUserService.GetNearbyUsersAsync()` — lấy users gần đó (visible only)
-- [x] P9.5 — Code `TempUserService.DeactivateExpiredAsync()` — xoá/ẩn users hết hạn
-- [x] P9.6 — Code `TempUsersController` — POST, PUT location, GET nearby
-- [x] P9.7 — Code `ExpiredUserCleanupService` (BackgroundService) — job chạy định kỳ xoá hết hạn
-- [x] P9.8 — Register services + background job trong DI
-- [x] P9.9 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 10 — Frontend Profile (Group B)
-- [x] P10.1 — Code `CreateProfilePage.tsx` — form nhập tên, giới tính, sở thích, món muốn ăn
-- [x] P10.2 — Code `useUserStore.ts` — Zustand store cho temp user state
-- [x] P10.3 — Code `tempUserApi.ts` — gọi API tạo profile, update location
-- [x] P10.4 — Code hiển thị nearby users trên map (markers với offset)
-- [x] P10.5 — Thêm translation keys cho Profile (vi.json + en.json)
-- [x] P10.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 11 — SignalR Real-time (Group C — Setup)
-- [x] P11.1 — Code `LocationHub.cs` — nhận/broadcast vị trí real-time
-- [x] P11.2 — Code `MatchHub.cs` — gửi/nhận lời mời match
-- [x] P11.3 — Code `ChatHub.cs` — gửi/nhận tin nhắn real-time
-- [x] P11.4 — Uncomment MapHub lines trong Program.cs, register hubs
-- [x] P11.5 — Code `useSignalR.ts` hook — connect, disconnect, event handlers
-- [x] P11.6 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 12 — Match System (Group C — C1, C2, C3)
-- [x] P12.1 — Code DTOs: `MatchRequestDto`, `MatchResponseDto`, `RespondMatchDto`
-- [x] P12.2 — Code `IMatchService` + `MatchService.SendRequestAsync()` — gửi lời mời
-- [x] P12.3 — Code `MatchService.RespondAsync()` — đồng ý/từ chối
-- [x] P12.4 — Code `MatchService.GetPendingRequestsAsync()` — lấy lời mời đang chờ
-- [x] P12.5 — Code `MatchRequestsController` — POST, PUT respond, GET pending
-- [x] P12.6 — Tích hợp SignalR push notification khi có lời mời mới
-- [x] P12.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 13 — Chat System (Group C — C3)
-- [x] P13.1 — Code DTOs: `ChatMessageDto`, `SendMessageDto`
-- [x] P13.2 — Code `IChatService` + `ChatService` — gửi/lấy tin nhắn, lưu DB
-- [x] P13.3 — Code `ChatController` — GET messages by match
-- [x] P13.4 — Tích hợp ChatHub — real-time send/receive
-- [x] P13.5 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 14 — Frontend Match + Chat (Group C)
-- [x] P14.1 — Code `useMatchStore.ts` — Zustand store cho match state
-- [x] P14.2 — Code `matchApi.ts` + `chatApi.ts` — gọi API
-- [x] P14.3 — Code UI gửi lời mời ăn cùng (click user trên map → popup → nút mời) (✅ UI Done)
-- [x] P14.4 — Code UI thông báo real-time khi nhận lời mời (✅ UI Done)
-- [x] P14.5 — Code UI đồng ý/từ chối lời mời (✅ UI Done)
-- [x] P14.6 — Code Chat popup/drawer — giao diện chat real-time (✅ UI Done)
-- [x] P14.7 — Thêm translation keys cho Match + Chat
-- [x] P14.8 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 15 — Routing + Report (Group C — C4, C5)
-- [x] P15.1 — Code `IRoutingService` + `OsrmRoutingService` — gọi OSRM API lấy route
-- [x] P15.2 — Code `RoutingController` — GET route between 2 points
-- [x] P15.3 — Code vẽ route trên Leaflet map (polyline) (✅ UI Done)
-- [x] P15.4 — Code `IReportService` + `ReportService` — báo cáo/chặn user
-- [x] P15.5 — Code `ReportsController` — POST report
-- [x] P15.6 — Code UI nút báo cáo/chặn user (✅ UI Done)
-- [x] P15.7 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 16 — Error Handling + Middleware
-- [x] P16.1 — Code `GlobalExceptionMiddleware` — catch unhandled exceptions, return consistent error JSON
-- [x] P16.2 — Code custom exception classes: `NotFoundException`, `BadRequestException`
-- [x] P16.3 — Register middleware trong Program.cs
-- [x] P16.4 — ✅ PRE-PUSH CHECK: Build, Test, UI/UX, Standards
-
----
-
-## Phase 17 — Unit Tests
-- [x] P17.1 — Setup test project: add references, install xUnit/Moq/FluentAssertions
-- [x] P17.2 — Code tests cho `FoodService` (random, suggest, category filter)
-- [x] P17.3 — Code tests cho `TempUserService` (create, expire, location offset)
-- [x] P17.4 — Code tests cho `MatchService` (send, respond, status transitions)
-- [x] P17.5 — ✅ TEST CHECK: `dotnet.exe test` → all tests pass
-
----
-
-## Phase 18 — Polish + Final Check
-- [x] P18.1 — Review responsive UI và UX trên mobile (đơn giản, tinh tế, Glassmorphism)
-- [x] P18.2 — Hoàn thiện tất cả translation keys (vi + en)
-- [x] P18.3 — Code README.md — kiến trúc, hướng dẫn chạy local, tech stack
-- [x] P18.4 — Final build: backend `dotnet.exe build -c Release` + frontend `npm run build`
-- [x] P18.5 — ✅ FINAL CHECK: 0 errors, 0 warnings, UI/UX perfect, no mock data
-
----
-
-## Summary
-| Phase | Mô tả | Số bước | Trạng thái |
-|---|---|---|---|
-| P0 | Environment Setup | 11 | ✅ Hoàn thành |
-| P1 | Domain Entities + Enums | 10 | ✅ Hoàn thành |
-| P2 | Infrastructure (DB + EF Core) | 13 | ✅ Hoàn thành |
-| P3 | Seed Data | 6 | ✅ Hoàn thành |
-| P4 | Food Service (Backend) | 7 | ✅ Hoàn thành |
-| P5 | Food Controller (API) | 5 | ✅ Hoàn thành |
-| P6 | Food Frontend | 10 | ✅ Hoàn thành |
-| P7 | Restaurant Service + API | 9 | ✅ Hoàn thành |
-| P8 | Map Frontend | 7 | ✅ Hoàn thành |
-| P9 | TempUser Service + API | 9 | ✅ Hoàn thành |
-| P10 | Profile Frontend | 6 | ✅ Hoàn thành |
-| P11 | SignalR Setup | 6 | ✅ Hoàn thành |
-| P12 | Match System | 7 | ✅ Hoàn thành |
-| P13 | Chat System (Backend) | 5 | ✅ Hoàn thành |
-| P14 | Match + Chat Frontend | 8 | ✅ Hoàn thành |
-| P15 | Routing + Report | 7 | ✅ Hoàn thành |
-| P16 | Error Handling | 4 | ✅ Hoàn thành |
-| P17 | Unit Tests | 5 | ✅ Hoàn thành |
-| P18 | Polish + Final | 5 | ✅ Hoàn thành |
-| P19 | Cố định Bug MVP (Overpass, Jitter) | 4 | ✅ Hoàn thành |
-| **TOTAL** | | **~143 bước** | |
+- [ ] CI GitHub Actions: đã thêm `.github/workflows/verify.yml` cho .NET 10 + PostgreSQL 16 tạm và Node 22, kiểm tra YAML local ngày 22/10/2026; cần lần chạy thật trên GitHub với cả hai job xanh trước phát hành. Workflow không tự deploy.
+- [ ] Hosting không tự phát hành trước review: `frontend/vercel.mjs` đặt `git.deploymentEnabled: false`; cần xác nhận Render Auto-Deploy Off trên dashboard và Vercel không tự deploy khi có push, rồi mới dùng staging/production thủ công sau các cổng phê duyệt.
+- [ ] Build, tests, dependency audit và các kiểm thử bảo mật ở trên đều đạt, hoặc lỗi còn lại được xử lý trước deploy.
+- [ ] Review migration + backup/rollback; health, log, HTTPS, CORS, WebSocket, route refresh và rate limit đều được kiểm tra trên môi trường triển khai. Docker image xây bằng đúng context Render đã đạt local ngày 22/10/2026; image khởi động trên Docker Desktop Linux với database thử riêng và `/api/health` trả Healthy, sau đó xóa container/database thử. Điều này chưa thay thế kiểm tra Render/Supabase thật.
+- [ ] Người dùng duyệt diff và kết quả kiểm thử cụ thể trước push/publish.

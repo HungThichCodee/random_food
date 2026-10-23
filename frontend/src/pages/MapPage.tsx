@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useUserStore } from '../stores/useUserStore';
+import { searchMapUrl, viewMapUrl } from '../utils/mapsEmbed';
+
+const quickSearches = ['Quán ăn', 'Cà phê', 'Món chay'];
 
 export default function MapPage() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useGeolocation();
   const profile = useUserStore((state) => state.profile);
@@ -30,37 +31,18 @@ export default function MapPage() {
     }
   };
 
-  const [initialLoc, setInitialLoc] = useState<{lat: number, lng: number} | null>(null);
-
-  useEffect(() => {
-    if (!initialLoc) {
-      if (profile?.currentLat && profile?.currentLng) {
-        setInitialLoc({ lat: profile.currentLat, lng: profile.currentLng });
-      } else if (location.lat && location.lng) {
-        setInitialLoc({ lat: location.lat, lng: location.lng });
-      }
-    }
-  }, [location.lat, location.lng, profile?.currentLat, profile?.currentLng, initialLoc]);
+  const livePosition = location.lat != null && location.lng != null &&
+    Number.isFinite(location.lat) && Number.isFinite(location.lng);
+  const savedPosition = profile?.currentLat != null && profile.currentLng != null &&
+    Number.isFinite(profile.currentLat) && Number.isFinite(profile.currentLng);
+  const currentLat = livePosition ? location.lat : savedPosition ? profile.currentLat : null;
+  const currentLng = livePosition ? location.lng : savedPosition ? profile.currentLng : null;
 
   const mapSrc = useMemo(() => {
-    // Embed API modes: search, place, directions without using API Key
-    if (searchQuery) {
-      const encodedQuery = encodeURIComponent(searchQuery);
-      if (initialLoc) {
-        // Force the map to STAY centered on the user's exact coordinates using 'll'
-        // This prevents Google Maps from automatically flying away to another district
-        return `https://maps.google.com/maps?q=${encodedQuery}&ll=${initialLoc.lat},${initialLoc.lng}&z=15&output=embed`;
-      }
-      return `https://maps.google.com/maps?q=${encodedQuery}&output=embed`;
-    }
-    
-    // Default fallback to just showing the map at user's location (view mode)
-    if (initialLoc) {
-      return `https://maps.google.com/maps?q=${initialLoc.lat},${initialLoc.lng}&z=15&output=embed`;
-    }
-
-    return "";
-  }, [searchQuery, initialLoc]);
+    const center = currentLat != null && currentLng != null
+      ? { lat: currentLat, lng: currentLng } : null;
+    return searchQuery ? searchMapUrl(searchQuery, center) : viewMapUrl(center);
+  }, [searchQuery, currentLat, currentLng]);
 
   return (
     <div className="h-[100dvh] w-full bg-background relative flex flex-col">
@@ -101,11 +83,31 @@ export default function MapPage() {
             )}
           </form>
         </div>
+        <div className="mx-auto mt-3 flex max-w-[390px] gap-2 overflow-x-auto pb-1" role="group" aria-label="Tìm nhanh trên bản đồ">
+          {quickSearches.map((term) => (
+            <button key={term} type="button" onClick={() => {
+              setInputValue(term);
+              setSearchParams({ search: term });
+            }} aria-pressed={searchQuery === term}
+              className={`min-h-10 shrink-0 rounded-full px-3 text-sm font-semibold ${searchQuery === term
+                ? 'bg-primary-container text-white' : 'bg-surface-container-high text-on-surface-variant'}`}>
+              {term}
+            </button>
+          ))}
+        </div>
+        <p className="mx-auto mt-1 max-w-[390px] text-xs text-on-surface-variant">
+          Google Maps nhận vị trí đang dùng để hiển thị bản đồ.
+        </p>
       </div>
 
       {/* Map Content */}
       <div className="flex-1 w-full relative">
-        {(!location.lat || !location.lng) && location.isLoading && (
+        {mapSrc && !location.isLoading && !livePosition && savedPosition && (
+          <p role="status" className="absolute top-3 inset-x-3 z-20 rounded-xl bg-surface-container-high/95 px-3 py-2 text-body-sm text-on-surface shadow-lg">
+            GPS chưa khả dụng. Bản đồ đang dùng vị trí đã lưu, có thể không còn là vị trí hiện tại.
+          </p>
+        )}
+        {(location.lat == null || location.lng == null) && location.isLoading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-background z-20">
             <span className="material-symbols-outlined text-4xl text-primary animate-spin mb-4">progress_activity</span>
             <p className="text-on-surface-variant text-body-md">Đang lấy vị trí của bạn...</p>
@@ -115,12 +117,13 @@ export default function MapPage() {
         {mapSrc ? (
           <iframe
             src={mapSrc}
+            title={searchQuery ? `Tìm ${searchQuery} trên Google Maps` : 'Vị trí của tôi trên Google Maps'}
             width="100%"
             height="100%"
             style={{ border: 0 }}
-            allowFullScreen={false}
+            allowFullScreen
             loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
+            referrerPolicy="strict-origin-when-cross-origin"
             className="absolute inset-0"
           ></iframe>
         ) : (

@@ -26,11 +26,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         var issuer = _configuration["JwtSettings:Issuer"];
         var audience = _configuration["JwtSettings:Audience"];
 
-        if (string.IsNullOrEmpty(secret))
-        {
-            // Fallback for development if not in appsettings
-            secret = "SuperSecretKeyForFoodMatchApp12345!@#"; 
-        }
+        if (string.IsNullOrWhiteSpace(secret))
+            throw new InvalidOperationException("JwtSettings__Secret is required.");
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -38,13 +35,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("SessionToken", user.SessionToken)
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
         var token = new JwtSecurityToken(
-            issuer: issuer ?? "FoodMatchApi",
-            audience: audience ?? "FoodMatchClient",
+            issuer: issuer ?? throw new InvalidOperationException("JwtSettings__Issuer is required."),
+            audience: audience ?? throw new InvalidOperationException("JwtSettings__Audience is required."),
             claims: claims,
             expires: user.ExpiresAt,
             signingCredentials: credentials);

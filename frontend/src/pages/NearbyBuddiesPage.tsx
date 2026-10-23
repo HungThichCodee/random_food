@@ -1,63 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Modal } from 'antd-mobile';
+import { Button } from 'antd-mobile';
 import { Toast } from '../stores/useToastStore';
 import { tempUserApi } from '../api/tempUserApi';
 import { matchApi } from '../api/matchApi';
 import { useUserStore } from '../stores/useUserStore';
 import { useGeolocation } from '../hooks/useGeolocation';
 import type { NearbyUserDto } from '../types/tempUser';
+import type { MatchRequestDto } from '../types/match';
 
 export default function NearbyBuddiesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useGeolocation();
-  const { profile } = useUserStore();
+  const profile = useUserStore((state) => state.profile);
 
   const [nearbyUsers, setNearbyUsers] = useState<NearbyUserDto[]>([]);
-  const [activeMatch, setActiveMatch] = useState<any>(null);
+  const [activeMatch, setActiveMatch] = useState<MatchRequestDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [isSendingRequest, setIsSendingRequest] = useState(false);
   const [activeUserForMatch, setActiveUserForMatch] = useState<NearbyUserDto | null>(null);
+  const lastNearbyFetchAt = useRef(0);
 
   const fetchUsers = async () => {
+    setLoadError('');
     try {
-      if (location.lat && location.lng && profile) {
+      if (location.lat != null && location.lng != null && profile) {
         await tempUserApi.updateLocation(profile.id, location.lat, location.lng);
-        const users = await tempUserApi.getNearby(location.lat, location.lng, 3);
+        const users = await tempUserApi.getNearby();
         setNearbyUsers(users.filter((u) => u.id.toLowerCase() !== profile.id.toLowerCase()));
         
         // Check for active match
-        const active = await matchApi.getActive();
+        const active = await matchApi.getActive().catch((error: unknown) => {
+          if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+          throw error;
+        });
         if (active) {
           setActiveMatch(active);
         } else {
           setActiveMatch(null);
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      console.error('Could not load nearby users');
+      setLoadError('Không tải được danh sách người gần bạn. Hãy thử lại.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Round to 3 decimal places (~110 meters) to avoid continuous API calls when GPS fluctuates
-  const roundedLat = location.lat ? location.lat.toFixed(3) : null;
-  const roundedLng = location.lng ? location.lng.toFixed(3) : null;
-
   useEffect(() => {
-    if (!location.isLoading && location.lat && location.lng && profile) {
-      fetchUsers();
+    if (location.isLoading || !profile) return;
+    if (location.lat == null || location.lng == null) {
+      setIsLoading(false);
+      setLoadError('Không lấy được vị trí của bạn. Hãy cấp quyền GPS và thử lại.');
+      return;
     }
-  }, [location.isLoading, roundedLat, roundedLng, profile?.id]);
+    if (Date.now() - lastNearbyFetchAt.current < 10000) return;
+    lastNearbyFetchAt.current = Date.now();
+    void fetchUsers();
+  }, [location.isLoading, location.lat, location.lng, profile?.id]);
 
   const handleSendMatchRequest = async () => {
     if (!activeUserForMatch || !profile) return;
     setIsSendingRequest(true);
     try {
-      const matchRequest = await matchApi.sendRequest({
+      await matchApi.sendRequest({
         toTempUserId: activeUserForMatch.id,
       });
       Toast.show({
@@ -65,10 +76,11 @@ export default function NearbyBuddiesPage() {
         content: t('Lời mời đã gửi!'),
       });
       setActiveUserForMatch(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const response = axios.isAxiosError<{ message?: string }>(error) ? error.response : undefined;
       Toast.show({
         icon: 'fail',
-        content: error.response?.data?.message || t('Lỗi khi gửi lời rủ / Error sending request'),
+        content: response?.data?.message || t('Lỗi khi gửi lời rủ / Error sending request'),
       });
     } finally {
       setIsSendingRequest(false);
@@ -86,6 +98,10 @@ export default function NearbyBuddiesPage() {
         </Button>
       </div>
     );
+  }
+
+  if (!location.isLoading && location.error) {
+    return <div className="min-h-screen bg-background text-on-surface p-6 flex items-center justify-center text-center">Cần cho phép truy cập vị trí để tìm bạn ăn ở gần. {location.error}</div>;
   }
 
   return (
@@ -121,6 +137,7 @@ export default function NearbyBuddiesPage() {
           </div>
         )}
 
+        {loadError && <p className="p-4 mb-4 rounded-xl bg-error/10 text-error" role="alert">{loadError}</p>}
         {isLoading ? (
           <div className="flex justify-center py-12">
             <span className="material-symbols-outlined text-4xl text-primary animate-spin">progress_activity</span>
@@ -138,7 +155,6 @@ export default function NearbyBuddiesPage() {
                 <div className="flex items-center gap-3.5 min-w-0">
                   <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-container/80 to-surface-tint shadow-inner flex items-center justify-center text-2xl relative shrink-0">
                     {user.gender === 'Female' ? '👩' : user.gender === 'Male' ? '👨' : '👤'}
-                    <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-[#4ade80] border-2 border-surface-container-low rounded-full"></span>
                   </div>
                   <div className="flex flex-col min-w-0">
                     <h3 className="text-title-md font-bold text-white tracking-wide truncate pr-2">{user.displayName}</h3>

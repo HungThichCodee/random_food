@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using FoodMatch.Application.Interfaces;
 
 namespace FoodMatch.Api.Hubs;
 
@@ -10,22 +11,27 @@ namespace FoodMatch.Api.Hubs;
 [Authorize]
 public class ChatHub : Hub
 {
-    // Will be fully implemented in Phase 13
-    public async Task SendMessage(string matchId, string message)
-    {
-        var userIdString = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
-        {
-            throw new HubException("Unauthorized");
-        }
+    private readonly IChatService _chatService;
 
-        // Send to group representing the match
-        await Clients.Group(matchId).SendAsync("ReceiveMessage", new { FromUserId = userId, Message = message });
+    public ChatHub(IChatService chatService) => _chatService = chatService;
+
+    public override async Task OnConnectedAsync()
+    {
+        if (!Guid.TryParse(Context.User?.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            throw new HubException("Unauthorized");
+
+        foreach (var matchId in await _chatService.GetActiveMatchIdsAsync(userId))
+            await Groups.AddToGroupAsync(Context.ConnectionId, matchId.ToString());
+
+        await base.OnConnectedAsync();
     }
 
     public async Task JoinChatGroup(string matchId)
     {
-        // Add current connection to the match chat group
+        if (!Guid.TryParse(Context.User?.FindFirstValue(ClaimTypes.NameIdentifier), out var userId) ||
+            !int.TryParse(matchId, out var requestId) ||
+            !await _chatService.CanAccessMatchAsync(requestId, userId))
+            throw new HubException("Unauthorized");
         await Groups.AddToGroupAsync(Context.ConnectionId, matchId);
     }
 }

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace FoodMatch.Application.DTOs.Chat;
 
 /// <summary>
@@ -6,5 +8,7 @@ namespace FoodMatch.Application.DTOs.Chat;
 public class SendMessageDto
 {
     public int MatchRequestId { get; set; }
+    [Required]
+    [StringLength(1000, MinimumLength = 1)]
     public string Message { get; set; } = string.Empty;
 }

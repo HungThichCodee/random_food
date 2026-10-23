@@ -1,0 +1,80 @@
+name: Verify Food Match
+
+on:
+  push:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: foodmatch_ci
+          POSTGRES_PASSWORD: foodmatch_ci_only
+          POSTGRES_DB: foodmatch_test_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U foodmatch_ci -d foodmatch_test_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=foodmatch_test_ci;Username=foodmatch_ci;Password=foodmatch_ci_only
+      FOODMATCH_TEST_CONNECTION: Host=localhost;Port=5432;Database=foodmatch_test_ci;Username=foodmatch_ci;Password=foodmatch_ci_only
+      JwtSettings__Secret: foodmatch_ci_only_0123456789_0123456789_0123456789
+      JwtSettings__Issuer: FoodMatchApi
+      JwtSettings__Audience: FoodMatchClient
+      Cors__Origins: http://localhost:5173
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore and build
+        run: |
+          dotnet restore backend/FoodMatch/FoodMatch.sln
+          dotnet build backend/FoodMatch/FoodMatch.sln -c Release --no-restore
+      - name: Install EF migration tool
+        run: dotnet tool install dotnet-ef --version 10.0.0 --tool-path "$RUNNER_TEMP/dotnet-tools"
+      - name: Migrate disposable PostgreSQL database
+        run: >-
+          "$RUNNER_TEMP/dotnet-tools/dotnet-ef" database update
+          --project backend/FoodMatch/src/FoodMatch.Infrastructure
+          --startup-project backend/FoodMatch/src/FoodMatch.Api
+          --configuration Release --no-build
+      - name: Test backend with PostgreSQL
+        run: dotnet test backend/FoodMatch/FoodMatch.sln -c Release --no-build --no-restore
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_API_URL: https://api.example.test
+      VITE_SIGNALR_URL: https://api.example.test
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm audit --audit-level=high
+      - run: npm audit --omit=dev
+      - run: npm run check:vercel

@@ -1,66 +1,20 @@
-# CLAUDE.md — Food Match Project Brain
+# Food Match — quy trình hiện hành
 
-## 🚨 Guardrails (CRITICAL RULES)
-> [!IMPORTANT]
-> The following rules MUST be followed at all times without exception:
-> 1. **NEVER expose Domain entities directly in API responses** — Always map to and return DTOs.
-> 2. **ALWAYS validate DTOs before processing** — Use DataAnnotations and/or FluentValidation.
-> 3. **ALWAYS use async/await for DB operations** — Never call `.Result` or `.Wait()`.
-> 4. **NEVER store real user location** — Always offset user coordinates by a random distance (e.g. 50–150m) before saving or broadcasting.
-> 5. **Temp user sessions expire after 3 hours** — Enforce 3-hour TTL on temp profiles and cleanup expired data.
-> 6. **Default search radius is 3km** — Match queries and restaurant recommendations default to 3km radius unless explicitly overridden within allowable bounds.
+Đây là bộ quy trình thay cho các kế hoạch Claude cũ. Mục tiêu: hoàn thiện tính năng gợi ý điểm hẹn cho cặp đã match, khóa các lỗ hổng có thể kiểm chứng, rồi mới deploy. Đọc `implementation_plan.md`, `rules/security.md` và `skills/deploy.md` theo công việc tương ứng. Không coi các dấu “MVP hoàn thành” trong tài liệu cũ là bằng chứng.
 
----
+## Hiện trạng xác nhận từ mã nguồn 2026-10-20
 
-## 📌 Project Overview
-- **Name:** Food Match
-- **Description:** Food recommendation & social dining matching application
-- **Target Audience:** Food lovers looking for random dish inspiration or dining companions nearby
+- ASP.NET Core 10 + EF Core/Npgsql/PostgreSQL; React 19 + Vite/TypeScript; JWT cho hồ sơ tạm; SignalR; Google Maps iframe.
+- Vòng quay món, gợi ý món, tìm người gần, match và chat đã có. Chưa có đơn hàng, thanh toán, tài khoản mật khẩu, email hay cookie đăng nhập. Các quy tắc dành cho chúng trong `rules/security.md` là cổng bắt buộc khi thêm chức năng, không phải đã triển khai.
+- Backend lưu tọa độ đầu vào chính xác. Nearby chỉ cho biết hồ sơ hiển thị ở trong 3 km, không trả tọa độ hay khoảng cách chi tiết; chủ dự án chấp nhận tín hiệu gần đúng này trước khi chia sẻ. Trong match accepted, mỗi người tự quyết định chia sẻ tọa độ của mình cho người kia tối đa 60 phút; người nhận không cần chia sẻ lại. Gợi ý điểm hẹn cần cả hai còn chia sẻ. Không offset hoặc jitter tọa độ.
+- Worktree có nhiều thay đổi chưa commit. Không reset, ghi đè hoặc push khi chưa xem diff và có sự đồng ý của người dùng.
 
----
+## Luồng làm việc
 
-## 🛠️ Tech Stack Summary
-- **Backend:** ASP.NET Core Web API (.NET 10), C# 12
-- **Database:** PostgreSQL 16 (Supabase / local Docker via EF Core 10 + Npgsql)
-- **Real-time Communication:** SignalR (`LocationHub`, `MatchHub`, `ChatHub`)
-- **Frontend:** React 19 + TypeScript 5 (Strict Mode) + Vite 6
-- **UI Library:** Ant Design 5 (Mobile-responsive, Ant Design icons)
-- **State Management:** Zustand 5
-- **Maps & Geolocation:** Leaflet.js + React-Leaflet, OpenStreetMap tiles, Overpass API (restaurant data), OSRM (routing)
-- **Internationalization:** Bilingual support (Vietnamese [default] & English) via `i18next` + `react-i18next`
-- **HTTP Client:** Axios
+1. Mỗi lượt bắt đầu bằng `git.exe status --short`, đọc các file liên quan và kết quả test hiện có. Không dùng trạng thái trong memory làm bằng chứng hiện tại.
+2. Chọn mục chưa đạt trong `implementation_plan.md`, ghi rõ luồng dữ liệu/quyền, sửa nhỏ có thể review, viết test cho bất biến quan trọng.
+3. Chạy backend build/test, frontend build và kiểm thử API/FE phù hợp. Test IDOR, đầu vào xấu, đồng ý/thu hồi vị trí và hành vi mạng theo phạm vi thay đổi.
+4. Đối chiếu `rules/security.md` và ghi minh chứng hoặc lỗi còn lại. Cập nhật `implementation_plan.md` và ghi chú trạng thái; không đánh dấu hoàn thành theo cảm nhận.
+5. Chỉ deploy khi mọi cổng release trong `skills/deploy.md` đạt. Push/publish sau khi người dùng duyệt bản thay đổi cụ thể.
 
----
-
-## 🏛️ Architecture: Clean Architecture
-Dependencies flow inward only:
-```
-[Domain] <--- [Application] <--- [Infrastructure]
-   ^               ^                    ^
-   |               |                    |
-   +---------------+--------------------+--- [Api]
-```
-
-- **Domain:** Entities, Enums, Value Objects, Domain Exceptions (Zero external dependencies).
-- **Application:** DTOs, Interface definitions (`IRepository<T>`, Service contracts), Business Logic, Validators, Mappings (Depends only on Domain).
-- **Infrastructure:** DbContext (`FoodMatchDbContext`), EF Core entity configurations, Repository implementations, Seed data, External API clients (Depends on Domain and Application).
-- **Api:** Controllers, SignalR Hubs, Middlewares, Dependency Injection registration, Program entry point (Depends on all layers).
-
----
-
-## 📐 Key Conventions & Coding Standards
-
-### Backend (C# / .NET 10)
-- **File-scoped namespaces:** Use `namespace FoodMatch.{Layer}.{Folder};` everywhere.
-- **Controller-based API:** Standard ASP.NET Core Controllers with `[ApiController]` and `[Route("api/[controller]")]` attributes (not Minimal APIs).
-- **Repository Pattern:** Generic `IRepository<T>` backed by specific queries where appropriate.
-- **DTOs:** Request and Response DTOs for all API contracts.
-- **Modern C# 12:** Primary constructors where clean, pattern matching, records for immutable DTOs.
-- **Async everywhere:** All I/O and EF Core queries use `async Task<T>` / `CancellationToken`.
-
-### Frontend (React / TypeScript / Vite)
-- **Feature-based Structure:** `src/features/{feature-name}/` containing components, hooks, api, and types.
-- **Zustand Stores:** Dedicated lightweight stores per domain (`useAuthStore`, `useMatchStore`, `useFoodStore`, etc.).
-- **Ant Design:** Use standard AntD components and grid; avoid custom CSS when AntD primitives suffice.
-- **Bilingual:** All UI text must reference translation keys via `useTranslation()` (`vi` default, `en` switchable).
-- **TypeScript:** Strict type checks enabled; `any` is prohibited.
+Không ghi secret, JWT, cookie, tọa độ chính xác hoặc nội dung chat vào tài liệu/log. Không đổi bản đồ và giao diện vòng quay ngoài phạm vi thay đổi cần thiết.

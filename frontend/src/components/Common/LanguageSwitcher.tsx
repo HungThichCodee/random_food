@@ -1,9 +1,7 @@
 import { Button } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { useLanguageStore } from '../../stores/useLanguageStore';
 
 export default function LanguageSwitcher() {
-  const { t } = useTranslation();
   const { currentLanguage, toggleLanguage } = useLanguageStore();
 
   return (

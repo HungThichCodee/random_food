@@ -17,7 +17,8 @@ public class MatchRequestDto
     public bool BuddyHasSharedLocation { get; set; } // Did the buddy share?
     public DateTime? LocationSharedAt { get; set; }
     
-    // Only populated when BOTH have shared
+    // Populated when the buddy's own sharing consent is active.
     public double? BuddyLat { get; set; }
     public double? BuddyLng { get; set; }
+    public MeetingPlaceChoiceDto? MeetingPlace { get; set; }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using FoodMatch.Application.Interfaces;
 using FoodMatch.Application.DTOs.Food;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FoodMatch.Api.Controllers;
 
@@ -10,6 +11,7 @@ namespace FoodMatch.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("GeneralApi")]
 public class FoodsController : ControllerBase
 {
     private readonly IFoodService _foodService;
@@ -42,23 +44,31 @@ public class FoodsController : ControllerBase
         {
             return BadRequest(new { Error = ex.Message });
         }
-        catch (Exception ex)
+        catch (KeyNotFoundException)
         {
-            return StatusCode(500, new { Error = $"Internal server error while fetching random food: {ex.Message}" });
+            return NotFound(new { Error = "No food is available for this filter." });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { Error = "An internal error occurred." });
         }
     }
 
     [HttpGet("wheel")]
-    public async Task<ActionResult<IEnumerable<FoodResponseDto>>> GetWheelFoods([FromQuery] string? category, [FromQuery] int count = 8)
+    public async Task<ActionResult<IEnumerable<FoodResponseDto>>> GetWheelFoods([FromQuery] string? category, [FromQuery] int? count = null)
     {
         try
         {
             var result = await _foodService.GetWheelFoodsAsync(category, count);
             return Ok(result);
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, new { Error = $"Internal server error while fetching wheel foods: {ex.Message}" });
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { Error = "An internal error occurred." });
         }
     }
 
@@ -77,9 +87,9 @@ public class FoodsController : ControllerBase
         {
             return BadRequest(new { Error = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return StatusCode(500, new { Error = $"Internal server error while suggesting foods: {ex.Message}" });
+            return StatusCode(500, new { Error = "An internal error occurred." });
         }
     }
 
@@ -94,9 +104,13 @@ public class FoodsController : ControllerBase
             var tagCounts = await _foodService.GetTagCountsAsync(request);
             return Ok(tagCounts);
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, new { Error = $"Internal server error: {ex.Message}" });
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { Error = "An internal error occurred." });
         }
     }
 }

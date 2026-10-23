@@ -3,16 +3,24 @@ using FoodMatch.Infrastructure.Data;
 using FoodMatch.Infrastructure.Repositories;
 using FoodMatch.Application.Interfaces;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using System.Security.Claims;
+using FoodMatch.Api.Configuration;
+RootEnvironment.Load();
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 64 * 1024);
+// Browser SignalR transports can put the bearer token in the URL query string.
+builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.Warning);
 
 // 1. DbContext with Npgsql
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings__DefaultConnection must be set in the root .env or deployment environment.");
 builder.Services.AddDbContext<FoodMatchDbContext>(options =>
-    options.UseNpgsql(connectionString)
-           .ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+    options.UseNpgsql(connectionString));
 
 // 2. Repository registrations
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 // 3. Service registrations
 builder.Services.AddScoped<IFoodService, FoodMatch.Application.Services.FoodService>();
@@ -22,9 +30,53 @@ builder.Services.AddScoped<IMatchService, FoodMatch.Application.Services.MatchSe
 builder.Services.AddScoped<IChatService, FoodMatch.Application.Services.ChatService>();
 builder.Services.AddScoped<IReportService, FoodMatch.Application.Services.ReportService>();
 builder.Services.AddScoped<FoodMatch.Api.Services.IJwtTokenGenerator, FoodMatch.Api.Services.JwtTokenGenerator>();
+builder.Services.AddHttpClient<FoodMatch.Api.Services.ICaptchaVerifier, FoodMatch.Api.Services.TurnstileVerifier>(
+    client => client.Timeout = TimeSpan.FromSeconds(5));
+builder.Services.AddMemoryCache();
+var overpassEndpoint = builder.Configuration["MeetingPlaces:OverpassUrl"]?.Trim();
+if (!string.IsNullOrWhiteSpace(overpassEndpoint))
+{
+    if (!Uri.TryCreate(overpassEndpoint, UriKind.Absolute, out var overpassUri) ||
+        overpassUri.Scheme != Uri.UriSchemeHttps || overpassUri.UserInfo.Length > 0 ||
+        overpassUri.Query.Length > 0 || overpassUri.Fragment.Length > 0 ||
+        string.Equals(overpassUri.IdnHost.TrimEnd('.'), "overpass-api.de",
+            StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException(
+            "MeetingPlaces__OverpassUrl must be an approved HTTPS interpreter endpoint, not the public default.");
+
+    builder.Services.AddHttpClient<FoodMatch.Api.Services.IMeetingPlaceService, FoodMatch.Api.Services.MeetingPlaceService>(
+        client =>
+        {
+            client.BaseAddress = overpassUri;
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("FoodMatch/1.0");
+        });
+}
+else
+    builder.Services.AddScoped<FoodMatch.Api.Services.IMeetingPlaceService,
+        FoodMatch.Api.Services.UnavailableMeetingPlaceService>();
+
+var turnstileHostnames = FoodMatch.Api.Services.TurnstileVerifier.ParseAllowedHostnames(
+    builder.Configuration["Turnstile:Hostname"]);
+if (builder.Environment.IsProduction() &&
+    (string.IsNullOrWhiteSpace(builder.Configuration["Turnstile:SecretKey"]) ||
+     turnstileHostnames.Count == 0 || turnstileHostnames.Contains("localhost") ||
+     new[]
+     {
+         "1x0000000000000000000000000000000AA",
+         "2x0000000000000000000000000000000AA",
+         "3x0000000000000000000000000000000AA"
+     }.Contains(builder.Configuration["Turnstile:SecretKey"])))
+    throw new InvalidOperationException("Production requires a real Turnstile__SecretKey and Turnstile__Hostname.");
 
 // JWT Authentication
-var jwtSecret = builder.Configuration["JwtSettings:Secret"] ?? "SuperSecretKeyForFoodMatchApp12345!@#";
+var jwtSecret = builder.Configuration["JwtSettings:Secret"];
+if (string.IsNullOrWhiteSpace(jwtSecret) || System.Text.Encoding.UTF8.GetByteCount(jwtSecret) < 32)
+    throw new InvalidOperationException("JwtSettings__Secret must contain at least 32 bytes in the root .env or deployment environment.");
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"]
+    ?? throw new InvalidOperationException("JwtSettings__Issuer is required.");
+var jwtAudience = builder.Configuration["JwtSettings:Audience"]
+    ?? throw new InvalidOperationException("JwtSettings__Audience is required.");
 builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -33,15 +85,26 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "FoodMatchApi",
-            ValidAudience = builder.Configuration["JwtSettings:Audience"] ?? "FoodMatchClient",
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
             IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSecret))
         };
         
         // SignalR Auth configuration
         options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
         {
+            OnChallenge = context =>
+            {
+                LogSecurityEvent(context.HttpContext, "authentication_denied");
+                return Task.CompletedTask;
+            },
+            OnForbidden = context =>
+            {
+                LogSecurityEvent(context.HttpContext, "authorization_denied");
+                return Task.CompletedTask;
+            },
             OnMessageReceived = context =>
             {
                 var accessToken = context.Request.Query["access_token"];
@@ -67,22 +130,62 @@ builder.Services.AddHostedService<FoodMatch.Api.HostedServices.ExpiredUserCleanu
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.AddFixedWindowLimiter("GeneralApi", opt =>
+    options.GlobalLimiter = ClientIpRateLimiter.Create();
+    options.AddPolicy("GeneralApi", context => PerIpWindow(context, 60));
+    options.AddPolicy("CreateProfile", context => PerIpWindow(context, 10));
+    options.AddPolicy("ReportApi", context => PerIpWindow(context, 3));
+    options.AddPolicy("SignalRConnect", context => PerIpWindow(context, 20));
+    options.AddPolicy("MeetingSuggestions", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            RateLimitKey(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 6,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+    options.OnRejected = async (context, cancellationToken) =>
     {
-        opt.PermitLimit = 60;
-        opt.Window = TimeSpan.FromMinutes(1);
-    });
-    options.AddFixedWindowLimiter("CreateProfile", opt =>
-    {
-        opt.PermitLimit = 10;
-        opt.Window = TimeSpan.FromMinutes(1);
-    });
-    options.AddFixedWindowLimiter("ReportApi", opt =>
-    {
-        opt.PermitLimit = 3;
-        opt.Window = TimeSpan.FromMinutes(1);
-    });
+        LogSecurityEvent(context.HttpContext, "rate_limit_denied");
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+            context.HttpContext.Response.Headers.RetryAfter =
+                Math.Max(1, (int)Math.Ceiling(retryAfter.TotalSeconds)).ToString();
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new { message = "Too many requests. Try again later." }, cancellationToken);
+    };
 });
+
+static RateLimitPartition<string> PerIpWindow(HttpContext context, int permitLimit) =>
+    RateLimitPartition.GetFixedWindowLimiter(
+        RateLimitKey(context),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = permitLimit,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        });
+
+static string RateLimitKey(HttpContext context)
+{
+    var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (Guid.TryParse(userId, out var parsedUserId))
+        return $"user:{parsedUserId}";
+
+    return ClientIpRateLimiter.GetKey(context);
+}
+
+static void LogSecurityEvent(HttpContext context, string reason)
+{
+    var claimedId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var actor = Guid.TryParse(claimedId, out var id) ? id.ToString() : "anonymous";
+    var logger = context.RequestServices.GetRequiredService<ILoggerFactory>()
+        .CreateLogger("SecurityEvents");
+    logger.LogWarning("Security event {Reason} for actor {ActorId} at {UtcTime:o}",
+        reason, actor, DateTime.UtcNow);
+}
 
 
 builder.Services.AddControllers();
@@ -96,10 +199,21 @@ builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString!);
 
 // CORS
+var corsOrigins = builder.Configuration["Cors:Origins"]
+    ?? throw new InvalidOperationException("Cors__Origins is required.");
+var allowedCorsOrigins = corsOrigins.Split(',',
+    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+if (allowedCorsOrigins.Length == 0 || allowedCorsOrigins.Any(origin =>
+        !Uri.TryCreate(origin, UriKind.Absolute, out var uri) ||
+        uri.UserInfo.Length > 0 || uri.AbsolutePath != "/" ||
+        uri.Query.Length > 0 || uri.Fragment.Length > 0 ||
+        origin.EndsWith('/') ||
+        (builder.Environment.IsProduction() && uri.Scheme != Uri.UriSchemeHttps)))
+    throw new InvalidOperationException("Cors__Origins must contain exact, approved HTTPS origins.");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173") // Vite dev server
+        policy.WithOrigins(allowedCorsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
@@ -114,24 +228,14 @@ try
     var context = scope.ServiceProvider.GetRequiredService<FoodMatchDbContext>();
     await context.Database.MigrateAsync();
     
-    // Auto-patch missing columns for Location Sharing (workaround for pending migrations)
-    try 
-    {
-        await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"match_requests\" ADD COLUMN IF NOT EXISTS \"FromUserSharedLocation\" boolean NOT NULL DEFAULT FALSE;");
-        await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"match_requests\" ADD COLUMN IF NOT EXISTS \"ToUserSharedLocation\" boolean NOT NULL DEFAULT FALSE;");
-        await context.Database.ExecuteSqlRawAsync("ALTER TABLE \"match_requests\" ADD COLUMN IF NOT EXISTS \"LocationSharedAt\" timestamp with time zone NULL;");
-    } 
-    catch (Exception ex) 
-    {
-        app.Logger.LogWarning(ex, "Could not auto-patch MatchRequests columns.");
-    }
-
     await FoodMatch.Infrastructure.Data.Seed.DataSeeder.SeedAsync(context);
     app.Logger.LogInformation("Database migrated and seeded successfully.");
 }
 catch (Exception ex)
 {
-    app.Logger.LogError(ex, "Database connection/migration failed. Please ensure PostgreSQL is running via 'docker-compose up -d'.");
+    app.Logger.LogCritical("Database connection or migration failed during startup: {ErrorType} at {UtcTime:o}",
+        ex.GetType().Name, DateTime.UtcNow);
+    throw;
 }
 
 
@@ -142,10 +246,39 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<FoodMatch.Api.Middlewares.GlobalExceptionMiddleware>();
-app.UseHttpsRedirection();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Permissions-Policy"] = "geolocation=(self), camera=(), microphone=()";
+    if (app.Environment.IsProduction())
+        context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000";
+    await next();
+});
+// Render already redirects public HTTP to HTTPS before forwarding HTTP internally.
+if (!string.Equals(Environment.GetEnvironmentVariable("RENDER"), "true",
+    StringComparison.OrdinalIgnoreCase))
+    app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
-app.UseRateLimiter();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/hubs") &&
+        string.Equals(context.Request.Headers["Upgrade"].ToString(), "websocket",
+            StringComparison.OrdinalIgnoreCase))
+    {
+        var origin = context.Request.Headers["Origin"].ToString();
+        if (!string.IsNullOrEmpty(origin) &&
+            !allowedCorsOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase))
+        {
+            LogSecurityEvent(context, "websocket_origin_denied");
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return;
+        }
+    }
+    await next();
+});
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -165,8 +298,11 @@ app.MapHealthChecks("/api/health", new Microsoft.AspNetCore.Diagnostics.HealthCh
     }
 });
 
-app.MapHub<FoodMatch.Api.Hubs.LocationHub>("/hubs/location");
-app.MapHub<FoodMatch.Api.Hubs.MatchHub>("/hubs/match");
-app.MapHub<FoodMatch.Api.Hubs.ChatHub>("/hubs/chat");
+app.MapHub<FoodMatch.Api.Hubs.MatchHub>("/hubs/match",
+        options => options.CloseOnAuthenticationExpiration = true)
+    .RequireRateLimiting("SignalRConnect");
+app.MapHub<FoodMatch.Api.Hubs.ChatHub>("/hubs/chat",
+        options => options.CloseOnAuthenticationExpiration = true)
+    .RequireRateLimiting("SignalRConnect");
 
 app.Run();

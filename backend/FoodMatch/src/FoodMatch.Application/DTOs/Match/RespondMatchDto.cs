@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace FoodMatch.Application.DTOs.Match;
 
 /// <summary>
@@ -5,5 +7,6 @@ namespace FoodMatch.Application.DTOs.Match;
 /// </summary>
 public class RespondMatchDto
 {
-    public bool Accept { get; set; }
+    [Required]
+    public bool? Accept { get; set; }
 }

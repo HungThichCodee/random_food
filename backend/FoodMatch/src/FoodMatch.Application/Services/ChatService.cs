@@ -11,17 +11,22 @@ using FoodMatch.Domain.Entities;
 /// </summary>
 public class ChatService(
     IRepository<ChatMessage> chatMessageRepository,
-    IRepository<MatchRequest> matchRequestRepository) : IChatService
+    IRepository<MatchRequest> matchRequestRepository,
+    IRepository<TempUser> tempUserRepository) : IChatService
 {
     public async Task<ChatMessageDto> SendMessageAsync(Guid senderUserId, SendMessageDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Message) || dto.Message.Length > 1000)
+            throw new ArgumentException("Message must contain 1 to 1000 characters.");
         var match = await matchRequestRepository.GetByIdAsync(dto.MatchRequestId);
-        if (match == null) throw new Exception("Match request not found.");
-        if (match.Status != MatchStatus.Accepted) throw new Exception("Match is not active.");
+        if (match == null) throw new KeyNotFoundException("Match request not found.");
+        if (match.Status != MatchStatus.Accepted) throw new InvalidOperationException("Match is not active.");
         if (match.FromTempUserId != senderUserId && match.ToTempUserId != senderUserId)
         {
-            throw new Exception("Unauthorized to send message in this match.");
+            throw new UnauthorizedAccessException("Unauthorized to send message in this match.");
         }
+        if (!await BothProfilesActiveAsync(match))
+            throw new UnauthorizedAccessException("A match profile has expired.");
 
         var message = new ChatMessage
         {
@@ -43,8 +48,37 @@ public class ChatService(
         };
     }
 
-    public async Task<List<ChatMessageDto>> GetMessagesAsync(int matchRequestId)
+    public async Task<bool> CanAccessMatchAsync(int matchRequestId, Guid userId)
     {
+        var match = await matchRequestRepository.GetByIdAsync(matchRequestId);
+        return match != null && match.Status == MatchStatus.Accepted &&
+            (match.FromTempUserId == userId || match.ToTempUserId == userId) &&
+            await BothProfilesActiveAsync(match);
+    }
+
+    public async Task<IReadOnlyList<int>> GetActiveMatchIdsAsync(Guid userId)
+    {
+        var matches = await matchRequestRepository.FindAsync(match =>
+            match.Status == MatchStatus.Accepted &&
+            (match.FromTempUserId == userId || match.ToTempUserId == userId));
+        var activeIds = new List<int>();
+        foreach (var match in matches)
+            if (await BothProfilesActiveAsync(match)) activeIds.Add(match.Id);
+        return activeIds;
+    }
+
+    private async Task<bool> BothProfilesActiveAsync(MatchRequest match)
+    {
+        var from = await tempUserRepository.GetByIdAsync(match.FromTempUserId);
+        var to = await tempUserRepository.GetByIdAsync(match.ToTempUserId);
+        var now = DateTime.UtcNow;
+        return from?.ExpiresAt > now && to?.ExpiresAt > now;
+    }
+
+    public async Task<List<ChatMessageDto>> GetMessagesAsync(int matchRequestId, Guid userId)
+    {
+        if (!await CanAccessMatchAsync(matchRequestId, userId))
+            throw new UnauthorizedAccessException("You are not part of this active match.");
         var messages = await chatMessageRepository.FindAsync(m => m.MatchRequestId == matchRequestId);
         return messages.OrderBy(m => m.SentAt).Select(m => new ChatMessageDto
         {

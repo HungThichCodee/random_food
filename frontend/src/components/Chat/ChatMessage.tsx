@@ -1,5 +1,4 @@
 import { Typography } from 'antd';
-import { useTranslation } from 'react-i18next';
 import type { ChatMessageDto } from '../../types/chat';
 
 const { Text } = Typography;
@@ -10,7 +9,6 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, isOwn }: ChatMessageProps) {
-  const { t } = useTranslation();
 
   return (
     // TODO: Single chat message bubble

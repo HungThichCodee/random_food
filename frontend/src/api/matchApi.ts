@@ -1,5 +1,5 @@
 import apiClient from './axiosClient';
-import type { MatchRequestDto, CreateMatchRequestDto } from '../types/match';
+import type { MatchRequestDto, CreateMatchRequestDto, MeetingSuggestionsDto, MeetingSearchKind } from '../types/match';
 
 export const matchApi = {
   sendRequest: async (dto: CreateMatchRequestDto): Promise<MatchRequestDto> => {
@@ -13,6 +13,27 @@ export const matchApi = {
   },
   getActive: async (): Promise<MatchRequestDto> => {
     return await apiClient.get<MatchRequestDto, MatchRequestDto>('/MatchRequests/active');
+  },
+  getById: async (requestId: number): Promise<MatchRequestDto> => {
+    return await apiClient.get<MatchRequestDto, MatchRequestDto>(`/MatchRequests/${requestId}`);
+  },
+  getMeetingSuggestions: async (requestId: number,
+    kind: MeetingSearchKind = 'restaurant'): Promise<MeetingSuggestionsDto> => {
+    return await apiClient.get<MeetingSuggestionsDto, MeetingSuggestionsDto>(
+      `/MatchRequests/${requestId}/meeting-suggestions?kind=${kind}`);
+  },
+  proposeMeetingPlace: async (requestId: number, placeId: string): Promise<MatchRequestDto> => {
+    return await apiClient.post<MatchRequestDto, MatchRequestDto>(
+      `/MatchRequests/${requestId}/meeting-place`, { placeId });
+  },
+  proposeGoogleMeetingPlace: async (requestId: number, name: string,
+    googleMapsUrl: string): Promise<MatchRequestDto> => {
+    return await apiClient.post<MatchRequestDto, MatchRequestDto>(
+      `/MatchRequests/${requestId}/meeting-place/google`, { name, googleMapsUrl });
+  },
+  confirmMeetingPlace: async (requestId: number, placeId: string): Promise<MatchRequestDto> => {
+    return await apiClient.post<MatchRequestDto, MatchRequestDto>(
+      `/MatchRequests/${requestId}/meeting-place/confirm`, { placeId });
   },
   shareLocation: async (requestId: number): Promise<MatchRequestDto> => {
     return await apiClient.post<MatchRequestDto, MatchRequestDto>(`/MatchRequests/${requestId}/share-location`, {});

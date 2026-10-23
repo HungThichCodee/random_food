@@ -74,13 +74,14 @@ export default function HomePage() {
                   } else {
                     Toast.show({ content: 'Không có thông báo mới' });
                   }
-                } catch (e) {}
+                } catch {
+                  Toast.show({ content: 'Không tải được thông báo. Vui lòng thử lại.' });
+                }
               }}
               className="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container/60 text-on-surface-variant hover:text-on-surface transition-colors relative"
               aria-label="Thông báo"
             >
               <span className="material-symbols-outlined text-[22px]">notifications</span>
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_#ff6b35]"></span>
             </button>
             <button 
               onClick={() => navigate('/profile')} 
@@ -92,11 +93,7 @@ export default function HomePage() {
                   {profile.displayName.charAt(0).toUpperCase()}
                 </div>
               ) : (
-                <img 
-                  alt="Profile" 
-                  className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/40" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA92w28fcnzXyfesyI7ypUuEyvf1p5UPHUIovJr0yN3HicG5VCbxRdTRqP8aAwKlfnlhMLCncSiYqORv_MxWipkJB1b9n_O8sG9etzaq9kZOts8_xz3QTUL_JfdrZZbp1UV_uTJhwITx1N4bFcWMVrDw_di98xQ1cB-L3b3B0NlJwYBkMHPRk4EaGQn6Q8wDMKrfj0WCGLW-TAedGPY6d01D6SDUbgOf27W9rMwxnDGvs8VhVmGf2c7RA" 
-                />
+                <span className="w-8 h-8 rounded-full bg-surface-container-high ring-2 ring-primary-container/40 flex items-center justify-center material-symbols-outlined" aria-hidden="true">person</span>
               )}
             </button>
           </div>

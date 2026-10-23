@@ -5,12 +5,14 @@ using System.Security.Claims;
 using FoodMatch.Application.Interfaces;
 using FoodMatch.Application.DTOs.Chat;
 using FoodMatch.Api.Hubs;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FoodMatch.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[EnableRateLimiting("GeneralApi")]
 public class ChatController(
     IChatService chatService,
     IHubContext<ChatHub> chatHubContext) : ControllerBase
@@ -18,7 +20,9 @@ public class ChatController(
     [HttpGet("{matchRequestId}/messages")]
     public async Task<IActionResult> GetMessages(int matchRequestId)
     {
-        var messages = await chatService.GetMessagesAsync(matchRequestId);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) return Unauthorized();
+        if (!await chatService.CanAccessMatchAsync(matchRequestId, userId)) return Forbid();
+        var messages = await chatService.GetMessagesAsync(matchRequestId, userId);
         return Ok(messages);
     }
 
@@ -34,14 +38,40 @@ public class ChatController(
             var message = await chatService.SendMessageAsync(userId, dto);
             
             // Notify other users in the chat room (match group)
-            await chatHubContext.Clients.Group(dto.MatchRequestId.ToString())
-                .SendAsync("ReceiveMessage", message);
+            try
+            {
+                await chatHubContext.Clients.Group(dto.MatchRequestId.ToString())
+                    .SendAsync("ReceiveMessage", message);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                // The message is saved; clients can load it from the history endpoint.
+                HttpContext.RequestServices.GetService<ILogger<ChatController>>()?
+                    .LogWarning("Chat notification failed: {ErrorType} at {UtcTime:o}",
+                        ex.GetType().Name, DateTime.UtcNow);
+            }
 
             return Ok(message);
         }
-        catch (Exception ex)
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { error = "An internal error occurred." });
         }
     }
 }

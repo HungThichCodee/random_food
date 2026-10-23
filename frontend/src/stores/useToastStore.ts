@@ -11,7 +11,7 @@ interface ToastState {
   hide: () => void;
 }
 
-export const useToastStore = create<ToastState>((set, get) => ({
+export const useToastStore = create<ToastState>((set) => ({
   toast: null,
   show: (options) => {
     const toastOptions = typeof options === 'string' ? { content: options } : options;

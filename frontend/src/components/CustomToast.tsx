@@ -1,6 +1,5 @@
 import React from 'react';
 import { useToastStore } from '../stores/useToastStore';
-import { CheckCircleOutline, CloseCircleOutline } from 'antd-mobile-icons';
 
 export const CustomToast: React.FC = () => {
   const { toast } = useToastStore();

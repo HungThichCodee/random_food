@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { tempUserApi } from '../api/tempUserApi';
 import { useUserStore } from '../stores/useUserStore';
 import type { CreateTempUserDto } from '../types/tempUser';
 import logoImg from '../assert/logo.png';
+import TurnstileWidget from '../components/TurnstileWidget';
+
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';
+const captchaRequired = Boolean(turnstileSiteKey) || !import.meta.env.DEV;
 
 interface TasteTag {
   id: string;
@@ -39,10 +44,11 @@ const FUN_NICKNAMES = [
 export default function CreateProfilePage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { profile, setProfile, toggleVisibilityLocally, clearProfile } = useUserStore();
+  const { profile, setProfile, clearProfile } = useUserStore();
 
   const [displayName, setDisplayName] = useState(profile?.displayName || '');
-  const [gender, setGender] = useState<'Male' | 'Female' | 'Other'>((profile?.gender as any) || 'Female');
+  const [gender, setGender] = useState<'Male' | 'Female' | 'Other'>(
+    profile?.gender === 'Male' || profile?.gender === 'Other' ? profile.gender : 'Female');
   const [selectedTags, setSelectedTags] = useState<string[]>(
     profile?.foodPreferences?.length ? profile.foodPreferences : []
   );
@@ -51,6 +57,8 @@ export default function CreateProfilePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [diceRolling, setDiceRolling] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
 
   // Dynamic progress calculation based on form completion
   const progress = React.useMemo(() => {
@@ -86,6 +94,10 @@ export default function CreateProfilePage() {
       setErrorMessage(t('profile.displayNameRequired', 'Vui lòng nhập biệt danh khi đi ăn!'));
       return;
     }
+    if (captchaRequired && !captchaToken) {
+      setErrorMessage('Vui lòng hoàn tất xác minh bảo mật.');
+      return;
+    }
     setErrorMessage(null);
     setLoading(true);
 
@@ -95,19 +107,22 @@ export default function CreateProfilePage() {
         gender,
         foodPreferences: selectedTags,
         desiredFood: desiredFood.trim() || undefined,
+        captchaToken: captchaToken || undefined,
       };
 
       const user = await tempUserApi.create(dto);
       setProfile(user);
-      toggleVisibilityLocally(true);
 
       setSuccessToast(true);
       setTimeout(() => {
         navigate('/map');
       }, 900);
-    } catch (error: any) {
-      console.error('Error creating profile', error);
-      setErrorMessage(error?.response?.data?.message || t('common.error', 'Đã có lỗi xảy ra. Vui lòng thử lại!'));
+    } catch (error: unknown) {
+      const response = axios.isAxiosError<{ message?: string }>(error) ? error.response : undefined;
+      console.error('Error creating profile, HTTP status:', response?.status ?? 'network');
+      setErrorMessage(response?.data?.message || t('common.error', 'Đã có lỗi xảy ra. Vui lòng thử lại!'));
+      setCaptchaToken(null);
+      setCaptchaResetKey((value) => value + 1);
     } finally {
       setLoading(false);
     }
@@ -446,11 +461,16 @@ export default function CreateProfilePage() {
 
               {/* Actions & CTA Section */}
               <div className="flex flex-col w-full pt-2 space-y-3">
+                <TurnstileWidget
+                  siteKey={turnstileSiteKey}
+                  onToken={setCaptchaToken}
+                  resetKey={captchaResetKey}
+                />
                 {/* Main Shimmer Neon Button */}
                 <button
                   id="submit-profile-btn"
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || (captchaRequired && !captchaToken)}
                   className="w-full py-4 px-6 rounded-full font-title-md text-title-md text-white font-bold tracking-wide shadow-[0_4px_24px_rgba(255,107,53,0.5)] active:scale-95 hover:scale-[1.02] transition-all duration-300 relative overflow-hidden flex items-center justify-center space-x-2 bg-gradient-to-r from-[#FF6B35] via-[#FF8A5B] to-[#FFE14D] hover:shadow-[0_6px_30px_rgba(255,107,53,0.7)] disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {loading ? (

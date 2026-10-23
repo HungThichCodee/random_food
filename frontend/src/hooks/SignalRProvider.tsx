@@ -1,18 +1,18 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { useUserStore } from '../stores/useUserStore';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const signalRUrl = import.meta.env.VITE_SIGNALR_URL;
+if (!signalRUrl) throw new Error('VITE_SIGNALR_URL must be set in the root .env');
+const API_BASE_URL = signalRUrl.replace(/\/$/, '');
 
 interface SignalRContextType {
-  locationHub: signalR.HubConnection | null;
   matchHub: signalR.HubConnection | null;
   chatHub: signalR.HubConnection | null;
   isConnected: boolean;
 }
 
 const SignalRContext = createContext<SignalRContextType>({
-  locationHub: null,
   matchHub: null,
   chatHub: null,
   isConnected: false,
@@ -21,86 +21,94 @@ const SignalRContext = createContext<SignalRContextType>({
 export const useSignalR = () => useContext(SignalRContext);
 
 export function SignalRProvider({ children }: { children: React.ReactNode }) {
-  const { profile } = useUserStore();
-  const tokenRef = useRef<string | null>(null);
+  const token = useUserStore((state) => state.profile?.token);
+  const expiresAt = useUserStore((state) => state.profile?.expiresAt);
 
-  const [locationHub, setLocationHub] = useState<signalR.HubConnection | null>(null);
   const [matchHub, setMatchHub] = useState<signalR.HubConnection | null>(null);
   const [chatHub, setChatHub] = useState<signalR.HubConnection | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const currentToken = profile?.token || null;
-    
-    // Don't reconnect if token hasn't actually changed
-    if (currentToken === tokenRef.current) return;
-    tokenRef.current = currentToken;
-
-    if (!currentToken) {
+    const expiration = Date.parse(expiresAt ?? '');
+    if (!token || !Number.isFinite(expiration) || expiration <= Date.now()) {
       setIsConnected(false);
-      // Stop existing connections
-      locationHub?.stop();
-      matchHub?.stop();
-      chatHub?.stop();
-      setLocationHub(null);
       setMatchHub(null);
       setChatHub(null);
       return;
     }
-
+    setIsConnected(false);
+    let disposed = false;
+    let starting = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    const tokenIsValid = () => Date.now() < expiration;
     const options: signalR.IHttpConnectionOptions = {
-      accessTokenFactory: () => currentToken,
+      accessTokenFactory: () => token,
     };
-
-    const newLocationHub = new signalR.HubConnectionBuilder()
-      .withUrl(`${API_BASE_URL}/hubs/location`, options)
-      .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Warning)
-      .build();
-
+    const reconnectPolicy: signalR.IRetryPolicy = {
+      nextRetryDelayInMilliseconds: () => tokenIsValid() ? 5000 : null,
+    };
     const newMatchHub = new signalR.HubConnectionBuilder()
       .withUrl(`${API_BASE_URL}/hubs/match`, options)
-      .withAutomaticReconnect()
+      .withAutomaticReconnect(reconnectPolicy)
       .configureLogging(signalR.LogLevel.Warning)
       .build();
-
     const newChatHub = new signalR.HubConnectionBuilder()
       .withUrl(`${API_BASE_URL}/hubs/chat`, options)
-      .withAutomaticReconnect()
+      .withAutomaticReconnect(reconnectPolicy)
       .configureLogging(signalR.LogLevel.Warning)
       .build();
 
-    const startConnections = async () => {
-      try {
-        await Promise.all([
-          newLocationHub.start(),
-          newMatchHub.start(),
-          newChatHub.start(),
-        ]);
-        console.log('[SignalR] All hubs connected successfully');
-        setIsConnected(true);
-      } catch (err) {
-        console.error('[SignalR] Error connecting to hubs:', err);
-        setIsConnected(false);
+    const bothConnected = () =>
+      newMatchHub.state === signalR.HubConnectionState.Connected &&
+      newChatHub.state === signalR.HubConnectionState.Connected;
+    const syncConnected = () => {
+      if (disposed) return;
+      const connected = bothConnected();
+      setIsConnected(connected);
+      if (connected && retryTimer) {
+        clearTimeout(retryTimer);
+        retryTimer = null;
       }
     };
+    const scheduleRetry = () => {
+      if (disposed || !tokenIsValid() || retryTimer) return;
+      retryTimer = setTimeout(() => {
+        retryTimer = null;
+        void startConnections();
+      }, 5000);
+    };
+    const startConnections = async () => {
+      if (disposed || !tokenIsValid() || starting) return;
+      starting = true;
+      await Promise.allSettled([newMatchHub, newChatHub].map((hub) =>
+        hub.state === signalR.HubConnectionState.Disconnected ? hub.start() : Promise.resolve()));
+      starting = false;
+      syncConnected();
+      if (!bothConnected()) scheduleRetry();
+    };
 
-    setLocationHub(newLocationHub);
+    for (const hub of [newMatchHub, newChatHub]) {
+      hub.onreconnecting(syncConnected);
+      hub.onreconnected(syncConnected);
+      hub.onclose(() => {
+        syncConnected();
+        scheduleRetry();
+      });
+    }
+
     setMatchHub(newMatchHub);
     setChatHub(newChatHub);
-
-    startConnections();
+    void startConnections();
 
     return () => {
-      console.log('[SignalR] Cleaning up hub connections');
-      newLocationHub.stop();
-      newMatchHub.stop();
-      newChatHub.stop();
+      disposed = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      void Promise.allSettled([newMatchHub.stop(), newChatHub.stop()]);
     };
-  }, [profile?.token]);
+  }, [token, expiresAt]);
 
   return (
-    <SignalRContext.Provider value={{ locationHub, matchHub, chatHub, isConnected }}>
+    <SignalRContext.Provider value={{ matchHub, chatHub, isConnected }}>
       {children}
     </SignalRContext.Provider>
   );

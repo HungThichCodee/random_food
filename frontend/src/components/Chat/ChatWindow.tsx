@@ -11,7 +11,7 @@ interface ChatWindowProps {
 export default function ChatWindow({ matchRequestId }: ChatWindowProps) {
   const { t } = useTranslation();
   const [inputText, setInputText] = useState('');
-  const [messages, setMessages] = useState<ChatMessageDto[]>([]);
+  const [messages] = useState<ChatMessageDto[]>([]);
 
   const handleSend = () => {
     // TODO: Send chat message via SignalR / API

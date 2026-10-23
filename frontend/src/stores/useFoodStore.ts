@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import type { FoodResponseDto, FoodRandomRequestDto, FoodSuggestRequestDto } from '../types/food';
 import { foodApi } from '../api/foodApi';
 
+let latestWheelRequest = 0;
+
 interface FoodState {
   currentFood: FoodResponseDto | null;
   suggestedFoods: FoodResponseDto[];
@@ -37,8 +39,8 @@ export const useFoodStore = create<FoodState>((set) => ({
     try {
       const food = await foodApi.getRandomFood(request);
       set({ currentFood: food, isLoading: false });
-    } catch (err: any) {
-      set({ error: err.response?.data?.Error || err.message || 'Failed to fetch random food', isLoading: false });
+    } catch {
+      set({ error: 'Không tải được món ăn. Hãy thử lại.', isLoading: false });
     }
   },
 
@@ -53,8 +55,8 @@ export const useFoodStore = create<FoodState>((set) => ({
         suggestMessage: res.message,
         isLoading: false 
       });
-    } catch (err: any) {
-      set({ error: err.response?.data?.Error || err.message || 'Failed to suggest foods', isLoading: false });
+    } catch {
+      set({ error: 'Không tải được gợi ý món ăn. Hãy thử lại.', isLoading: false });
     }
   },
 
@@ -62,18 +64,20 @@ export const useFoodStore = create<FoodState>((set) => ({
     try {
       const counts = await foodApi.getTagCounts(request);
       set({ tagCounts: counts });
-    } catch (err: any) {
-      console.error('Failed to fetch tag counts', err);
+    } catch {
+      console.error('Could not fetch tag counts');
     }
   },
 
-  fetchWheelFoods: async (category?: string, count: number = 8) => {
-    set({ isLoading: true, error: null });
+  fetchWheelFoods: async (category?: string, count?: number) => {
+    const requestId = ++latestWheelRequest;
+    set({ isLoading: true, error: null, wheelFoods: [] });
     try {
       const foods = await foodApi.getWheelFoods(category, count);
-      set({ wheelFoods: foods, isLoading: false });
-    } catch (err: any) {
-      set({ error: err.response?.data?.Error || err.message || 'Failed to fetch wheel foods', isLoading: false });
+      if (requestId === latestWheelRequest) set({ wheelFoods: foods, isLoading: false });
+    } catch {
+      if (requestId === latestWheelRequest)
+        set({ error: 'Không tải được vòng quay món ăn. Hãy thử lại.', wheelFoods: [], isLoading: false });
     }
   },
   

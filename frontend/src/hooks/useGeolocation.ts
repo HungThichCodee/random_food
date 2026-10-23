@@ -19,8 +19,8 @@ export function useGeolocation() {
   useEffect(() => {
     if (!navigator.geolocation) {
       setState({
-        lat: 10.776889, // Default to HCM city
-        lng: 106.700806,
+        lat: null,
+        lng: null,
         error: 'Geolocation is not supported by your browser',
         isLoading: false,
       });
@@ -38,8 +38,8 @@ export function useGeolocation() {
 
     const handleError = (error: GeolocationPositionError) => {
       setState({
-        lat: 10.776889, // Default to HCM city
-        lng: 106.700806,
+        lat: null,
+        lng: null,
         error: error.message,
         isLoading: false,
       });

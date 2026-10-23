@@ -10,16 +10,5 @@ namespace FoodMatch.Api.Hubs;
 [Authorize]
 public class MatchHub : Hub
 {
-    // Will be fully implemented in Phase 12
-    public async Task SendMatchRequest(Guid targetUserId)
-    {
-        var userIdString = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
-        {
-            throw new HubException("Unauthorized");
-        }
-        
-        // Notify target user via their ConnectionId or User group
-        await Clients.User(targetUserId.ToString()).SendAsync("MatchRequestReceived", new { FromUserId = userId });
-    }
+    // Match notifications are sent by the authorized API after a database change.
 }

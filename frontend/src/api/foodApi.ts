@@ -19,9 +19,9 @@ export const foodApi = {
     const response = await apiClient.post<unknown, Record<string, number>>('/foods/tags-count', request);
     return response;
   },
-  getWheelFoods: async (category?: string, count: number = 8): Promise<FoodResponseDto[]> => {
+  getWheelFoods: async (category?: string, count?: number): Promise<FoodResponseDto[]> => {
     const params = new URLSearchParams();
-    params.append('count', count.toString());
+    if (count !== undefined) params.append('count', count.toString());
     if (category) {
       params.append('category', category);
     }

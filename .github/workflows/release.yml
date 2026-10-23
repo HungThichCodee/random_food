@@ -1,0 +1,146 @@
+name: Release Food Match
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Deploy environment with its own Render and Vercel projects
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foodmatch-release-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    uses: ./.github/workflows/verify.yml
+
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: ${{ inputs.target }}
+      url: ${{ steps.check_frontend.outputs.web_url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Validate release settings
+        shell: bash
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+          API_ORIGIN: ${{ vars.API_ORIGIN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          WEB_ORIGIN: ${{ vars.WEB_ORIGIN }}
+        run: |
+          set -euo pipefail
+          for name in RENDER_API_KEY RENDER_SERVICE_ID API_ORIGIN VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID WEB_ORIGIN; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing $name in the selected GitHub environment" >&2
+              exit 1
+            fi
+          done
+          [[ "$RENDER_SERVICE_ID" =~ ^srv-[a-z0-9]+$ ]]
+          [[ "$API_ORIGIN" =~ ^https://[A-Za-z0-9.-]+$ ]]
+          [[ "$WEB_ORIGIN" =~ ^https://[A-Za-z0-9.-]+$ ]]
+      - name: Deploy the verified commit to Render and wait for it
+        shell: bash
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+          API_ORIGIN: ${{ vars.API_ORIGIN }}
+        run: |
+          set -euo pipefail
+          body=$(jq -nc --arg commit "$GITHUB_SHA" '{commitId:$commit,clearCache:"do_not_clear"}')
+          created=$(curl --fail-with-body --silent --show-error --max-time 30 \
+            -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H 'Content-Type: application/json' -d "$body")
+          deploy_id=$(jq -r '.id // empty' <<< "$created")
+          [[ "$deploy_id" =~ ^dep-[a-z0-9]+$ ]]
+          [[ "$(jq -r '.commit.id // empty' <<< "$created")" == "$GITHUB_SHA" ]]
+          echo "Render deploy: $deploy_id"
+          for attempt in {1..75}; do
+            response=$(curl --fail-with-body --silent --show-error --max-time 30 \
+              "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys/$deploy_id" \
+              -H "Authorization: Bearer $RENDER_API_KEY")
+            status=$(jq -r '.status // empty' <<< "$response")
+            commit=$(jq -r '.commit.id // empty' <<< "$response")
+            if [[ "$commit" != "$GITHUB_SHA" ]]; then
+              echo 'Render is deploying a different commit' >&2
+              exit 1
+            fi
+            case "$status" in
+              live) break ;;
+              build_failed|update_failed|pre_deploy_failed|canceled|deactivated)
+                echo "Render deploy failed: $status" >&2
+                exit 1 ;;
+            esac
+            if (( attempt == 75 )); then
+              echo 'Render deploy did not become live within 25 minutes' >&2
+              exit 1
+            fi
+            sleep 20
+          done
+          health=$(curl --fail-with-body --silent --show-error --max-time 30 "$API_ORIGIN/api/health")
+          [[ "$(jq -r '.status // empty' <<< "$health")" == Healthy ]]
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install pinned Vercel CLI
+        run: npm install --global vercel@65.2.0
+      - name: Deploy the same frontend commit to Vercel
+        shell: bash
+        working-directory: frontend
+        env:
+          FOODMATCH_REQUIRE_MAPS_EMBED_KEY: '1'
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          expected=$(sha256sum .vercel/output/static/index.html | cut -d' ' -f1)
+          [[ "$expected" =~ ^[a-f0-9]{64}$ ]]
+          echo "EXPECTED_INDEX_SHA=$expected" >> "$GITHUB_ENV"
+          deployment_url=$(vercel deploy --prebuilt --prod --meta git_sha="$GITHUB_SHA" --token="$VERCEL_TOKEN")
+          [[ "$deployment_url" =~ ^https://[A-Za-z0-9.-]+$ ]]
+          echo "Vercel deployment: $deployment_url"
+      - name: Check public frontend and route refresh
+        id: check_frontend
+        shell: bash
+        env:
+          WEB_ORIGIN: ${{ vars.WEB_ORIGIN }}
+        run: |
+          set -euo pipefail
+          for attempt in {1..12}; do
+            if curl --fail-with-body --silent --show-error --location --compressed --max-time 30 \
+              "$WEB_ORIGIN/" -o "$RUNNER_TEMP/foodmatch-index.html"; then
+              actual=$(sha256sum "$RUNNER_TEMP/foodmatch-index.html" | cut -d' ' -f1)
+              if [[ "$actual" == "$EXPECTED_INDEX_SHA" ]]; then break; fi
+            fi
+            if (( attempt == 12 )); then
+              echo 'Public frontend does not serve the verified Vercel build' >&2
+              exit 1
+            fi
+            sleep 5
+          done
+          for route in map route; do
+            curl --fail-with-body --silent --show-error --location --compressed --max-time 30 \
+              "$WEB_ORIGIN/$route" -o "$RUNNER_TEMP/foodmatch-$route.html"
+            [[ "$(sha256sum "$RUNNER_TEMP/foodmatch-$route.html" | cut -d' ' -f1)" == "$EXPECTED_INDEX_SHA" ]]
+          done
+          echo "web_url=$WEB_ORIGIN" >> "$GITHUB_OUTPUT"

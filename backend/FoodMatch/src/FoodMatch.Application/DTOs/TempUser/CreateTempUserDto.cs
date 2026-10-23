@@ -15,8 +15,12 @@ public class CreateTempUserDto
     [StringLength(20, ErrorMessage = "Gender must not exceed 20 characters.")]
     public string? Gender { get; set; }
 
+    [MaxLength(10)]
     public List<string>? FoodPreferences { get; set; }
 
     [StringLength(100, ErrorMessage = "DesiredFood must not exceed 100 characters.")]
     public string? DesiredFood { get; set; }
+
+    [StringLength(2048, ErrorMessage = "Captcha token is too long.")]
+    public string? CaptchaToken { get; set; }
 }

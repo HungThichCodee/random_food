@@ -168,12 +168,61 @@ namespace FoodMatch.Infrastructure.Migrations
                     b.Property<Guid>("FromTempUserId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("FromUserSharedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("FromUserSharedLocation")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LocationSharedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("MeetingPlaceAgreedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MeetingPlaceCategory")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("MeetingPlaceGoogleMapsUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<string>("MeetingPlaceId")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<double?>("MeetingPlaceLat")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("MeetingPlaceLng")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("MeetingPlaceName")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<Guid?>("MeetingPlaceProposedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("ToTempUserId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ToUserSharedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("ToUserSharedLocation")
+                        .HasColumnType("boolean");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

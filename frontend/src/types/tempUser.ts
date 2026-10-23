@@ -3,11 +3,11 @@ export interface CreateTempUserDto {
   gender?: string;
   foodPreferences?: string[];
   desiredFood?: string;
+  captchaToken?: string;
 }
 
 export interface TempUserDto {
   id: string;
-  sessionToken: string;
   token: string;
   displayName: string;
   gender?: string;
