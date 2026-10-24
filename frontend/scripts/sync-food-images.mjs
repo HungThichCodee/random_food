@@ -91,18 +91,22 @@ const missing = seedNames.filter((name) => !manifestNames.includes(name));
 const extra = manifestNames.filter((name) => !seedNames.includes(name));
 if (missing.length || extra.length || new Set(manifestNames).size !== manifest.length)
   throw new Error(`Manifest coverage failed: missing=${missing.join(', ')} extra=${extra.join(', ')}`);
+const onlyIndex = process.argv.indexOf('--only');
+const onlyName = onlyIndex < 0 ? null : process.argv[onlyIndex + 1];
+if (onlyIndex >= 0 && (!onlyName || !manifestNames.includes(onlyName)))
+  throw new Error(`Unknown dish for --only: ${onlyName || ''}`);
 if (process.argv.includes('--check')) {
   console.log(`Manifest covers all ${seedNames.length} seeded dishes.`);
   process.exit(0);
 }
 
 mkdirSync(outputDir, { recursive: true });
-const catalog = {};
+const catalog = onlyName ? JSON.parse(readFileSync(catalogPath, 'utf8')) : {};
 const failures = [];
-for (const entry of manifest) {
+for (const entry of manifest.filter((item) => !onlyName || item.name === onlyName)) {
   try {
     catalog[entry.name] = await download(entry);
-    console.log(`${Object.keys(catalog).length}/${manifest.length} ${entry.name} -> ${catalog[entry.name].file}`);
+    console.log(`${entry.name} -> ${catalog[entry.name].file}`);
   } catch (error) {
     failures.push(`${entry.name}: ${error.message}`);
     console.error(failures.at(-1));
@@ -112,6 +116,9 @@ if (failures.length) {
   console.error(`${failures.length} images failed; catalog not updated.`);
   process.exit(1);
 }
+if (onlyName && (Object.keys(catalog).length !== manifest.length ||
+  !manifestNames.every((name) => Object.hasOwn(catalog, name))))
+  throw new Error('Existing photo catalog does not cover every seeded dish');
 
 writeFileSync(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
 const rows = Object.entries(catalog).map(([name, item]) => {

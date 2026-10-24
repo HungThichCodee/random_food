@@ -172,12 +172,12 @@
   },
   "Lẩu Thái": {
     "file": "lau-thai.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:Thai_suki,_Thai_hot_pot_preparation,_Dining_in_Bangkok,_Thailand.jpg",
-    "author": "Vyacheslav Argenberg",
-    "license": "CC BY 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-    "match": "representative",
-    "bytes": 149534
+    "source": "https://commons.wikimedia.org/wiki/File:L%E1%BA%ABu_Th%C3%A1i_chua_cay_%E1%BB%9F_qu%C3%A1n_%E1%BB%91c_La_C%C3%A0,_SnH_2013_(4).JPG",
+    "author": "Phương Huy (thảo luận)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:L%E1%BA%ABu_Th%C3%A1i_chua_cay_%E1%BB%9F_qu%C3%A1n_%E1%BB%91c_La_C%C3%A0,_SnH_2013_(4).JPG",
+    "match": "exact",
+    "bytes": 208503
   },
   "Lẩu Bò": {
     "file": "lau-bo.jpg",

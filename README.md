@@ -172,7 +172,7 @@ random_food/
     └── FoodMatch.sln                 # Solution .NET
 ```
 
-Ảnh món cục bộ trong `frontend/public/food-images/`; trang `/image-credits` hiển thị tác giả, nguồn và giấy phép. Khi đổi nguồn ảnh, cập nhật manifest rồi chạy `node frontend/scripts/sync-food-images.mjs`; kiểm tra lại bằng `npm run check:food-images` trong `frontend`.
+Ảnh món cục bộ trong `frontend/public/food-images/`; trang `/image-credits` hiển thị tác giả, nguồn và giấy phép. Khi đổi nguồn ảnh, cập nhật manifest rồi chạy `node frontend/scripts/sync-food-images.mjs --only "Tên món"` để cập nhật một món, hoặc bỏ `--only` để đồng bộ toàn bộ; kiểm tra lại bằng `npm run check:food-images` trong `frontend`.
 
 ## Kiểm thử
 
