@@ -16,6 +16,14 @@ Food Match là ứng dụng web hỗ trợ quyết định ăn gì và kết n�
 
 ![Kết quả quay món ngọt ở viewport điện thoại](docs/screenshots/mobile-random-result.png)
 
+Ảnh món cục bộ trên viewport 390×844, chụp ngày 24/10/2026:
+
+![Vòng quay với ảnh món](docs/screenshots/mobile-random-photos-2026-10-24.png)
+
+![Popup kết quả với ảnh món](docs/screenshots/mobile-random-result-photos-2026-10-24.png)
+
+![Danh sách gợi ý món có ảnh](docs/screenshots/mobile-suggest-photos-2026-10-24.png)
+
 ![Gợi ý điểm hẹn trên Google Maps ở viewport điện thoại](docs/screenshots/mobile-meeting.png)
 
 Maps Embed API với key thật ở localhost:5173, chụp ngày 23/10/2026:
@@ -30,8 +38,9 @@ Maps Embed API với key thật ở localhost:5173, chụp ngày 23/10/2026:
 
 ## Tính năng chính
 
-- Vòng quay món ăn với các bộ lọc Tất cả, Món mặn, Chay và Ngọt; ảnh riêng của món được ưu tiên khi dữ liệu có ảnh.
-- Gợi ý món theo loại, khoảng giá, buổi ăn và tag khẩu vị.
+- Vòng quay món ăn với các bộ lọc Tất cả, Món mặn, Chay và Ngọt; thẻ món và popup kết quả hiện ảnh món.
+- Gợi ý món theo loại, khoảng giá, buổi ăn và tag khẩu vị; mỗi kết quả hiện ảnh món.
+- 62 món seed có ảnh cục bộ đặt tên theo món; ảnh biến thể được ghi nhãn, kèm [nguồn, tác giả và giấy phép](docs/food-image-credits.md). Món thêm ngoài seed dùng `ImageUrl` hợp lệ nếu có.
 - Tạo hồ sơ tạm, tìm người ăn trong 3 km và gửi lời mời ghép cặp; backend kiểm tra lại phạm vi khi gửi lời mời.
 - Chat và thông báo ghép cặp theo thời gian thực qua SignalR.
 - Trong cặp đã chấp nhận match, mỗi người có thể chia sẻ độc lập tọa độ chính xác của mình cho người kia, tối đa 60 phút mỗi lần bật. Người nhận thấy ngay tọa độ đó dù chưa chia sẻ lại; thu hồi của một người không tắt quyền chia sẻ của người còn lại. Tọa độ GPS từng người được giữ nguyên, không làm lệch. Khi **cả hai** còn chia sẻ, iframe Google Maps tìm quán quanh điểm giữa với mức zoom 15; nếu cấu hình Maps Embed API key, iframe dùng chế độ search chính thức của Google. Ứng dụng làm mới khoảng 30 giây một lần và có nút làm mới. Người dùng sao chép liên kết quán từ Google Maps để đề xuất, người kia xác nhận. Ứng dụng không đọc được danh sách hoặc quán được bấm trong iframe. Nút mở Google Maps cho phép xem danh sách kết quả trực tiếp trên Google. Nếu cấu hình Overpass riêng, ứng dụng còn hiển thị danh sách OSM để chọn nhanh. Đề xuất bị ẩn khi một bên thu hồi hoặc hết quyền chia sẻ.
@@ -92,7 +101,7 @@ Frontend đọc biến `VITE_*` từ `.env` ở thư mục gốc theo `vite.conf
 | `Turnstile__SecretKey`, `Turnstile__Hostname` | Xác minh CAPTCHA ở backend; hostname Production/staging chính xác, phân tách bằng dấu phẩy, không có `https://`, port hoặc wildcard | Rỗng khi Development | Có, khóa thật khi Production |
 | `VITE_API_URL` | URL gốc backend, không thêm `/api` | `http://localhost:5000` | Có với frontend |
 | `VITE_SIGNALR_URL` | URL gốc backend cho các hub SignalR | `http://localhost:5000` | Có với frontend |
-| `VITE_FOOD_IMAGE_ORIGINS` | Origin HTTPS bổ sung cho ảnh món; dùng chung với CSP Vercel, phân tách bằng dấu phẩy | Rỗng; mặc định cho Unsplash/Wikimedia | Không |
+| `VITE_FOOD_IMAGE_ORIGINS` | Origin HTTPS bổ sung cho `ImageUrl` của món thêm ngoài seed; dùng chung với CSP Vercel, phân tách bằng dấu phẩy | Rỗng; mặc định cho Unsplash/Wikimedia | Không |
 | `VITE_TURNSTILE_SITE_KEY` | Khóa công khai widget CAPTCHA | Rỗng khi Development | Có khi Production |
 | `GoogleMaps__EmbedApiKey` | Khóa công khai Maps Embed API cho cả backend và frontend, giới hạn theo API và HTTP referrer của site | Rỗng: iframe cũ; có khóa: `view`, `search`, `directions` chính thức | Có cho release; đặt ở cả Render và Vercel |
 | `MeetingPlaces__OverpassUrl` | Nguồn Overpass riêng cho danh sách OSM bổ sung | Bỏ trống: chỉ dùng Google Maps ở mọi môi trường | Không; chỉ đặt endpoint HTTPS riêng đã duyệt, endpoint công khai mặc định bị từ chối |
@@ -124,9 +133,10 @@ Mở `http://localhost:5173`. Các lệnh frontend khác được khai báo tron
 npm run build
 npm run preview
 npm run lint
+npm run check:food-images
 ```
 
-`npm run build` tạo `frontend/dist/`; `npm run preview` phục vụ bản build để kiểm tra. `npm run lint` kiểm tra mã bằng ESLint. Frontend **không có** script `npm test` hoặc `npm run test`.
+`npm run build` tạo `frontend/dist/`; `npm run preview` phục vụ bản build để kiểm tra. `npm run lint` kiểm tra mã bằng ESLint. `npm run check:food-images` kiểm tra đủ ảnh, tên file và thông tin giấy phép cho 62 món seed. Frontend **không có** script `npm test` hoặc `npm run test`.
 
 ## Cấu trúc thư mục
 
@@ -147,7 +157,9 @@ random_food/
 │   │   ├── stores/           # Trạng thái Zustand
 │   │   ├── styles/           # CSS chung
 │   │   ├── types/            # Kiểu dữ liệu TypeScript
-│   │   └── utils/            # Hàm hỗ trợ và ảnh gợi ý
+│   │   └── utils/            # Hàm hỗ trợ và danh mục ảnh món
+│   ├── public/food-images/   # Ảnh món cục bộ theo tên món
+│   ├── food-images.manifest.json # Danh sách ảnh nguồn để đồng bộ
 │   ├── package.json          # Script và phụ thuộc frontend
 │   └── vite.config.ts        # Cấu hình Vite, dev port 5173
 └── backend/FoodMatch/
@@ -160,7 +172,7 @@ random_food/
     └── FoodMatch.sln                 # Solution .NET
 ```
 
-Hiện chưa có thư mục `frontend/public/`; ảnh kiểm tra vòng quay trên viewport điện thoại ở `docs/screenshots/`.
+Ảnh món cục bộ trong `frontend/public/food-images/`; trang `/image-credits` hiển thị tác giả, nguồn và giấy phép. Khi đổi nguồn ảnh, cập nhật manifest rồi chạy `node frontend/scripts/sync-food-images.mjs`; kiểm tra lại bằng `npm run check:food-images` trong `frontend`.
 
 ## Kiểm thử
 
@@ -171,13 +183,15 @@ cd backend/FoodMatch
 & ..\..\.dotnet\dotnet.exe test FoodMatch.sln
 ```
 
-Trên Windows có Edge, đặt `$env:FOODMATCH_VISUAL_PORT='5173'` rồi chạy `& .\scripts\capture-random-mobile.ps1` từ thư mục gốc để chụp vòng quay, kết quả, bản đồ, đường đi và điểm hẹn ở viewport 390×844 với key giới hạn cho localhost:5173. Script xác nhận GPS chính xác, điểm giữa thay đổi, thu hồi quyền chia sẻ và SignalR nối lại. Script mặc định dùng cổng 5174 nếu không đặt biến trên, dùng PostgreSQL thử riêng và không ghi đè các ảnh `*-mobile-preview.png` đã có ở thư mục gốc.
+Trên Windows có Edge, đặt `$env:FOODMATCH_VISUAL_PORT='5173'` rồi chạy `& .\scripts\capture-random-mobile.ps1` từ thư mục gốc để chụp vòng quay, popup kết quả, gợi ý món, bản đồ, đường đi và điểm hẹn ở viewport 390×844 với key giới hạn cho localhost:5173. Script xác nhận ảnh cục bộ đã tải, GPS chính xác, điểm giữa thay đổi, thu hồi quyền chia sẻ và SignalR nối lại. Script mặc định dùng cổng 5174 nếu không đặt biến trên, dùng PostgreSQL thử riêng và không ghi đè các ảnh `*-mobile-preview.png` đã có ở thư mục gốc.
 
 Trước deploy, thực hiện [quy trình kiểm tra trên hai điện thoại thật](docs/two-phone-acceptance.md) với bản staging HTTPS để xác nhận GPS, quyền chia sẻ độc lập, Google Maps, thu hồi và SignalR trên thiết bị thực.
 
 Để kiểm tra nâng cấp database có dữ liệu chia sẻ cũ, chạy `& .\scripts\test-location-migration.ps1` từ thư mục gốc. Script tạo PostgreSQL thử riêng, nâng từ migration trước đó, xác nhận mốc 60 phút được giữ cho cặp đã đồng ý và trạng thái một phía cũ không rõ thời điểm bị đặt lại, rồi chạy toàn bộ test backend. Database thử được xóa sau khi chạy.
 
 Kiểm chứng mới nhất ngày 23/10/2026: backend Release và migration nâng cấp trên PostgreSQL thử đạt **85/85 test, 0 skip**. Smoke SignalR độc lập đạt, Docker image build và health check trên database thử đạt. Edge 390×844 với key thật ở localhost:5173 đạt kiểm tra URL iframe chính thức, GPS chính xác, quyền chia sẻ và reconnect; ảnh Bản đồ, Đường đi và điểm hẹn được tạo. `npm ci`, lint, release build yêu cầu key, `check:vercel` với origin HTTPS mẫu và hai lệnh audit đều đạt. Bài thử hai điện thoại HTTPS, Turnstile thật và GitHub Actions vẫn cần thực hiện trước production.
+
+Ngày 24/10/2026: kiểm tra danh mục 62 ảnh seed, frontend lint/build và backend Release build đạt; migration đổi tên “Gà Nướng Muối Ớt” nâng cấp và rollback trên PostgreSQL thử đạt, sau đó **85/85 backend test, 0 skip** trên database thử. Bài Edge 390×844 xác nhận ảnh thực sự hiện trong vòng quay, popup và kết quả Gợi ý; các kiểm tra vị trí chính xác, chia sẻ/thu hồi và kết nối lại vẫn đạt. Ảnh mẫu ở đầu README. CI của commit ảnh mới cần chạy sau khi push nhánh review.
 
 Riêng verifier Turnstile đã đạt **15/15** trường hợp Production/Preview, domain ngoài danh sách và cấu hình sai; chưa dùng khóa Cloudflare thật. Frontend `npm ci`, lint, build và audit đã đạt ở lần kiểm tra ngày 22/10/2026. API dùng hạn mức 240 request/phút cho mỗi IP trên một instance, cộng với policy theo hồ sơ/endpoint; trên Render, IP lấy từ header `CF-Connecting-IP` do edge ghi đè. Cần xác nhận hai IP mạng thật và hành vi qua proxy trên staging.
 

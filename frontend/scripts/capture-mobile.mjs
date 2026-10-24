@@ -67,7 +67,7 @@ function send(method, params = {}) {
     const timer = setTimeout(() => {
       pending.delete(id);
       reject(new Error(`${method} timed out`));
-    }, 10000);
+    }, method === 'Page.navigate' ? 30000 : 10000);
     pending.set(id, { resolve, reject, timer });
     socket.send(JSON.stringify({ id, method, params }));
   });
@@ -136,6 +136,8 @@ try {
   assert.equal(metrics.width, 390);
   assert.ok(metrics.scrollWidth <= 391, `Horizontal overflow: ${metrics.scrollWidth}px`);
   assert.deepEqual(metrics.filters, ['Tất cả', 'Món mặn', 'Chay', 'Ngọt']);
+  await waitFor(`(() => { const img = document.querySelector('.random-page-card[aria-hidden="false"].border-primary-container img');
+    return img?.naturalWidth > 0 && getComputedStyle(img).opacity === '1'; })()`, 12000);
   await capture(process.env.FOODMATCH_VISUAL_SCREENSHOT);
 
   await evaluate(`document.querySelectorAll('[aria-label="Lọc món ăn"] button')[3].click()`);
@@ -153,7 +155,29 @@ try {
   assert.ok(resultMetrics.dialogWidth <= 390, 'Result dialog exceeds mobile viewport');
   assert.equal(resultMetrics.centeredName, resultMetrics.resultName,
     'The wheel did not stop on the selected dish');
+  await waitFor(`(() => { const img = document.querySelector('[role="dialog"] .random-page-result-photo img');
+    return img?.naturalWidth > 0 && getComputedStyle(img).opacity === '1'; })()`, 12000);
+  const resultPhoto = await evaluate(`({alt: document.querySelector('[role="dialog"] .random-page-result-photo img')?.alt,
+    src: document.querySelector('[role="dialog"] .random-page-result-photo img')?.getAttribute('src')})`);
+  assert.ok(resultPhoto.alt?.includes(resultMetrics.resultName), 'Result photo has the wrong dish name');
+  assert.ok(resultPhoto.src?.startsWith('/food-images/'), 'Result photo is not the local licensed asset');
   await capture(process.env.FOODMATCH_VISUAL_RESULT_SCREENSHOT);
+
+  await send('Page.navigate', { url: `${visualOrigin}/suggest` });
+  await waitFor(`Boolean([...document.querySelectorAll('button')].find(button => button.textContent.trim() === 'Tìm món'))`);
+  await evaluate(`[...document.querySelectorAll('button')].find(button => button.textContent.trim() === 'Tìm món').click()`);
+  await waitFor(`document.querySelectorAll('section[aria-live="polite"] article').length > 0`, 12000);
+  await evaluate(`document.querySelector('section[aria-live="polite"] article').scrollIntoView({block: 'center'})`);
+  await waitFor(`(() => { const img = document.querySelector('section[aria-live="polite"] article img');
+    return img?.naturalWidth > 0 && getComputedStyle(img).opacity === '1'; })()`, 12000);
+  const suggestedPhotos = await evaluate(`({cards: document.querySelectorAll('section[aria-live="polite"] article').length,
+    photos: [...document.querySelectorAll('section[aria-live="polite"] article img')].map(img => ({alt: img.alt, src: img.getAttribute('src')})),
+    scrollWidth: document.documentElement.scrollWidth})`);
+  assert.equal(suggestedPhotos.cards, suggestedPhotos.photos.length, 'Suggested dish has no photo');
+  assert.ok(suggestedPhotos.photos.every(photo => photo.src?.startsWith('/food-images/') && photo.alt),
+    'Suggested dish did not use local named photos');
+  assert.ok(suggestedPhotos.scrollWidth <= 391, 'Suggested dish cards caused horizontal overflow');
+  await capture(process.env.FOODMATCH_VISUAL_SUGGEST_SCREENSHOT);
 
   const a = await api('/api/TempUsers', 'POST', undefined,
     { displayName: 'Visual A' });

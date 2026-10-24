@@ -1,7 +1,8 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { foodApi } from '../api/foodApi';
+import FoodPhoto from '../components/FoodPhoto';
 import type { FoodResponseDto, SuggestResponseDto } from '../types/food';
 
 const categories = [
@@ -126,10 +127,12 @@ export default function SuggestFoodPage() {
         {result && (
           <section className="mt-7 space-y-3" aria-live="polite">
             <h2 className="text-xl font-bold">{result.items.length} món phù hợp</h2>
+            <Link to="/image-credits" className="inline-block text-sm text-primary underline">Nguồn ảnh món ăn</Link>
             {result.message && <p className="text-on-surface-variant">{result.message}</p>}
             {result.items.length === 0 && <p className="rounded-xl bg-surface-container p-4">Không tìm thấy món phù hợp. Hãy thử đổi tiêu chí.</p>}
             {result.items.map((food: FoodResponseDto) => (
               <article key={food.id} className="rounded-2xl bg-surface-container p-5 border border-white/10">
+                <FoodPhoto food={food} className="mb-4 h-44 w-full overflow-hidden rounded-2xl bg-gradient-to-br from-primary-container/20 to-secondary/10" />
                 <h3 className="font-bold text-lg">{food.name}</h3>
                 <div className="flex flex-wrap gap-2 mt-2 text-sm text-on-surface-variant">
                   {food.avgPriceRange && <span>Giá: {food.avgPriceRange}</span>}

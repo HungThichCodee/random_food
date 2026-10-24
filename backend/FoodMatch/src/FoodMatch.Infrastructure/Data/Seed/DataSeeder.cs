@@ -74,7 +74,7 @@ public static class DataSeeder
             
             CreateFood("Lẩu Bò", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Cao, FoodMatch.Domain.Enums.MealTime.Toi, tags["man"], tags["thit"]),
             CreateFood("Lẩu Gà Lá É", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Cao, FoodMatch.Domain.Enums.MealTime.Toi, tags["man"], tags["thit"]),
-            CreateFood("Gà Nướng Mối", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Cao, FoodMatch.Domain.Enums.MealTime.Toi, tags["man"], tags["nuong"], tags["thit"]),
+            CreateFood("Gà Nướng Muối Ớt", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Cao, FoodMatch.Domain.Enums.MealTime.Toi, tags["man"], tags["nuong"], tags["thit"]),
             CreateFood("Cơm Gà Hội An", FoodMatch.Domain.Enums.FoodCategory.Kho, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Trua, tags["man"], tags["thit"]),
             CreateFood("Bún Cá", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Sang, tags["man"], tags["hai_san"]),
             CreateFood("Cháo Lòng", FoodMatch.Domain.Enums.FoodCategory.Nuoc, FoodMatch.Domain.Enums.PriceRange.Vua, FoodMatch.Domain.Enums.MealTime.Khuya, tags["man"], tags["thit"]),

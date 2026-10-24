@@ -6,6 +6,7 @@ $dbName = 'foodmatch_test_visual_' + [guid]::NewGuid().ToString('N').Substring(0
 $browserDir = Join-Path $root ('.tmp_visual_' + [guid]::NewGuid().ToString('N'))
 $screenshot = Join-Path $root 'random-mobile-preview.png'
 $resultScreenshot = Join-Path $root 'random-mobile-result-preview.png'
+$suggestScreenshot = Join-Path $root 'suggest-mobile-preview.png'
 $meetingScreenshot = Join-Path $root 'meeting-mobile-preview.png'
 $mapScreenshot = Join-Path $root 'map-mobile-preview.png'
 $routeScreenshot = Join-Path $root 'route-mobile-preview.png'
@@ -97,6 +98,7 @@ try {
     if (-not (Test-Path -LiteralPath $edgePath)) { throw 'Edge is not installed at the expected path' }
     if ((Test-Path -LiteralPath $screenshot) -or
         (Test-Path -LiteralPath $resultScreenshot) -or
+        (Test-Path -LiteralPath $suggestScreenshot) -or
         (Test-Path -LiteralPath $meetingScreenshot) -or
         (Test-Path -LiteralPath $mapScreenshot) -or
         (Test-Path -LiteralPath $routeScreenshot)) {
@@ -120,6 +122,7 @@ try {
 
     $env:FOODMATCH_VISUAL_SCREENSHOT = $screenshot
     $env:FOODMATCH_VISUAL_RESULT_SCREENSHOT = $resultScreenshot
+    $env:FOODMATCH_VISUAL_SUGGEST_SCREENSHOT = $suggestScreenshot
     $env:FOODMATCH_VISUAL_MEETING_SCREENSHOT = $meetingScreenshot
     $env:FOODMATCH_VISUAL_MAP_SCREENSHOT = $mapScreenshot
     $env:FOODMATCH_VISUAL_ROUTE_SCREENSHOT = $routeScreenshot
@@ -133,17 +136,19 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Mobile browser checks failed' }
     if (-not (Test-Path -LiteralPath $screenshot) -or
         -not (Test-Path -LiteralPath $resultScreenshot) -or
+        -not (Test-Path -LiteralPath $suggestScreenshot) -or
         -not (Test-Path -LiteralPath $meetingScreenshot) -or
         -not (Test-Path -LiteralPath $mapScreenshot) -or
         -not (Test-Path -LiteralPath $routeScreenshot) -or
         (Get-Item -LiteralPath $screenshot).Length -lt 10000 -or
         (Get-Item -LiteralPath $resultScreenshot).Length -lt 10000 -or
+        (Get-Item -LiteralPath $suggestScreenshot).Length -lt 10000 -or
         (Get-Item -LiteralPath $meetingScreenshot).Length -lt 10000 -or
         (Get-Item -LiteralPath $mapScreenshot).Length -lt 10000 -or
         (Get-Item -LiteralPath $routeScreenshot).Length -lt 10000) {
         throw 'Edge did not produce usable screenshots'
     }
-    Write-Output "Mobile screenshots: $screenshot; $resultScreenshot; $meetingScreenshot; $mapScreenshot; $routeScreenshot"
+    Write-Output "Mobile screenshots: $screenshot; $resultScreenshot; $suggestScreenshot; $meetingScreenshot; $mapScreenshot; $routeScreenshot"
 } finally {
     if ($edge -and -not $edge.HasExited) { Stop-Process -Id $edge.Id -Force }
     if ($vite -and -not $vite.HasExited) { Stop-Process -Id $vite.Id -Force }

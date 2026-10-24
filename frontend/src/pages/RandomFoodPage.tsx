@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { foodApi } from '../api/foodApi';
+import FoodPhoto from '../components/FoodPhoto';
 import { useFoodStore } from '../stores/useFoodStore';
 import { useUserStore } from '../stores/useUserStore';
 import type { FoodResponseDto } from '../types/food';
-import { safeFoodImageUrl, suggestedFoodImage } from '../utils/foodImages';
 import './RandomFoodPage.css';
 
 const filters = [
@@ -29,34 +29,6 @@ function appearance(food: FoodResponseDto) {
   if (tags.includes('ngọt')) return { icon: '🍮', label: 'Món ngọt', tone: 'text-tertiary' };
   if (tags.includes('chay')) return { icon: '🥬', label: 'Món chay', tone: 'text-secondary' };
   return { icon: food.category === 'Nuoc' ? '🍜' : '🍽️', label: 'Món mặn', tone: 'text-primary' };
-}
-
-function FoodPhoto({ food, className }: { food: FoodResponseDto; className: string }) {
-  const [sourceIndex, setSourceIndex] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const suggested = suggestedFoodImage(food);
-  const imageUrl = safeFoodImageUrl(food.imageUrl);
-  const sources = imageUrl ? [imageUrl, suggested] : [suggested];
-
-  useEffect(() => {
-    setSourceIndex(0);
-    setImageLoaded(false);
-  }, [food.id, food.imageUrl]);
-  useEffect(() => setImageLoaded(false), [sourceIndex]);
-
-  return (
-    <div className={`${className} relative`}>
-      <span className="absolute inset-0 flex items-center justify-center text-5xl" aria-hidden="true">
-        {appearance(food).icon}
-      </span>
-      {sourceIndex < sources.length && (
-        <img src={sources[sourceIndex]} alt={food.name} loading="lazy" decoding="async"
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-          onLoad={() => setImageLoaded(true)}
-          onError={() => setSourceIndex((index) => index + 1)} />
-      )}
-    </div>
-  );
 }
 
 export default function RandomFoodPage() {
@@ -332,7 +304,10 @@ export default function RandomFoodPage() {
             {selected && !modalOpen && <button type="button" onClick={() => setModalOpen(true)} className="mt-3 w-full py-2 text-center text-sm font-semibold text-primary">Xem món vừa chọn: {selected.name}</button>}
           </div>
         </section>
-        <p className="random-page-footnote mt-4 text-center text-xs leading-relaxed text-on-surface-variant">Các món trên vòng quay và kết quả đều lấy từ dữ liệu của hệ thống.</p>
+        <p className="random-page-footnote mt-4 text-center text-xs leading-relaxed text-on-surface-variant">
+          Các món trên vòng quay và kết quả đều lấy từ dữ liệu của hệ thống.{' '}
+          <Link to="/image-credits" className="text-primary underline">Nguồn ảnh món ăn</Link>
+        </p>
       </div>
 
       {modalOpen && selected && (
@@ -347,7 +322,7 @@ export default function RandomFoodPage() {
               </button>
             </div>
             <div className="mt-3 text-center">
-              <FoodPhoto food={selected} className="random-page-result-photo mx-auto h-40 w-full overflow-hidden rounded-[24px] bg-gradient-to-br from-primary-container/25 to-secondary/15" />
+              <FoodPhoto food={selected} eager className="random-page-result-photo mx-auto h-40 w-full overflow-hidden rounded-[24px] bg-gradient-to-br from-primary-container/25 to-secondary/15" />
               <h2 id="random-result-title" className="mt-4 text-2xl font-extrabold">{selected.name}</h2>
               <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm text-on-surface-variant">
                 {selected.avgPriceRange && <span className="rounded-full bg-white/5 px-3 py-1">Giá {priceLabel[selected.avgPriceRange] || selected.avgPriceRange}</span>}

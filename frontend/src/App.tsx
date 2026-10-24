@@ -14,6 +14,7 @@ const NearbyBuddiesPage = lazy(() => import('./pages/NearbyBuddiesPage'));
 const CreateProfilePage = lazy(() => import('./pages/CreateProfilePage'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
 const DirectionRoutePage = lazy(() => import('./pages/DirectionRoutePage'));
+const FoodImageCreditsPage = lazy(() => import('./pages/FoodImageCreditsPage'));
 
 function App() {
   const expiresAt = useUserStore((state) => state.profile?.expiresAt);
@@ -48,6 +49,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/random" element={<RandomFoodPage />} />
             <Route path="/suggest" element={<SuggestFoodPage />} />
+            <Route path="/image-credits" element={<FoodImageCreditsPage />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/buddies" element={<NearbyBuddiesPage />} />
             <Route path="/profile" element={<CreateProfilePage />} />

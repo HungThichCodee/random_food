@@ -1,0 +1,560 @@
+{
+  "Phở Bò": {
+    "file": "pho-bo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ph%E1%BB%9F_b%C3%B2_t%C3%A1i.JPG",
+    "author": "Ngô Trung",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "match": "exact",
+    "bytes": 184179
+  },
+  "Bún Bò Huế": {
+    "file": "bun-bo-hue.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bun-Bo-Hue-from-Huong-Giang-2011.jpg",
+    "author": "Kham Tran - www.khamtran.com",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "match": "exact",
+    "bytes": 84571
+  },
+  "Cơm Tấm": {
+    "file": "com-tam.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Com-Tam-2008.jpg",
+    "author": "Kham Tran",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "match": "exact",
+    "bytes": 131366
+  },
+  "Bánh Mì Thịt": {
+    "file": "banh-mi-thit.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_m%C3%AC_th%E1%BB%8Bt_ngu%E1%BB%99i.jpg",
+    "author": "Minh Nguyen",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 126329
+  },
+  "Gỏi Cuốn": {
+    "file": "goi-cuon.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:G%E1%BB%8Fi_cu%E1%BB%91n.jpg",
+    "author": "Tran Hai Duong",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "match": "exact",
+    "bytes": 90449
+  },
+  "Bún Chả": {
+    "file": "bun-cha.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_ch%E1%BA%A3_Vietnamese_food.jpg",
+    "author": "stuart_spivack",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 121181
+  },
+  "Bánh Xèo": {
+    "file": "banh-xeo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_x%C3%A8o_with_n%C6%B0%E1%BB%9Bc_m%E1%BA%AFm.jpg",
+    "author": "Vivian D Nguyen",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 87027
+  },
+  "Bún Đậu Mắm Tôm": {
+    "file": "bun-dau-mam-tom.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m.jpg",
+    "author": "trungnguyen299",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 154271
+  },
+  "Mì Quảng": {
+    "file": "mi-quang.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:M%C3%AC_Qu%E1%BA%A3ng,_Da_Nang,_Vietnam.jpg",
+    "author": "Christopher Crouzet",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 100352
+  },
+  "Bún Riêu": {
+    "file": "bun-rieu.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bun_rieu.jpg",
+    "author": "Schellack at English Wikipedia",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "match": "exact",
+    "bytes": 174344
+  },
+  "Hủ Tiếu Nam Vang": {
+    "file": "hu-tieu-nam-vang.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:H%E1%BB%A7_ti%E1%BA%BFu_Nam_Vang.jpg",
+    "author": "SauceSupreme",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 142013
+  },
+  "Cơm Rang Dưa Bò": {
+    "file": "com-rang-dua-bo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Cumin_beef_fried_rice.jpg",
+    "author": "Fumikas Sagisavas",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "match": "representative",
+    "bytes": 201377
+  },
+  "Xôi Xéo": {
+    "file": "xoi-xeo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:X%C3%B4i_x%C3%A9o.jpg",
+    "author": "Viethavvh",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 204065
+  },
+  "Bánh Canh Cua": {
+    "file": "banh-canh-cua.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_canh_cua.jpg",
+    "author": "SauceSupreme",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 151867
+  },
+  "Bún Thịt Nướng": {
+    "file": "bun-thit-nuong.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bun_thit_nuong.jpg",
+    "author": "Lưu Ly",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:Bun_thit_nuong.jpg",
+    "match": "exact",
+    "bytes": 221357
+  },
+  "Bánh Khọt": {
+    "file": "banh-khot.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_kh%E1%BB%8Dt_(2020-3-28).jpg",
+    "author": "Baoothersks",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 348594
+  },
+  "Chả Giò (Nem Rán)": {
+    "file": "cha-gio-nem-ran.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ch%E1%BA%A3_gi%C3%B2_SG_(nem_r%C3%A1n_gi%C3%B2n)_%E1%BB%9F_qu%C3%A1n_b%C3%BAn_ri%C3%AAu_B%C3%A0_Ti_ng26th7n2023_(3).jpg",
+    "author": "Phương Huy",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 431789
+  },
+  "Bánh Bèo": {
+    "file": "banh-beo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_b%C3%A8o_ch%C3%A9n.jpg",
+    "author": "Nha Nghi La from Ho Chi Minh, Viet Nam",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 111174
+  },
+  "Nem Nướng": {
+    "file": "nem-nuong.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Nem_n%C6%B0%E1%BB%9Bng.jpg",
+    "author": "Buihaidang192",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 335535
+  },
+  "Lẩu Thái": {
+    "file": "lau-thai.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Thai_suki,_Thai_hot_pot_preparation,_Dining_in_Bangkok,_Thailand.jpg",
+    "author": "Vyacheslav Argenberg",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "match": "representative",
+    "bytes": 149534
+  },
+  "Lẩu Bò": {
+    "file": "lau-bo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:L%E1%BA%A9u_b%C3%B2_t%E1%BA%A1i_qu%C3%A1n_B%C3%B2_c%C6%B0%E1%BB%9Di_(3).jpg",
+    "author": "Phương Huy (thảo luận)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:L%E1%BA%A9u_b%C3%B2_t%E1%BA%A1i_qu%C3%A1n_B%C3%B2_c%C6%B0%E1%BB%9Di_(3).jpg",
+    "match": "exact",
+    "bytes": 312937
+  },
+  "Lẩu Gà Lá É": {
+    "file": "lau-ga-la-e.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Newone_-_l%E1%BA%A9u_g%C3%A0,_s%C6%B0%E1%BB%9Dn_v%C3%A0_r%C6%B0%E1%BB%A3u_%C4%91inh_l%C4%83ng.jpg",
+    "author": "Newone",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "representative",
+    "bytes": 184878
+  },
+  "Gà Nướng Muối Ớt": {
+    "file": "ga-nuong-muoi-ot.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:G%C3%A0_n%C6%B0%E1%BB%9Bng_mu%E1%BB%91i_%E1%BB%9Bt.jpg",
+    "author": "Baoothersks",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 331772
+  },
+  "Cơm Gà Hội An": {
+    "file": "com-ga-hoi-an.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Com_ga_Viet_Nam_voi_ga_luoc_com_vang_va_nuoc_cham.jpg",
+    "author": "Taikhuong04",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "representative",
+    "bytes": 404071
+  },
+  "Bún Cá": {
+    "file": "bun-ca.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_C%C3%A1_H%C3%A0_N%E1%BB%99i.jpg",
+    "author": "Ron Diggity",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 170632
+  },
+  "Cháo Lòng": {
+    "file": "chao-long.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_l%C3%B2ng.jpg",
+    "author": "hongnhung106",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 128044
+  },
+  "Bún Ốc": {
+    "file": "bun-oc.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_%E1%BB%91c.jpg",
+    "author": "Thang Nguyen from Nottingham, United Kingdom",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 194913
+  },
+  "Bánh Tráng Trộn": {
+    "file": "banh-trang-tron.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Vietnamese_%22banh_trang_tron%22.JPG",
+    "author": "Memberofc1",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "match": "exact",
+    "bytes": 217139
+  },
+  "Bánh Tráng Nướng": {
+    "file": "banh-trang-nuong.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_tr%C3%A1ng_n%C6%B0%E1%BB%9Bng_TP._H%E1%BB%93_Ch%C3%AD_Minh_-_street_food_in_Ho_Chi_Minh_City,_Vietnam.jpg",
+    "author": "Light Write",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 174203
+  },
+  "Chè Khúc Bạch": {
+    "file": "che-khuc-bach.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ch%C3%A8_kh%C3%BAc_b%E1%BA%A1ch_%E1%BB%9F_qu%C3%A1n_Th%E1%BA%A3o_Vy_2020_09_06.jpg",
+    "author": "Phương Huy",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 194675
+  },
+  "Chè Đậu Đen": {
+    "file": "che-dau-den.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ch%C3%A8_%C4%91%E1%BA%ADu_%C4%91en_nh%C3%A0_l%C3%A0m_(th%C3%A1ng_1_n%C4%83m_2018)_(1).jpg",
+    "author": "Phương Huy (thảo luận)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%A8_%C4%91%E1%BA%ADu_%C4%91en_nh%C3%A0_l%C3%A0m_(th%C3%A1ng_1_n%C4%83m_2018)_(1).jpg",
+    "match": "exact",
+    "bytes": 165271
+  },
+  "Sinh Tố Bơ": {
+    "file": "sinh-to-bo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Sinh_t%E1%BB%91_b%C6%A1.jpg",
+    "author": "Hoangkid (thảo luận)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:Sinh_t%E1%BB%91_b%C6%A1.jpg",
+    "match": "exact",
+    "bytes": 100105
+  },
+  "Nước Mía": {
+    "file": "nuoc-mia.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Sugarcanejuice.jpg",
+    "author": "Food Trails",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 104729
+  },
+  "Cà Phê Sữa Đá": {
+    "file": "ca-phe-sua-da.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ca_Phe_Sua_Da.jpg",
+    "author": "Clarin",
+    "license": "CC BY 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+    "match": "exact",
+    "bytes": 141704
+  },
+  "Bò Né": {
+    "file": "bo-ne.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%B2_n%C3%A9_(b%C3%B2_Gia_Lai)_ng8th2n2021_(3).jpg",
+    "author": "Phương Huy",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "match": "exact",
+    "bytes": 423781
+  },
+  "Bò Lúc Lắc": {
+    "file": "bo-luc-lac.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bo_Luc_Lac-_the_shaking_beef.jpg",
+    "author": "Nick Nguyen",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 114413
+  },
+  "Cơm Niêu": {
+    "file": "com-nieu.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_ni%C3%AAu_Kombo.jpg",
+    "author": "Tuantq89",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 478895
+  },
+  "Bún Mắm": {
+    "file": "bun-mam.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_M%E1%BA%AFm_S%C3%B3c_Tr%C4%83ng.jpg",
+    "author": "Alpha",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 115293
+  },
+  "Bánh Ướt": {
+    "file": "banh-uot.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_%C6%B0%E1%BB%9Bt_(wet_cakes)_(23976854760).jpg",
+    "author": "pelican from Tokyo, Japan",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 87169
+  },
+  "Bánh Đúc Nóng": {
+    "file": "banh-duc-nong.jpg",
+    "source": "https://www.flickr.com/photos/12938647@N00/54287722192",
+    "author": "librarianidol",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "match": "exact",
+    "bytes": 135470
+  },
+  "Cơm Hến": {
+    "file": "com-hen.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_c%C6%A1m_h%E1%BA%BFn_V%C4%A9_D%E1%BA%A1_(1).jpg",
+    "author": "Phương Huy",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 497904
+  },
+  "Bún Hến": {
+    "file": "bun-hen.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_h%E1%BA%BFn_-_%C4%91%E1%BA%B7c_s%E1%BA%A3n_Mai_X%C3%A1.JPG",
+    "author": "The original uploader was Bút Chiến at Vietnamese Wikipedia.",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_h%E1%BA%BFn_-_%C4%91%E1%BA%B7c_s%E1%BA%A3n_Mai_X%C3%A1.JPG",
+    "match": "exact",
+    "bytes": 266919
+  },
+  "Nem Lụi": {
+    "file": "nem-lui.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Nem_l%E1%BB%A5i.jpg",
+    "author": "Charles Haynes",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "match": "exact",
+    "bytes": 252828
+  },
+  "Bò Kho": {
+    "file": "bo-kho.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bo_Kho.jpg",
+    "author": "Jason Hutchens",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 255161
+  },
+  "Phở Gà": {
+    "file": "pho-ga.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Pho_ga_(29741913464).jpg",
+    "author": "T.Tseng",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 147303
+  },
+  "Miến Lươn": {
+    "file": "mien-luon.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Mien_luon_Hang_Dieu.JPG",
+    "author": "vi:User:Rungbachduong",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "match": "exact",
+    "bytes": 241712
+  },
+  "Cháo Sườn": {
+    "file": "chao-suon.jpg",
+    "source": "https://www.flickr.com/photos/93512023@N00/4367100754",
+    "author": "jasonlam",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "match": "representative",
+    "bytes": 43517
+  },
+  "Súp Cua": {
+    "file": "sup-cua.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:S%C3%BAp_cua_Vi%E1%BB%87t_Nam.jpg",
+    "author": "Phương Huy (thảo luận)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:S%C3%BAp_cua_Vi%E1%BB%87t_Nam.jpg",
+    "match": "exact",
+    "bytes": 113684
+  },
+  "Bột Chiên": {
+    "file": "bot-chien.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:B%E1%BB%99t_chi%C3%AAn_t%E1%BA%A1i_S%C3%A0i_G%C3%B2n.JPG",
+    "author": "Tonbi ko",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 172895
+  },
+  "Cơm Chay": {
+    "file": "com-chay.jpg",
+    "source": "https://www.flickr.com/photos/52887766@N00/7380998632",
+    "author": "steveschoenly",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "match": "representative",
+    "bytes": 125544
+  },
+  "Phở Chay Nấm Hương": {
+    "file": "pho-chay-nam-huong.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Tofu_noodle_soup_(Ph%E1%BB%9F_chay)_-_Pho_Hanoi_Authentic_2024-12-01.jpg",
+    "author": "Andy Li",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "match": "representative",
+    "bytes": 148249
+  },
+  "Bún Riêu Chay Đậu Hũ": {
+    "file": "bun-rieu-chay-dau-hu.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Vietnamese_vegetarian_crab_noodle_soup.jpg",
+    "author": "Mx. Granger",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "match": "representative",
+    "bytes": 186921
+  },
+  "Hủ Tiếu Chay Rau Củ": {
+    "file": "hu-tieu-chay-rau-cu.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Hu_tieu_chay.jpg",
+    "author": "Nguyen Thi Quynh Tram",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "match": "representative",
+    "bytes": 126897
+  },
+  "Bún Bò Huế Chay": {
+    "file": "bun-bo-hue-chay.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Chinese_spicy_soup_rice_noodle_with_spicy_tofu.jpg",
+    "author": "Mystery6002",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "match": "representative",
+    "bytes": 263133
+  },
+  "Gỏi Cuốn Chay Nấm": {
+    "file": "goi-cuon-chay-nam.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:G%E1%BB%8Fi_Cu%E1%BB%91n_Chay_Vietnamese_Fresh_Vegetarian_Spring_Roll_2019-1599.jpg",
+    "author": "Paul R. Burley",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "representative",
+    "bytes": 88931
+  },
+  "Bánh Mì Chay Pâté Nấm": {
+    "file": "banh-mi-chay-pate-nam.jpg",
+    "source": "https://www.flickr.com/photos/21001756@N06/4944251022",
+    "author": "Stacy Spensley",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "match": "representative",
+    "bytes": 128251
+  },
+  "Miến Xào Chay Nấm Đông Cô": {
+    "file": "mien-xao-chay-nam-dong-co.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:M%E1%BB%99c_nh%C4%A9_x%C3%A0o_mi%E1%BA%BFn_chay,_t%E1%BA%A5t_ni%C3%AAn_nh%C3%A0_m%E1%BB%87,_T%E1%BA%BFt_2018_(1).jpg",
+    "author": "Phương Huy (thảo luận)",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:M%E1%BB%99c_nh%C4%A9_x%C3%A0o_mi%E1%BA%BFn_chay,_t%E1%BA%A5t_ni%C3%AAn_nh%C3%A0_m%E1%BB%87,_T%E1%BA%BFt_2018_(1).jpg",
+    "match": "representative",
+    "bytes": 323222
+  },
+  "Salad Bơ Trái Cây Sốt Mè": {
+    "file": "salad-bo-trai-cay-sot-me.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:A_bowl_of_fruits_salad_with_avocado.jpg",
+    "author": "Halima Waziri",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "representative",
+    "bytes": 329763
+  },
+  "Cháo Nấm Tràm Hạt Sen": {
+    "file": "chao-nam-tram-hat-sen.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Beoseot-deulkkae-juk.jpg",
+    "author": "모카향기",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "match": "representative",
+    "bytes": 165042
+  },
+  "Canh Nấm Đậu Hũ Rong Biển": {
+    "file": "canh-nam-dau-hu-rong-bien.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Miso_Soup_001.jpg",
+    "author": "Ocdp",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "match": "representative",
+    "bytes": 92642
+  },
+  "Chè Hạt Sen Long Nhãn": {
+    "file": "che-hat-sen-long-nhan.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Nh%C3%A0_m%C3%ACnh_d%E1%BB%8Bp_L%E1%BB%85_2th9n2023_(ch%C3%A8_nh%C3%A3n_nh%E1%BB%A5c_h%E1%BA%A1t_sen)_(1).jpg",
+    "author": "Phương Huy",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "match": "exact",
+    "bytes": 234777
+  },
+  "Cơm Chiên Chay Dương Châu": {
+    "file": "com-chien-chay-duong-chau.jpg",
+    "source": "https://www.flickr.com/photos/35022955@N06/7893613332",
+    "author": "Lablascovegmenu",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "match": "representative",
+    "bytes": 132418
+  }
+}
