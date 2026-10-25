@@ -67,6 +67,11 @@ try {
     }
     if (-not $ready) { throw 'Temporary API did not become healthy' }
 
+    $healthResponse = Invoke-WebRequest -Uri 'http://127.0.0.1:5099/api/health' -UseBasicParsing -TimeoutSec 3
+    if ($healthResponse.Headers['Cache-Control'] -notmatch '(^|,)\s*no-store(\s*,|$)') {
+        throw 'API responses must include Cache-Control: no-store'
+    }
+
     node (Join-Path $root 'frontend/scripts/smoke-signalr.mjs')
     if ($LASTEXITCODE -ne 0) { throw 'SignalR smoke failed' }
 

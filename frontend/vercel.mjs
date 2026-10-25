@@ -18,6 +18,10 @@ function requiredHttpsOrigin(name) {
 
 const apiOrigin = requiredHttpsOrigin('VITE_API_URL');
 const signalrOrigin = requiredHttpsOrigin('VITE_SIGNALR_URL');
+const publicIndexing = process.env.FOODMATCH_SEO_INDEXABLE === '1';
+if (process.env.FOODMATCH_SEO_INDEXABLE && !['0', '1'].includes(process.env.FOODMATCH_SEO_INDEXABLE))
+  throw new Error('FOODMATCH_SEO_INDEXABLE must be 0 or 1');
+if (publicIndexing) requiredHttpsOrigin('VITE_PUBLIC_ORIGIN');
 const socketOrigin = new URL(signalrOrigin.replace(/^https:/, 'wss:')).origin;
 const imageOrigins = [...new Set([
   'https://images.unsplash.com',
@@ -54,6 +58,7 @@ export const config = {
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'Permissions-Policy', value: 'geolocation=(self), camera=(), microphone=()' },
       { key: 'X-Frame-Options', value: 'DENY' },
+      ...(!publicIndexing ? [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] : []),
       {
         key: 'Content-Security-Policy',
         value: [
@@ -71,5 +76,8 @@ export const config = {
         ].join('; '),
       },
     ],
-  }],
+  }, ...['/map', '/profile', '/buddies', '/route', '/chat', '/chat/:matchId'].map(source => ({
+    source,
+    headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+  }))],
 };

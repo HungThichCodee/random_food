@@ -248,6 +248,9 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<FoodMatch.Api.Middlewares.GlobalExceptionMiddleware>();
 app.Use(async (context, next) =>
 {
+    if (context.Request.Path.StartsWithSegments("/api") ||
+        context.Request.Path.StartsWithSegments("/hubs"))
+        context.Response.Headers.CacheControl = "no-store";
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
     context.Response.Headers["Permissions-Policy"] = "geolocation=(self), camera=(), microphone=()";

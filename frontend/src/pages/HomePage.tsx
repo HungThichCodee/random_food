@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Toast } from '../stores/useToastStore';
 import { useUserStore } from '../stores/useUserStore';
@@ -35,10 +35,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_16px_rgba(0,0,0,0.35)]">
         <div className="h-16 px-margin flex items-center justify-between">
-          <div 
-            className="flex items-center gap-space-sm cursor-pointer"
-            onClick={() => navigate('/')}
-          >
+          <Link to="/" className="flex items-center gap-space-sm cursor-pointer">
             <img 
               alt="Food Match Brand Icon" 
               className="h-8 w-auto object-contain" 
@@ -53,7 +50,7 @@ export default function HomePage() {
                 {t('home.yourArea')}
               </span>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-space-xs">
             {/* Language Switcher */}
             <button
@@ -168,8 +165,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-3.5">
               
               {/* Card 1: Random Món Ăn */}
-              <div 
-                onClick={() => navigate('/random')} 
+              <Link to="/random"
                 className="group cursor-pointer relative flex flex-col justify-between p-4 rounded-lg bg-surface-container/75 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_24px_rgba(255,107,53,0.35)] overflow-hidden border border-white/5"
               >
                 <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary-container/15 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
@@ -191,11 +187,10 @@ export default function HomePage() {
                   <span>{t('home.spinNow')}</span>
                   <span className="material-symbols-outlined text-[14px]">casino</span>
                 </div>
-              </div>
+              </Link>
 
               {/* Card 2: Tìm Quán */}
-              <div 
-                onClick={() => navigate('/map')} 
+              <Link to="/map"
                 className="group cursor-pointer relative flex flex-col justify-between p-4 rounded-lg bg-surface-container/75 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_24px_rgba(79,219,204,0.35)] overflow-hidden border border-white/5"
               >
                 <div className="absolute -top-10 -right-10 w-24 h-24 bg-secondary-container/15 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
@@ -217,11 +212,10 @@ export default function HomePage() {
                   <span>{t('home.explore')}</span>
                   <span className="material-symbols-outlined text-[14px]">near_me</span>
                 </div>
-              </div>
+              </Link>
 
               {/* Card 3: Gợi Ý Khẩu Vị */}
-              <div 
-                onClick={() => navigate('/suggest')} 
+              <Link to="/suggest"
                 className="group relative flex flex-col justify-between p-4 rounded-lg bg-surface-container/75 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_24px_rgba(227,198,51,0.35)] overflow-hidden cursor-pointer border border-white/5"
               >
                 <div className="absolute -top-10 -right-10 w-24 h-24 bg-tertiary-container/15 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
@@ -243,11 +237,10 @@ export default function HomePage() {
                   <span>{t('home.setup')}</span>
                   <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
                 </div>
-              </div>
+              </Link>
 
               {/* Card 4: Tìm Bạn Ăn */}
-              <div 
-                onClick={() => navigate('/profile')} 
+              <Link to="/profile"
                 className="group relative flex flex-col justify-between p-4 rounded-lg bg-surface-container/75 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_24px_rgba(255,107,53,0.35)] overflow-hidden cursor-pointer border border-white/5"
               >
                 <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/20 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
@@ -271,7 +264,7 @@ export default function HomePage() {
                   <span>{t('home.joinTable')}</span>
                   <span className="material-symbols-outlined text-[14px]">group_add</span>
                 </div>
-              </div>
+              </Link>
 
             </div>
           </section>

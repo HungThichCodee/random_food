@@ -102,6 +102,8 @@ Frontend đọc biến `VITE_*` từ `.env` ở thư mục gốc theo `vite.conf
 | `VITE_API_URL` | URL gốc backend, không thêm `/api` | `http://localhost:5000` | Có với frontend |
 | `VITE_SIGNALR_URL` | URL gốc backend cho các hub SignalR | `http://localhost:5000` | Có với frontend |
 | `VITE_FOOD_IMAGE_ORIGINS` | Origin HTTPS bổ sung cho `ImageUrl` của món thêm ngoài seed; dùng chung với CSP Vercel, phân tách bằng dấu phẩy | Rỗng; mặc định cho Unsplash/Wikimedia | Không |
+| `FOODMATCH_SEO_INDEXABLE` | Vercel: `0` cho staging; `1` chỉ cho project production đã có domain HTTPS cố định. Khi không đặt, mọi trang nhận `X-Robots-Tag: noindex` | Không đặt = `0` | Có khi muốn production được lập chỉ mục |
+| `VITE_PUBLIC_ORIGIN` | Origin HTTPS chính thức dùng cho canonical của các trang công khai; Vercel bắt buộc khi bật `FOODMATCH_SEO_INDEXABLE=1` | Không đặt khi local | Có nếu bật lập chỉ mục production |
 | `VITE_TURNSTILE_SITE_KEY` | Khóa công khai widget CAPTCHA | Rỗng khi Development | Có khi Production |
 | `GoogleMaps__EmbedApiKey` | Khóa công khai Maps Embed API cho cả backend và frontend, giới hạn theo API và HTTP referrer của site | Rỗng: iframe cũ; có khóa: `view`, `search`, `directions` chính thức | Có cho release; đặt ở cả Render và Vercel |
 | `MeetingPlaces__OverpassUrl` | Nguồn Overpass riêng cho danh sách OSM bổ sung | Bỏ trống: chỉ dùng Google Maps ở mọi môi trường | Không; chỉ đặt endpoint HTTPS riêng đã duyệt, endpoint công khai mặc định bị từ chối |
@@ -206,6 +208,8 @@ CI ở [Verify Food Match](.github/workflows/verify.yml) chạy khi push/PR; [ru
 Build frontend trong thư mục `frontend` bằng `npm run build` và phục vụ các file trong `frontend/dist/` bằng máy chủ tĩnh có chuyển các route ứng dụng về `index.html`. Các biến `VITE_*` cần đúng **trước lúc build** vì Vite đưa chúng vào bundle. Backend có `backend/FoodMatch/src/FoodMatch.Api/Dockerfile` để build image ASP.NET Core 10; `docker-compose.yml` hiện chỉ khai báo PostgreSQL, chưa có service frontend/backend. Có thể kiểm tra image local bằng `docker build -f src/FoodMatch.Api/Dockerfile -t foodmatch-api:preflight .` từ `backend/FoodMatch`, rồi chạy `& .\scripts\smoke-docker-api.ps1` từ thư mục gốc khi PostgreSQL Docker đang hoạt động. Script tạo và xóa database thử riêng. Cấu hình PostgreSQL, JWT, CORS và địa chỉ lắng nghe cho môi trường triển khai; lưu secret ngoài Git. API chạy migration và seed lúc khởi động, nên cần quyền truy cập database phù hợp.
 
 Quy trình cụ thể Supabase → Render → Vercel nằm trong [.claude/skills/deploy.md](.claude/skills/deploy.md). Verify chạy khi push/PR và được Release gọi lại. Release là CD thủ công cho staging/production, triển khai cùng SHA lên Render/Vercel sau GitHub Environment gate. [CI đầu tiên của nhánh review](https://github.com/HungThichCodee/random_food/actions/runs/39984638973) đã đạt cả frontend/backend; chưa deploy staging/production. Có thể bắt đầu quy trình staging sau khi duyệt bản review và CI commit cuối xanh; chỉ phát hành production khi hai điện thoại HTTPS, Turnstile, CSP/WSS, backup/rollback và rà chiến lược lưu phiên đạt.
+
+Trước khi cấu hình Vercel, xem [báo cáo bảo mật và SEO](docs/security-seo-review-2026-10-25.md). Project staging đặt `FOODMATCH_SEO_INDEXABLE=0`; project production chỉ đặt `1` cùng `VITE_PUBLIC_ORIGIN` là domain HTTPS chính thức. Các trang chat/hồ sơ/vị trí luôn có `noindex`; đây không phải cơ chế phân quyền.
 
 ## Xử lý sự cố thường gặp
 

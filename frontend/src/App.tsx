@@ -5,6 +5,7 @@ import { useUserStore } from './stores/useUserStore';
 
 import AppLayout from './components/Layout/AppLayout';
 import RequireActiveProfile from './components/RequireActiveProfile';
+import PageMetadata from './components/PageMetadata';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const RandomFoodPage = lazy(() => import('./pages/RandomFoodPage'));
@@ -43,6 +44,7 @@ function App() {
 
   return (
     <SignalRProvider>
+      <PageMetadata />
       <Suspense fallback={<div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 text-center text-on-surface" role="status">Đang tải trang...</div>}>
         <Routes>
           <Route element={<AppLayout />}>
