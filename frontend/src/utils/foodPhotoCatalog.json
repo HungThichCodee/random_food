@@ -488,12 +488,12 @@
   },
   "Gỏi Cuốn Chay Nấm": {
     "file": "goi-cuon-chay-nam.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:G%E1%BB%8Fi_Cu%E1%BB%91n_Chay_Vietnamese_Fresh_Vegetarian_Spring_Roll_2019-1599.jpg",
-    "author": "Paul R. Burley",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "match": "representative",
-    "bytes": 88931
+    "source": "https://www.flickr.com/photos/12670507@N02/6844917268",
+    "author": "gamene",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "match": "exact",
+    "bytes": 193952
   },
   "Bánh Mì Chay Pâté Nấm": {
     "file": "banh-mi-chay-pate-nam.jpg",
