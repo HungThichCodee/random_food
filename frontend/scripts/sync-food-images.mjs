@@ -82,7 +82,8 @@ async function download(entry) {
   writeFileSync(path.join(outputDir, filename), bytes);
   return {
     file: filename, source: data.source, author: data.author, license: data.license,
-    licenseUrl: data.licenseUrl, match: entry.match || 'exact', bytes: bytes.length,
+    licenseUrl: data.licenseUrl, match: entry.match || 'exact',
+    ...(entry.crop ? { crop: entry.crop } : {}), bytes: bytes.length,
   };
 }
 

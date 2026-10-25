@@ -415,12 +415,13 @@
   },
   "Cháo Sườn": {
     "file": "chao-suon.jpg",
-    "source": "https://www.flickr.com/photos/93512023@N00/4367100754",
-    "author": "jasonlam",
-    "license": "CC BY-SA 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
-    "match": "representative",
-    "bytes": 43517
+    "source": "https://www.flickr.com/photos/princeroy/22383567766",
+    "author": "Prince Roy",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "match": "exact",
+    "crop": "right-half",
+    "bytes": 138125
   },
   "Súp Cua": {
     "file": "sup-cua.jpg",

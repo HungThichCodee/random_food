@@ -10,6 +10,7 @@ type PhotoRecord = {
   license: string;
   licenseUrl: string;
   match: 'exact' | 'representative';
+  crop?: 'right-half';
 };
 
 const photos = catalog as Record<string, PhotoRecord>;
@@ -43,7 +44,7 @@ export default function FoodPhoto({ food, className, eager = false }: {
           alt={record?.match === 'representative' ? `Ảnh minh họa món ${food.name}` : food.name}
           loading={eager ? 'eager' : 'lazy'}
           decoding="async"
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute top-0 h-full max-w-none object-cover transition-opacity ${record?.crop === 'right-half' ? 'right-0 w-[200%]' : 'inset-x-0 w-full'} ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setImageLoaded(true)}
           onError={() => { setImageLoaded(false); setSourceIndex((index) => index + 1); }}
         />

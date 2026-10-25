@@ -51,7 +51,7 @@
 | Bò Kho | [bo-kho.jpg](https://commons.wikimedia.org/wiki/File:Bo_Kho.jpg) | Jason Hutchens | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) | Đúng món |
 | Phở Gà | [pho-ga.jpg](https://commons.wikimedia.org/wiki/File:Pho_ga_(29741913464).jpg) | T.Tseng | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) | Đúng món |
 | Miến Lươn | [mien-luon.jpg](https://commons.wikimedia.org/wiki/File:Mien_luon_Hang_Dieu.JPG) | vi:User:Rungbachduong | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | Đúng món |
-| Cháo Sườn | [chao-suon.jpg](https://www.flickr.com/photos/93512023@N00/4367100754) | jasonlam | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | Minh họa biến thể |
+| Cháo Sườn | [chao-suon.jpg](https://www.flickr.com/photos/princeroy/22383567766) | Prince Roy | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | Đúng món |
 | Súp Cua | [sup-cua.jpg](https://commons.wikimedia.org/wiki/File:S%C3%BAp_cua_Vi%E1%BB%87t_Nam.jpg) | Phương Huy (thảo luận) | [Public domain](https://commons.wikimedia.org/wiki/File:S%C3%BAp_cua_Vi%E1%BB%87t_Nam.jpg) | Đúng món |
 | Bột Chiên | [bot-chien.jpg](https://commons.wikimedia.org/wiki/File:B%E1%BB%99t_chi%C3%AAn_t%E1%BA%A1i_S%C3%A0i_G%C3%B2n.JPG) | Tonbi ko | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
 | Cơm Chay | [com-chay.jpg](https://commons.wikimedia.org/wiki/File:Saigon_Vegetarian_food.jpg) | Takeaway | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | Đúng món |
