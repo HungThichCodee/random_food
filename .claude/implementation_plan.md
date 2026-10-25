@@ -42,6 +42,8 @@ Maps Embed và CI/CD cập nhật 23/10/2026: đã thêm `view/search/directions
 
 Ảnh món cập nhật 24/10/2026: 62 món seed có ảnh cục bộ, tên file theo món, nguồn/tác giả/giấy phép riêng tại `docs/food-image-credits.md`; ảnh chỉ gần đúng được ghi “minh họa biến thể”. Vòng quay, popup và trang Gợi ý đã hiển thị ảnh; Edge 390×844 xác nhận ảnh hiện thật và các luồng vị trí, quyền chia sẻ, reconnect vẫn đạt. Frontend lint/build, kiểm tra danh mục ảnh và backend Release build đạt; migration tên món nâng cấp/rollback và 85/85 test PostgreSQL đạt trên database thử. [Verify CI của commit ảnh `8e37b0a`](https://github.com/HungThichCodee/random_food/actions/runs/40084816509) đạt cả frontend/backend. Mọi commit tiếp theo vẫn cần Verify xanh trước merge.
 
+Ảnh món cập nhật 25/10/2026: chủ dự án cung cấp 9 ảnh PNG và xác nhận sở hữu, cho phép dùng trong Food Match. Đã thay 9 ảnh minh họa biến thể, ghi quyền sử dụng riêng trong catalog/trang nguồn ảnh, xóa 9 JPG cũ cùng danh sách ảnh đang chờ đã hết mục. `check:food-images`, lint và build đạt local; cần Verify mới sau khi push nhánh review. Chưa thay thế phép thử giao diện trên hai điện thoại staging.
+
 - [ ] CI GitHub Actions: đã thêm `.github/workflows/verify.yml` cho .NET 10 + PostgreSQL 16 tạm và Node 22, kiểm tra YAML local ngày 22/10/2026; cần lần chạy thật trên GitHub với cả hai job xanh trước phát hành. Workflow không tự deploy.
 - [ ] Hosting không tự phát hành trước review: `frontend/vercel.mjs` đặt `git.deploymentEnabled: false`; cần xác nhận Render Auto-Deploy Off trên dashboard và Vercel không tự deploy khi có push, rồi mới dùng staging/production thủ công sau các cổng phê duyệt.
 - [ ] Build, tests, dependency audit và các kiểm thử bảo mật ở trên đều đạt, hoặc lỗi còn lại được xử lý trước deploy.

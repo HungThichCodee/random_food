@@ -11,7 +11,7 @@ export default function FoodImageCreditsPage() {
         </Link>
         <h1 className="mt-3 text-2xl font-bold">Nguồn ảnh món ăn</h1>
         <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
-          Mỗi ảnh có giấy phép riêng của tác giả. Nhãn “ảnh minh họa” cho biết ảnh thể hiện một biến thể gần với món được gợi ý.
+          Ảnh do chủ dự án cung cấp được phép sử dụng trong Food Match. Các ảnh khác có giấy phép riêng của tác giả. Nhãn “ảnh minh họa” cho biết ảnh thể hiện một biến thể gần với món được gợi ý.
         </p>
       </header>
       <ul className="space-y-3">
@@ -20,11 +20,17 @@ export default function FoodImageCreditsPage() {
             className="scroll-mt-4 rounded-2xl border border-white/10 bg-surface-container p-4">
             <h2 className="font-bold">{name}</h2>
             <p className="mt-1 text-sm text-on-surface-variant">
-              {photo.match === 'representative' ? 'Ảnh minh họa biến thể · ' : ''}Tác giả: {photo.author}
+              {photo.match === 'representative' ? 'Ảnh minh họa biến thể · ' : ''}{photo.source ? 'Tác giả' : 'Chủ sở hữu'}: {photo.author}
             </p>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              <a href={photo.source} target="_blank" rel="noopener noreferrer" className="text-primary underline">Trang ảnh gốc</a>
-              <a href={photo.licenseUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline">{photo.license}</a>
+              {photo.source ? (
+                <a href={photo.source} target="_blank" rel="noopener noreferrer" className="text-primary underline">Trang ảnh gốc</a>
+              ) : (
+                <a href={`${import.meta.env.BASE_URL}food-images/${photo.file}`} target="_blank" rel="noopener noreferrer" className="text-primary underline">Xem ảnh</a>
+              )}
+              {photo.licenseUrl ? (
+                <a href={photo.licenseUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline">{photo.license}</a>
+              ) : <span>{photo.license}</span>}
             </div>
           </li>
         ))}

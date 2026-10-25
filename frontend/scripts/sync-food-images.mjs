@@ -70,7 +70,22 @@ async function flickr(entry) {
   return { url: embed.url, source: entry.flickr, author: embed.author_name || 'Flickr contributor', license, licenseUrl };
 }
 
+function provided(entry) {
+  const filename = `${slug(entry.name)}.png`;
+  if (entry.provided !== filename) throw new Error(`Invalid provided filename for ${entry.name}`);
+  const bytes = readFileSync(path.join(outputDir, filename));
+  if (bytes.length < 1024 || bytes.length > 2_000_000 ||
+    bytes.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a')
+    throw new Error(`Invalid provided PNG for ${entry.name}`);
+  return {
+    file: filename, source: '', author: 'Chủ dự án',
+    license: 'Chủ dự án cho phép sử dụng trong Food Match', licenseUrl: '',
+    match: 'exact', bytes: bytes.length,
+  };
+}
+
 async function download(entry) {
+  if (entry.provided) return provided(entry);
   const data = entry.commons ? await commons(entry) : await flickr(entry);
   const response = await get(data.url);
   const mime = response.headers.get('content-type')?.split(';')[0].toLowerCase();
@@ -88,23 +103,29 @@ async function download(entry) {
 }
 
 const manifestNames = manifest.map((entry) => entry.name);
+for (const entry of manifest) {
+  if (['commons', 'flickr', 'provided'].filter((key) => Boolean(entry[key])).length !== 1)
+    throw new Error(`Expected one image source for ${entry.name}`);
+}
 const missing = seedNames.filter((name) => !manifestNames.includes(name));
 const extra = manifestNames.filter((name) => !seedNames.includes(name));
 if (missing.length || extra.length || new Set(manifestNames).size !== manifest.length)
   throw new Error(`Manifest coverage failed: missing=${missing.join(', ')} extra=${extra.join(', ')}`);
 const onlyIndex = process.argv.indexOf('--only');
 const onlyName = onlyIndex < 0 ? null : process.argv[onlyIndex + 1];
+const onlyProvided = process.argv.includes('--provided');
 if (onlyIndex >= 0 && (!onlyName || !manifestNames.includes(onlyName)))
   throw new Error(`Unknown dish for --only: ${onlyName || ''}`);
+if (onlyName && onlyProvided) throw new Error('Use --only or --provided, not both');
 if (process.argv.includes('--check')) {
   console.log(`Manifest covers all ${seedNames.length} seeded dishes.`);
   process.exit(0);
 }
 
 mkdirSync(outputDir, { recursive: true });
-const catalog = onlyName ? JSON.parse(readFileSync(catalogPath, 'utf8')) : {};
+const catalog = onlyName || onlyProvided ? JSON.parse(readFileSync(catalogPath, 'utf8')) : {};
 const failures = [];
-for (const entry of manifest.filter((item) => !onlyName || item.name === onlyName)) {
+for (const entry of manifest.filter((item) => onlyProvided ? Boolean(item.provided) : !onlyName || item.name === onlyName)) {
   try {
     catalog[entry.name] = await download(entry);
     console.log(`${entry.name} -> ${catalog[entry.name].file}`);
@@ -117,22 +138,24 @@ if (failures.length) {
   console.error(`${failures.length} images failed; catalog not updated.`);
   process.exit(1);
 }
-if (onlyName && (Object.keys(catalog).length !== manifest.length ||
+if ((onlyName || onlyProvided) && (Object.keys(catalog).length !== manifest.length ||
   !manifestNames.every((name) => Object.hasOwn(catalog, name))))
   throw new Error('Existing photo catalog does not cover every seeded dish');
 
 writeFileSync(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
 const rows = Object.entries(catalog).map(([name, item]) => {
   const author = item.author.replace(/\|/g, '\\|');
-  return `| ${name} | [${item.file}](${item.source}) | ${author} | [${item.license}](${item.licenseUrl}) | ${item.match === 'exact' ? 'Đúng món' : 'Minh họa biến thể'} |`;
+  const source = item.source || `../frontend/public/food-images/${item.file}`;
+  const license = item.licenseUrl ? `[${item.license}](${item.licenseUrl})` : item.license;
+  return `| ${name} | [${item.file}](${source}) | ${author} | ${license} | ${item.match === 'exact' ? 'Đúng món' : 'Minh họa biến thể'} |`;
 });
 writeFileSync(creditsPath, [
   '# Nguồn ảnh món ăn',
   '',
-  'Ảnh trong `frontend/public/food-images` được tải từ Wikimedia Commons hoặc Flickr (được tìm qua Openverse). Giấy phép từng ảnh áp dụng riêng cho ảnh; giấy phép MIT của mã nguồn không thay thế giấy phép ảnh.',
+  'Ảnh trong `frontend/public/food-images` đến từ Wikimedia Commons, Flickr (được tìm qua Openverse) hoặc do chủ dự án cung cấp. Chủ dự án xác nhận sở hữu và cho phép sử dụng ảnh do mình cung cấp trong Food Match; sự cho phép này không đồng nghĩa cấp giấy phép Creative Commons. Giấy phép MIT của mã nguồn không thay thế quyền sử dụng ảnh.',
   'Ảnh ghi “Minh họa biến thể” thể hiện món hoặc nhóm món gần nhất khi chưa tìm được ảnh đúng mọi thành phần trong tên. Có thể thay bằng ảnh chính xác hơn nếu có nguồn và giấy phép phù hợp.',
   '',
-  '| Món | Ảnh và trang nguồn | Tác giả | Giấy phép | Mức khớp |',
+  '| Món | Ảnh và trang nguồn | Tác giả / chủ sở hữu | Quyền sử dụng | Mức khớp |',
   '| --- | --- | --- | --- | --- |',
   ...rows,
   '',

@@ -15,7 +15,10 @@ assert.deepEqual(manifest.map((item) => item.name), names, 'Manifest must follow
 assert.deepEqual(Object.keys(catalog), names, 'Photo catalog must follow and cover the seeded dishes');
 
 const files = new Set();
-for (const name of names) {
+for (const [index, name] of names.entries()) {
+  const entry = manifest[index];
+  assert.equal(['commons', 'flickr', 'provided'].filter((key) => Boolean(entry[key])).length, 1,
+    `Expected one image source for ${name}`);
   const photo = catalog[name];
   assert.match(photo.file, /^[a-z0-9]+(?:-[a-z0-9]+)*\.(?:jpg|png|webp)$/);
   assert.ok(!files.has(photo.file), `Duplicate asset: ${photo.file}`);
@@ -28,10 +31,19 @@ for (const name of names) {
   else assert.equal(bytes.subarray(0, 4).toString(), 'RIFF');
   assert.equal(statSync(path.join(imageDir, photo.file)).isFile(), true);
   assert.ok(['exact', 'representative'].includes(photo.match));
+  assert.equal(photo.match, entry.match || 'exact', `Image match status differs from manifest: ${name}`);
   assert.ok(photo.author.trim());
   assert.ok(photo.license.trim());
-  assert.ok(['commons.wikimedia.org', 'www.flickr.com'].includes(new URL(photo.source).host));
-  assert.equal(new URL(photo.licenseUrl).protocol, 'https:');
+  if (entry.provided) {
+    assert.equal(photo.file, entry.provided);
+    assert.equal(photo.source, '');
+    assert.equal(photo.licenseUrl, '');
+    assert.equal(photo.author, 'Chủ dự án');
+    assert.equal(photo.license, 'Chủ dự án cho phép sử dụng trong Food Match');
+  } else {
+    assert.ok(['commons.wikimedia.org', 'www.flickr.com'].includes(new URL(photo.source).host));
+    assert.equal(new URL(photo.licenseUrl).protocol, 'https:');
+  }
 }
 assert.deepEqual(new Set(readdirSync(imageDir)), files, 'Image directory contains missing or unlisted assets');
-console.log(`${names.length} seeded dishes have local image files, source links and license records.`);
+console.log(`${names.length} seeded dishes have local image files and source or owner records.`);

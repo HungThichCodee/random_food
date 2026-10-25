@@ -40,7 +40,7 @@ Maps Embed API với key thật ở localhost:5173, chụp ngày 23/10/2026:
 
 - Vòng quay món ăn với các bộ lọc Tất cả, Món mặn, Chay và Ngọt; thẻ món và popup kết quả hiện ảnh món.
 - Gợi ý món theo loại, khoảng giá, buổi ăn và tag khẩu vị; mỗi kết quả hiện ảnh món.
-- 62 món seed có ảnh cục bộ đặt tên theo món; ảnh biến thể được ghi nhãn, kèm [nguồn, tác giả và giấy phép](docs/food-image-credits.md). Món thêm ngoài seed dùng `ImageUrl` hợp lệ nếu có.
+- 62 món seed có ảnh cục bộ đặt tên theo món; ảnh biến thể được ghi nhãn, kèm [nguồn hoặc chủ sở hữu và quyền sử dụng](docs/food-image-credits.md). Chín ảnh do chủ dự án cung cấp được phép dùng trong Food Match; giấy phép MIT của mã nguồn không áp dụng cho ảnh. Món thêm ngoài seed dùng `ImageUrl` hợp lệ nếu có.
 - Tạo hồ sơ tạm, tìm người ăn trong 3 km và gửi lời mời ghép cặp; backend kiểm tra lại phạm vi khi gửi lời mời.
 - Chat và thông báo ghép cặp theo thời gian thực qua SignalR.
 - Trong cặp đã chấp nhận match, mỗi người có thể chia sẻ độc lập tọa độ chính xác của mình cho người kia, tối đa 60 phút mỗi lần bật. Người nhận thấy ngay tọa độ đó dù chưa chia sẻ lại; thu hồi của một người không tắt quyền chia sẻ của người còn lại. Tọa độ GPS từng người được giữ nguyên, không làm lệch. Khi **cả hai** còn chia sẻ, iframe Google Maps tìm quán quanh điểm giữa với mức zoom 15; nếu cấu hình Maps Embed API key, iframe dùng chế độ search chính thức của Google. Ứng dụng làm mới khoảng 30 giây một lần và có nút làm mới. Người dùng sao chép liên kết quán từ Google Maps để đề xuất, người kia xác nhận. Ứng dụng không đọc được danh sách hoặc quán được bấm trong iframe. Nút mở Google Maps cho phép xem danh sách kết quả trực tiếp trên Google. Nếu cấu hình Overpass riêng, ứng dụng còn hiển thị danh sách OSM để chọn nhanh. Đề xuất bị ẩn khi một bên thu hồi hoặc hết quyền chia sẻ.
@@ -136,7 +136,7 @@ npm run lint
 npm run check:food-images
 ```
 
-`npm run build` tạo `frontend/dist/`; `npm run preview` phục vụ bản build để kiểm tra. `npm run lint` kiểm tra mã bằng ESLint. `npm run check:food-images` kiểm tra đủ ảnh, tên file và thông tin giấy phép cho 62 món seed. Frontend **không có** script `npm test` hoặc `npm run test`.
+`npm run build` tạo `frontend/dist/`; `npm run preview` phục vụ bản build để kiểm tra. `npm run lint` kiểm tra mã bằng ESLint. `npm run check:food-images` kiểm tra đủ ảnh, tên file và ghi nhận nguồn hoặc chủ sở hữu cho 62 món seed. Frontend **không có** script `npm test` hoặc `npm run test`.
 
 ## Cấu trúc thư mục
 
@@ -172,7 +172,7 @@ random_food/
     └── FoodMatch.sln                 # Solution .NET
 ```
 
-Ảnh món cục bộ trong `frontend/public/food-images/`; trang `/image-credits` hiển thị tác giả, nguồn và giấy phép. Khi đổi nguồn ảnh, cập nhật manifest rồi chạy `node frontend/scripts/sync-food-images.mjs --only "Tên món"` để cập nhật một món, hoặc bỏ `--only` để đồng bộ toàn bộ; kiểm tra lại bằng `npm run check:food-images` trong `frontend`.
+Ảnh món cục bộ trong `frontend/public/food-images/`; trang `/image-credits` hiển thị nguồn hoặc chủ sở hữu cùng quyền sử dụng. Khi đổi ảnh từ Commons/Flickr, cập nhật manifest rồi chạy `node frontend/scripts/sync-food-images.mjs --only "Tên món"`. Với ảnh do chủ dự án cung cấp, đặt PNG theo tên slug trong thư mục ảnh, khai báo `provided` trong manifest rồi chạy `node frontend/scripts/sync-food-images.mjs --provided`. Bỏ các tùy chọn để đồng bộ toàn bộ; kiểm tra lại bằng `npm run check:food-images` trong `frontend`.
 
 ## Kiểm thử
 

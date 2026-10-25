@@ -99,13 +99,13 @@
     "bytes": 142013
   },
   "Cơm Rang Dưa Bò": {
-    "file": "com-rang-dua-bo.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:Cumin_beef_fried_rice.jpg",
-    "author": "Fumikas Sagisavas",
-    "license": "CC0",
-    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "match": "representative",
-    "bytes": 201377
+    "file": "com-rang-dua-bo.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 598583
   },
   "Xôi Xéo": {
     "file": "xoi-xeo.jpg",
@@ -189,13 +189,13 @@
     "bytes": 312937
   },
   "Lẩu Gà Lá É": {
-    "file": "lau-ga-la-e.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:Newone_-_l%E1%BA%A9u_g%C3%A0,_s%C6%B0%E1%BB%9Dn_v%C3%A0_r%C6%B0%E1%BB%A3u_%C4%91inh_l%C4%83ng.jpg",
-    "author": "Newone",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "match": "representative",
-    "bytes": 184878
+    "file": "lau-ga-la-e.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 624638
   },
   "Gà Nướng Muối Ớt": {
     "file": "ga-nuong-muoi-ot.jpg",
@@ -460,13 +460,13 @@
     "bytes": 289251
   },
   "Bún Riêu Chay Đậu Hũ": {
-    "file": "bun-rieu-chay-dau-hu.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:Vietnamese_vegetarian_crab_noodle_soup.jpg",
-    "author": "Mx. Granger",
-    "license": "CC0",
-    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "match": "representative",
-    "bytes": 186921
+    "file": "bun-rieu-chay-dau-hu.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 257867
   },
   "Hủ Tiếu Chay Rau Củ": {
     "file": "hu-tieu-chay-rau-cu.jpg",
@@ -478,13 +478,13 @@
     "bytes": 126897
   },
   "Bún Bò Huế Chay": {
-    "file": "bun-bo-hue-chay.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:House_Specials_Vegan_Chicken_%26_Mushroom_-_The_Big_Bowl.jpg",
-    "author": "Andy Li",
-    "license": "CC0",
-    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "match": "representative",
-    "bytes": 199104
+    "file": "bun-bo-hue-chay.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 255476
   },
   "Gỏi Cuốn Chay Nấm": {
     "file": "goi-cuon-chay-nam.jpg",
@@ -496,40 +496,40 @@
     "bytes": 193952
   },
   "Bánh Mì Chay Pâté Nấm": {
-    "file": "banh-mi-chay-pate-nam.jpg",
-    "source": "https://www.flickr.com/photos/21001756@N06/4944251022",
-    "author": "Stacy Spensley",
-    "license": "CC BY 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
-    "match": "representative",
-    "bytes": 128251
+    "file": "banh-mi-chay-pate-nam.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 141341
   },
   "Miến Xào Chay Nấm Đông Cô": {
-    "file": "mien-xao-chay-nam-dong-co.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:M%C5%A9i_N%C3%A9_th7n2023,_Khu_ND_(mi%E1%BA%BFn_x%C3%A0o_chay)_(1).jpg",
-    "author": "Phương Huy",
-    "license": "CC0",
-    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "match": "representative",
-    "bytes": 296805
+    "file": "mien-xao-chay-nam-dong-co.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 295330
   },
   "Salad Bơ Trái Cây Sốt Mè": {
-    "file": "salad-bo-trai-cay-sot-me.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:A_bowl_of_fruits_salad_with_avocado.jpg",
-    "author": "Halima Waziri",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "match": "representative",
-    "bytes": 329763
+    "file": "salad-bo-trai-cay-sot-me.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 208404
   },
   "Cháo Nấm Tràm Hạt Sen": {
-    "file": "chao-nam-tram-hat-sen.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:Beoseot-deulkkae-juk.jpg",
-    "author": "모카향기",
-    "license": "CC BY 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-    "match": "representative",
-    "bytes": 165042
+    "file": "chao-nam-tram-hat-sen.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 143082
   },
   "Canh Nấm Đậu Hũ Rong Biển": {
     "file": "canh-nam-dau-hu-rong-bien.jpg",
@@ -550,12 +550,12 @@
     "bytes": 234777
   },
   "Cơm Chiên Chay Dương Châu": {
-    "file": "com-chien-chay-duong-chau.jpg",
-    "source": "https://www.flickr.com/photos/35022955@N06/7893613332",
-    "author": "Lablascovegmenu",
-    "license": "CC BY 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
-    "match": "representative",
-    "bytes": 132418
+    "file": "com-chien-chay-duong-chau.png",
+    "source": "",
+    "author": "Chủ dự án",
+    "license": "Chủ dự án cho phép sử dụng trong Food Match",
+    "licenseUrl": "",
+    "match": "exact",
+    "bytes": 288198
   }
 }

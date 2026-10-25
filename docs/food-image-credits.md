@@ -1,9 +1,9 @@
 # Nguồn ảnh món ăn
 
-Ảnh trong `frontend/public/food-images` được tải từ Wikimedia Commons hoặc Flickr (được tìm qua Openverse). Giấy phép từng ảnh áp dụng riêng cho ảnh; giấy phép MIT của mã nguồn không thay thế giấy phép ảnh.
+Ảnh trong `frontend/public/food-images` đến từ Wikimedia Commons, Flickr (được tìm qua Openverse) hoặc do chủ dự án cung cấp. Chủ dự án xác nhận sở hữu và cho phép sử dụng ảnh do mình cung cấp trong Food Match; sự cho phép này không đồng nghĩa cấp giấy phép Creative Commons. Giấy phép MIT của mã nguồn không thay thế quyền sử dụng ảnh.
 Ảnh ghi “Minh họa biến thể” thể hiện món hoặc nhóm món gần nhất khi chưa tìm được ảnh đúng mọi thành phần trong tên. Có thể thay bằng ảnh chính xác hơn nếu có nguồn và giấy phép phù hợp.
 
-| Món | Ảnh và trang nguồn | Tác giả | Giấy phép | Mức khớp |
+| Món | Ảnh và trang nguồn | Tác giả / chủ sở hữu | Quyền sử dụng | Mức khớp |
 | --- | --- | --- | --- | --- |
 | Phở Bò | [pho-bo.jpg](https://commons.wikimedia.org/wiki/File:Ph%E1%BB%9F_b%C3%B2_t%C3%A1i.JPG) | Ngô Trung | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | Đúng món |
 | Bún Bò Huế | [bun-bo-hue.jpg](https://commons.wikimedia.org/wiki/File:Bun-Bo-Hue-from-Huong-Giang-2011.jpg) | Kham Tran - www.khamtran.com | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) | Đúng món |
@@ -16,7 +16,7 @@
 | Mì Quảng | [mi-quang.jpg](https://commons.wikimedia.org/wiki/File:M%C3%AC_Qu%E1%BA%A3ng,_Da_Nang,_Vietnam.jpg) | Christopher Crouzet | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
 | Bún Riêu | [bun-rieu.jpg](https://commons.wikimedia.org/wiki/File:Bun_rieu.jpg) | Schellack at English Wikipedia | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) | Đúng món |
 | Hủ Tiếu Nam Vang | [hu-tieu-nam-vang.jpg](https://commons.wikimedia.org/wiki/File:H%E1%BB%A7_ti%E1%BA%BFu_Nam_Vang.jpg) | SauceSupreme | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) | Đúng món |
-| Cơm Rang Dưa Bò | [com-rang-dua-bo.jpg](https://commons.wikimedia.org/wiki/File:Cumin_beef_fried_rice.jpg) | Fumikas Sagisavas | [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.en) | Minh họa biến thể |
+| Cơm Rang Dưa Bò | [com-rang-dua-bo.png](../frontend/public/food-images/com-rang-dua-bo.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
 | Xôi Xéo | [xoi-xeo.jpg](https://commons.wikimedia.org/wiki/File:X%C3%B4i_x%C3%A9o.jpg) | Viethavvh | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
 | Bánh Canh Cua | [banh-canh-cua.jpg](https://commons.wikimedia.org/wiki/File:B%C3%A1nh_canh_cua.jpg) | SauceSupreme | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) | Đúng món |
 | Bún Thịt Nướng | [bun-thit-nuong.jpg](https://commons.wikimedia.org/wiki/File:Bun_thit_nuong.jpg) | Lưu Ly | [Public domain](https://commons.wikimedia.org/wiki/File:Bun_thit_nuong.jpg) | Đúng món |
@@ -26,7 +26,7 @@
 | Nem Nướng | [nem-nuong.jpg](https://commons.wikimedia.org/wiki/File:Nem_n%C6%B0%E1%BB%9Bng.jpg) | Buihaidang192 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
 | Lẩu Thái | [lau-thai.jpg](https://commons.wikimedia.org/wiki/File:L%E1%BA%ABu_Th%C3%A1i_chua_cay_%E1%BB%9F_qu%C3%A1n_%E1%BB%91c_La_C%C3%A0,_SnH_2013_(4).JPG) | Phương Huy (thảo luận) | [Public domain](https://commons.wikimedia.org/wiki/File:L%E1%BA%ABu_Th%C3%A1i_chua_cay_%E1%BB%9F_qu%C3%A1n_%E1%BB%91c_La_C%C3%A0,_SnH_2013_(4).JPG) | Đúng món |
 | Lẩu Bò | [lau-bo.jpg](https://commons.wikimedia.org/wiki/File:L%E1%BA%A9u_b%C3%B2_t%E1%BA%A1i_qu%C3%A1n_B%C3%B2_c%C6%B0%E1%BB%9Di_(3).jpg) | Phương Huy (thảo luận) | [Public domain](https://commons.wikimedia.org/wiki/File:L%E1%BA%A9u_b%C3%B2_t%E1%BA%A1i_qu%C3%A1n_B%C3%B2_c%C6%B0%E1%BB%9Di_(3).jpg) | Đúng món |
-| Lẩu Gà Lá É | [lau-ga-la-e.jpg](https://commons.wikimedia.org/wiki/File:Newone_-_l%E1%BA%A9u_g%C3%A0,_s%C6%B0%E1%BB%9Dn_v%C3%A0_r%C6%B0%E1%BB%A3u_%C4%91inh_l%C4%83ng.jpg) | Newone | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Minh họa biến thể |
+| Lẩu Gà Lá É | [lau-ga-la-e.png](../frontend/public/food-images/lau-ga-la-e.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
 | Gà Nướng Muối Ớt | [ga-nuong-muoi-ot.jpg](https://commons.wikimedia.org/wiki/File:G%C3%A0_n%C6%B0%E1%BB%9Bng_mu%E1%BB%91i_%E1%BB%9Bt.jpg) | Baoothersks | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
 | Cơm Gà Hội An | [com-ga-hoi-an.jpg](https://www.flickr.com/photos/14671121@N03/11963216533) | knittymarie | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | Đúng món |
 | Bún Cá | [bun-ca.jpg](https://commons.wikimedia.org/wiki/File:B%C3%BAn_C%C3%A1_H%C3%A0_N%E1%BB%99i.jpg) | Ron Diggity | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) | Đúng món |
@@ -56,14 +56,14 @@
 | Bột Chiên | [bot-chien.jpg](https://commons.wikimedia.org/wiki/File:B%E1%BB%99t_chi%C3%AAn_t%E1%BA%A1i_S%C3%A0i_G%C3%B2n.JPG) | Tonbi ko | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
 | Cơm Chay | [com-chay.jpg](https://commons.wikimedia.org/wiki/File:Saigon_Vegetarian_food.jpg) | Takeaway | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | Đúng món |
 | Phở Chay Nấm Hương | [pho-chay-nam-huong.jpg](https://commons.wikimedia.org/wiki/File:Easy_vegan_pho_(48839662497).jpg) | Ella Olsson from Stockholm, Sweden | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) | Đúng món |
-| Bún Riêu Chay Đậu Hũ | [bun-rieu-chay-dau-hu.jpg](https://commons.wikimedia.org/wiki/File:Vietnamese_vegetarian_crab_noodle_soup.jpg) | Mx. Granger | [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.en) | Minh họa biến thể |
+| Bún Riêu Chay Đậu Hũ | [bun-rieu-chay-dau-hu.png](../frontend/public/food-images/bun-rieu-chay-dau-hu.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
 | Hủ Tiếu Chay Rau Củ | [hu-tieu-chay-rau-cu.jpg](https://commons.wikimedia.org/wiki/File:Hu_tieu_chay.jpg) | Nguyen Thi Quynh Tram | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) | Đúng món |
-| Bún Bò Huế Chay | [bun-bo-hue-chay.jpg](https://commons.wikimedia.org/wiki/File:House_Specials_Vegan_Chicken_%26_Mushroom_-_The_Big_Bowl.jpg) | Andy Li | [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.en) | Minh họa biến thể |
+| Bún Bò Huế Chay | [bun-bo-hue-chay.png](../frontend/public/food-images/bun-bo-hue-chay.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
 | Gỏi Cuốn Chay Nấm | [goi-cuon-chay-nam.jpg](https://www.flickr.com/photos/12670507@N02/6844917268) | gamene | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | Đúng món |
-| Bánh Mì Chay Pâté Nấm | [banh-mi-chay-pate-nam.jpg](https://www.flickr.com/photos/21001756@N06/4944251022) | Stacy Spensley | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | Minh họa biến thể |
-| Miến Xào Chay Nấm Đông Cô | [mien-xao-chay-nam-dong-co.jpg](https://commons.wikimedia.org/wiki/File:M%C5%A9i_N%C3%A9_th7n2023,_Khu_ND_(mi%E1%BA%BFn_x%C3%A0o_chay)_(1).jpg) | Phương Huy | [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.en) | Minh họa biến thể |
-| Salad Bơ Trái Cây Sốt Mè | [salad-bo-trai-cay-sot-me.jpg](https://commons.wikimedia.org/wiki/File:A_bowl_of_fruits_salad_with_avocado.jpg) | Halima Waziri | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Minh họa biến thể |
-| Cháo Nấm Tràm Hạt Sen | [chao-nam-tram-hat-sen.jpg](https://commons.wikimedia.org/wiki/File:Beoseot-deulkkae-juk.jpg) | 모카향기 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0) | Minh họa biến thể |
+| Bánh Mì Chay Pâté Nấm | [banh-mi-chay-pate-nam.png](../frontend/public/food-images/banh-mi-chay-pate-nam.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
+| Miến Xào Chay Nấm Đông Cô | [mien-xao-chay-nam-dong-co.png](../frontend/public/food-images/mien-xao-chay-nam-dong-co.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
+| Salad Bơ Trái Cây Sốt Mè | [salad-bo-trai-cay-sot-me.png](../frontend/public/food-images/salad-bo-trai-cay-sot-me.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
+| Cháo Nấm Tràm Hạt Sen | [chao-nam-tram-hat-sen.png](../frontend/public/food-images/chao-nam-tram-hat-sen.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |
 | Canh Nấm Đậu Hũ Rong Biển | [canh-nam-dau-hu-rong-bien.jpg](https://www.flickr.com/photos/63311602@N08/27396636625) | loustejskal.com | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | Đúng món |
 | Chè Hạt Sen Long Nhãn | [che-hat-sen-long-nhan.jpg](https://commons.wikimedia.org/wiki/File:Nh%C3%A0_m%C3%ACnh_d%E1%BB%8Bp_L%E1%BB%85_2th9n2023_(ch%C3%A8_nh%C3%A3n_nh%E1%BB%A5c_h%E1%BA%A1t_sen)_(1).jpg) | Phương Huy | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
-| Cơm Chiên Chay Dương Châu | [com-chien-chay-duong-chau.jpg](https://www.flickr.com/photos/35022955@N06/7893613332) | Lablascovegmenu | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | Minh họa biến thể |
+| Cơm Chiên Chay Dương Châu | [com-chien-chay-duong-chau.png](../frontend/public/food-images/com-chien-chay-duong-chau.png) | Chủ dự án | Chủ dự án cho phép sử dụng trong Food Match | Đúng món |

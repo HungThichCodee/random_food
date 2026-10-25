@@ -50,11 +50,12 @@ export default function FoodPhoto({ food, className, eager = false }: {
         />
       )}
       {imageLoaded && sourceIndex === 0 && record && (
-        <a href={record.source} target="_blank" rel="noopener noreferrer"
+        <a href={record.source || `${import.meta.env.BASE_URL}image-credits#${record.file.replace(/\.[^.]+$/, '')}`}
+          target={record.source ? '_blank' : undefined} rel={record.source ? 'noopener noreferrer' : undefined}
           aria-label={`Nguồn ảnh ${food.name}: ${record.author}, ${record.license}`}
           title={`${record.author} · ${record.license}`}
           className="absolute bottom-1 right-1 z-10 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white no-underline">
-          {record.match === 'representative' ? 'Ảnh minh họa · Nguồn' : 'Nguồn ảnh'}
+          {record.match === 'representative' ? 'Ảnh minh họa · Nguồn' : record.source ? 'Nguồn ảnh' : 'Ảnh chủ dự án'}
         </a>
       )}
     </div>
