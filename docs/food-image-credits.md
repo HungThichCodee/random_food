@@ -54,7 +54,7 @@
 | Cháo Sườn | [chao-suon.jpg](https://www.flickr.com/photos/93512023@N00/4367100754) | jasonlam | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | Minh họa biến thể |
 | Súp Cua | [sup-cua.jpg](https://commons.wikimedia.org/wiki/File:S%C3%BAp_cua_Vi%E1%BB%87t_Nam.jpg) | Phương Huy (thảo luận) | [Public domain](https://commons.wikimedia.org/wiki/File:S%C3%BAp_cua_Vi%E1%BB%87t_Nam.jpg) | Đúng món |
 | Bột Chiên | [bot-chien.jpg](https://commons.wikimedia.org/wiki/File:B%E1%BB%99t_chi%C3%AAn_t%E1%BA%A1i_S%C3%A0i_G%C3%B2n.JPG) | Tonbi ko | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | Đúng món |
-| Cơm Chay | [com-chay.jpg](https://www.flickr.com/photos/52887766@N00/7380998632) | steveschoenly | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) | Minh họa biến thể |
+| Cơm Chay | [com-chay.jpg](https://commons.wikimedia.org/wiki/File:Saigon_Vegetarian_food.jpg) | Takeaway | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | Đúng món |
 | Phở Chay Nấm Hương | [pho-chay-nam-huong.jpg](https://commons.wikimedia.org/wiki/File:Easy_vegan_pho_(48839662497).jpg) | Ella Olsson from Stockholm, Sweden | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) | Đúng món |
 | Bún Riêu Chay Đậu Hũ | [bun-rieu-chay-dau-hu.jpg](https://commons.wikimedia.org/wiki/File:Vietnamese_vegetarian_crab_noodle_soup.jpg) | Mx. Granger | [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.en) | Minh họa biến thể |
 | Hủ Tiếu Chay Rau Củ | [hu-tieu-chay-rau-cu.jpg](https://commons.wikimedia.org/wiki/File:Hu_tieu_chay.jpg) | Nguyen Thi Quynh Tram | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) | Minh họa biến thể |

@@ -442,12 +442,12 @@
   },
   "Cơm Chay": {
     "file": "com-chay.jpg",
-    "source": "https://www.flickr.com/photos/52887766@N00/7380998632",
-    "author": "steveschoenly",
-    "license": "CC BY-SA 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
-    "match": "representative",
-    "bytes": 125544
+    "source": "https://commons.wikimedia.org/wiki/File:Saigon_Vegetarian_food.jpg",
+    "author": "Takeaway",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "match": "exact",
+    "bytes": 106848
   },
   "Phở Chay Nấm Hương": {
     "file": "pho-chay-nam-huong.jpg",
