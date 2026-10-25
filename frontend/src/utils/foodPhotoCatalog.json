@@ -533,12 +533,12 @@
   },
   "Canh Nấm Đậu Hũ Rong Biển": {
     "file": "canh-nam-dau-hu-rong-bien.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:Miso_Soup_001.jpg",
-    "author": "Ocdp",
-    "license": "CC0",
-    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "match": "representative",
-    "bytes": 92642
+    "source": "https://www.flickr.com/photos/63311602@N08/27396636625",
+    "author": "loustejskal.com",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "match": "exact",
+    "bytes": 71233
   },
   "Chè Hạt Sen Long Nhãn": {
     "file": "che-hat-sen-long-nhan.jpg",
