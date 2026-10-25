@@ -208,12 +208,12 @@
   },
   "Cơm Gà Hội An": {
     "file": "com-ga-hoi-an.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_g%C3%A0_Tam_K%E1%BB%B3,_Qu%E1%BA%A3ng_Nam.JPG",
-    "author": "Đông Sơn (thảo luận)",
-    "license": "CC BY-SA 3.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-    "match": "representative",
-    "bytes": 181213
+    "source": "https://www.flickr.com/photos/14671121@N03/11963216533",
+    "author": "knittymarie",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "match": "exact",
+    "bytes": 192706
   },
   "Bún Cá": {
     "file": "bun-ca.jpg",
