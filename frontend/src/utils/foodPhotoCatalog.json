@@ -473,7 +473,7 @@
     "author": "Nguyen Thi Quynh Tram",
     "license": "CC BY 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
-    "match": "representative",
+    "match": "exact",
     "bytes": 126897
   },
   "Bún Bò Huế Chay": {
