@@ -451,12 +451,12 @@
   },
   "Phở Chay Nấm Hương": {
     "file": "pho-chay-nam-huong.jpg",
-    "source": "https://commons.wikimedia.org/wiki/File:Tofu_noodle_soup_(Ph%E1%BB%9F_chay)_-_Pho_Hanoi_Authentic_2024-12-01.jpg",
-    "author": "Andy Li",
-    "license": "CC0",
-    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
-    "match": "representative",
-    "bytes": 148249
+    "source": "https://commons.wikimedia.org/wiki/File:Easy_vegan_pho_(48839662497).jpg",
+    "author": "Ella Olsson from Stockholm, Sweden",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "match": "exact",
+    "bytes": 289251
   },
   "Bún Riêu Chay Đậu Hũ": {
     "file": "bun-rieu-chay-dau-hu.jpg",
