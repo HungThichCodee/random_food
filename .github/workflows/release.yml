@@ -101,7 +101,7 @@ jobs:
           node-version: '22'
       - name: Install pinned Vercel CLI
         run: npm install --global vercel@65.2.0
-      - name: Deploy the same frontend commit to Vercel
+      - name: Build the same frontend commit for Vercel
         shell: bash
         # Vercel already applies the project's Root Directory (frontend).
         # Running the CLI inside frontend makes it resolve frontend/frontend.
@@ -118,10 +118,19 @@ jobs:
             echo "Unexpected Vercel Root Directory: $root_directory (expected frontend)" >&2
             exit 1
           fi
+          node frontend/scripts/export-vercel-config.mjs
           vercel build --prod --token="$VERCEL_TOKEN"
           expected=$(sha256sum .vercel/output/static/index.html | cut -d' ' -f1)
           [[ "$expected" =~ ^[a-f0-9]{64}$ ]]
           echo "EXPECTED_INDEX_SHA=$expected" >> "$GITHUB_ENV"
+      - name: Deploy the same frontend commit to Vercel
+        shell: bash
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
           deployment_url=$(vercel deploy --prebuilt --prod --meta git_sha="$GITHUB_SHA" --token="$VERCEL_TOKEN")
           [[ "$deployment_url" =~ ^https://[A-Za-z0-9.-]+$ ]]
           echo "Vercel deployment: $deployment_url"
