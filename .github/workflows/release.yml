@@ -103,7 +103,8 @@ jobs:
         run: npm install --global vercel@65.2.0
       - name: Deploy the same frontend commit to Vercel
         shell: bash
-        working-directory: frontend
+        # Vercel already applies the project's Root Directory (frontend).
+        # Running the CLI inside frontend makes it resolve frontend/frontend.
         env:
           FOODMATCH_REQUIRE_MAPS_EMBED_KEY: '1'
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -112,6 +113,11 @@ jobs:
         run: |
           set -euo pipefail
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          root_directory=$(jq -r '.settings.rootDirectory // empty' .vercel/project.json)
+          if [[ "$root_directory" != frontend ]]; then
+            echo "Unexpected Vercel Root Directory: $root_directory (expected frontend)" >&2
+            exit 1
+          fi
           vercel build --prod --token="$VERCEL_TOKEN"
           expected=$(sha256sum .vercel/output/static/index.html | cut -d' ' -f1)
           [[ "$expected" =~ ^[a-f0-9]{64}$ ]]
