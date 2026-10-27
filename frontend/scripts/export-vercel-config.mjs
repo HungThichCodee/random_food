@@ -11,6 +11,7 @@ const names = [
   'VITE_PUBLIC_ORIGIN',
   'VITE_FOOD_IMAGE_ORIGINS',
   'FOODMATCH_SEO_INDEXABLE',
+  'FOODMATCH_GOOGLE_SITE_VERIFICATION',
 ];
 
 if (!process.env.GITHUB_ENV) throw new Error('GITHUB_ENV is required');

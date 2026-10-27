@@ -139,6 +139,7 @@ jobs:
         shell: bash
         env:
           WEB_ORIGIN: ${{ vars.WEB_ORIGIN }}
+          RELEASE_TARGET: ${{ inputs.target }}
         run: |
           set -euo pipefail
           for attempt in {1..12}; do
@@ -158,4 +159,15 @@ jobs:
               "$WEB_ORIGIN/$route" -o "$RUNNER_TEMP/foodmatch-$route.html"
             [[ "$(sha256sum "$RUNNER_TEMP/foodmatch-$route.html" | cut -d' ' -f1)" == "$EXPECTED_INDEX_SHA" ]]
           done
+          if [[ "$RELEASE_TARGET" == production ]]; then
+            curl --fail-with-body --silent --show-error --max-time 30 \
+              "$WEB_ORIGIN/robots.txt" -o "$RUNNER_TEMP/foodmatch-robots.txt"
+            grep -Fqx "Sitemap: $WEB_ORIGIN/sitemap.xml" "$RUNNER_TEMP/foodmatch-robots.txt"
+            curl --fail-with-body --silent --show-error --max-time 30 \
+              "$WEB_ORIGIN/sitemap.xml" -o "$RUNNER_TEMP/foodmatch-sitemap.xml"
+            grep -Fq "<loc>$WEB_ORIGIN/random</loc>" "$RUNNER_TEMP/foodmatch-sitemap.xml"
+            curl --fail-with-body --silent --show-error --location --compressed --max-time 30 \
+              "$WEB_ORIGIN/random" -o "$RUNNER_TEMP/foodmatch-random.html"
+            grep -Fq '<title>Random món ăn bằng vòng quay | Food Match</title>' "$RUNNER_TEMP/foodmatch-random.html"
+          fi
           echo "web_url=$WEB_ORIGIN" >> "$GITHUB_OUTPUT"

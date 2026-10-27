@@ -25,8 +25,14 @@ for (const origin of (process.env.VITE_FOOD_IMAGE_ORIGINS || '').split(',')
   .map(value => value.trim().replace(/\/$/, '')).filter(Boolean)) {
   assert.ok(images.split(' ').includes(origin), `img-src is missing ${origin}`);
 }
-assert.equal(config.rewrites?.[0]?.destination, '/index.html',
+assert.equal(config.rewrites?.at(-1)?.destination, '/index.html',
   'SPA fallback route is missing');
+if (process.env.FOODMATCH_SEO_INDEXABLE === '1') {
+  for (const route of ['/random', '/suggest', '/image-credits']) {
+    assert.equal(config.rewrites.find(rewrite => rewrite.source === route)?.destination,
+      `${route}.html`, `${route} must serve route-specific metadata`);
+  }
+}
 for (const source of ['/map', '/profile', '/buddies', '/route', '/chat', '/chat/:matchId']) {
   const rule = config.headers.find(item => item.source === source);
   assert.equal(rule?.headers.find(header => header.key === 'X-Robots-Tag')?.value,

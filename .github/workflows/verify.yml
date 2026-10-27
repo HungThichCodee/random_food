@@ -76,6 +76,14 @@ jobs:
       - run: npm run lint
       - run: npm run check:food-images
       - run: npm run build
+        env:
+          FOODMATCH_SEO_INDEXABLE: '1'
+          VITE_PUBLIC_ORIGIN: https://app.example.test
+      - name: Check public search files before deployment
+        run: |
+          grep -Fqx 'Sitemap: https://app.example.test/sitemap.xml' dist/robots.txt
+          grep -Fq '<loc>https://app.example.test/random</loc>' dist/sitemap.xml
+          grep -Fq '<title>Random món ăn bằng vòng quay | Food Match</title>' dist/random.html
       - run: npm audit --audit-level=high
       - run: npm audit --omit=dev
       - name: Check staging Vercel security and SEO headers

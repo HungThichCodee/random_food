@@ -49,7 +49,12 @@ const connectSources = [...new Set([
 
 export const config = {
   git: { deploymentEnabled: false },
-  rewrites: [{ source: '/(.*)', destination: '/index.html' }],
+  rewrites: [
+    ...(publicIndexing ? ['/random', '/suggest', '/image-credits'].map(source => ({
+      source, destination: `${source}.html`,
+    })) : []),
+    { source: '/(.*)', destination: '/index.html' },
+  ],
   headers: [{
     source: '/(.*)',
     headers: [

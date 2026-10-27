@@ -1,31 +1,15 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import publicPages from '../../seo/public-pages.json';
 
-const publicPages: Record<string, { title: string; description: string }> = {
-  '/': {
-    title: 'Food Match — Tìm món ăn & bạn ăn cùng',
-    description: 'Food Match giúp bạn quay ngẫu nhiên món ăn, lọc theo khẩu vị, tìm quán và tìm bạn ăn cùng gần mình.',
-  },
-  '/random': {
-    title: 'Vòng quay món ăn | Food Match',
-    description: 'Quay món ăn ngẫu nhiên và lọc món mặn, món chay hoặc món ngọt trên Food Match.',
-  },
-  '/suggest': {
-    title: 'Gợi ý món ăn | Food Match',
-    description: 'Chọn khẩu vị, mức giá và buổi ăn để tìm món phù hợp trên Food Match.',
-  },
-  '/image-credits': {
-    title: 'Nguồn ảnh món ăn | Food Match',
-    description: 'Xem nguồn, chủ sở hữu và quyền sử dụng ảnh món ăn trong Food Match.',
-  },
-};
+const pages: Record<string, { title: string; description: string }> = publicPages;
 const canonicalOrigin = import.meta.env.VITE_PUBLIC_ORIGIN || window.location.origin;
 
 export default function PageMetadata() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const page = publicPages[pathname];
+    const page = pages[pathname];
     document.title = page?.title ?? 'Food Match';
 
     const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');

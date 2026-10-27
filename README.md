@@ -2,6 +2,8 @@
 
 **Quay chọn món, lọc gợi ý và tìm bạn ăn ở gần.**
 
+Website production: [foodmatchh.vercel.app](https://foodmatchh.vercel.app/).
+
 ![React 19](https://img.shields.io/badge/React-19-149eca) ![Vite 6](https://img.shields.io/badge/Vite-6-646cff) ![.NET 10](https://img.shields.io/badge/.NET-10-512bd4) ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791)
 
 ## Giới thiệu
@@ -207,9 +209,11 @@ CI ở [Verify Food Match](.github/workflows/verify.yml) chạy khi push/PR; [ru
 
 Build frontend trong thư mục `frontend` bằng `npm run build` và phục vụ các file trong `frontend/dist/` bằng máy chủ tĩnh có chuyển các route ứng dụng về `index.html`. Các biến `VITE_*` cần đúng **trước lúc build** vì Vite đưa chúng vào bundle. Backend có `backend/FoodMatch/src/FoodMatch.Api/Dockerfile` để build image ASP.NET Core 10; `docker-compose.yml` hiện chỉ khai báo PostgreSQL, chưa có service frontend/backend. Có thể kiểm tra image local bằng `docker build -f src/FoodMatch.Api/Dockerfile -t foodmatch-api:preflight .` từ `backend/FoodMatch`, rồi chạy `& .\scripts\smoke-docker-api.ps1` từ thư mục gốc khi PostgreSQL Docker đang hoạt động. Script tạo và xóa database thử riêng. Cấu hình PostgreSQL, JWT, CORS và địa chỉ lắng nghe cho môi trường triển khai; lưu secret ngoài Git. API chạy migration và seed lúc khởi động, nên cần quyền truy cập database phù hợp.
 
-Quy trình cụ thể Supabase → Render → Vercel nằm trong [.claude/skills/deploy.md](.claude/skills/deploy.md). Verify chạy khi push/PR và được Release gọi lại. Release là CD thủ công cho staging/production, triển khai cùng SHA lên Render/Vercel sau GitHub Environment gate. [CI đầu tiên của nhánh review](https://github.com/HungThichCodee/random_food/actions/runs/39984638973) đã đạt cả frontend/backend; chưa deploy staging/production. Có thể bắt đầu quy trình staging sau khi duyệt bản review và CI commit cuối xanh; chỉ phát hành production khi hai điện thoại HTTPS, Turnstile, CSP/WSS, backup/rollback và rà chiến lược lưu phiên đạt.
+Quy trình cụ thể Supabase → Render → Vercel nằm trong [.claude/skills/deploy.md](.claude/skills/deploy.md). Verify chạy khi push/PR và được Release gọi lại. Release là CD thủ công cho staging/production, triển khai cùng SHA lên Render/Vercel sau GitHub Environment gate. [Release staging đã đạt](https://github.com/HungThichCodee/random_food/actions/runs/40346066866); chủ dự án xác nhận staging đạt kiểm thử trên hai điện thoại và production đã triển khai ngày 27/10/2026. Mỗi bản cập nhật production tiếp theo vẫn cần Verify, nghiệm thu staging phần bị ảnh hưởng và cổng phê duyệt Release.
 
 Trước khi cấu hình Vercel, xem [báo cáo bảo mật và SEO](docs/security-seo-review-2026-10-25.md). Project staging đặt `FOODMATCH_SEO_INDEXABLE=0`; project production chỉ đặt `1` cùng `VITE_PUBLIC_ORIGIN` là domain HTTPS chính thức. Các trang chat/hồ sơ/vị trí luôn có `noindex`; đây không phải cơ chế phân quyền.
+
+Để đăng ký với Google Search Console, tạo **URL-prefix property** `https://foodmatchh.vercel.app/` và chọn xác minh bằng **HTML tag**. Lấy riêng phần `content` của thẻ `google-site-verification`, đặt vào biến Vercel Production loại Config `FOODMATCH_GOOGLE_SITE_VERIFICATION`, rồi chạy Release production để thẻ xuất hiện trong HTML trang chủ. Sau khi xác minh, gửi `sitemap.xml` trong Search Console và dùng URL Inspection cho `/` cùng `/random`. Build production tạo `robots.txt`, `sitemap.xml`, canonical và HTML có title/description riêng cho các trang công khai; Google quyết định thời điểm lập chỉ mục, thứ hạng và gợi ý khi đang gõ.
 
 ## Xử lý sự cố thường gặp
 

@@ -1,0 +1,18 @@
+{
+  "/": {
+    "title": "Food Match | Random món ăn và tìm bạn ăn chung",
+    "description": "FoodMatchh giúp bạn random món ăn bằng vòng quay, lọc món mặn, chay, ngọt và tìm bạn ăn chung gần mình."
+  },
+  "/random": {
+    "title": "Random món ăn bằng vòng quay | Food Match",
+    "description": "Không biết ăn gì? Quay random món ăn và lọc món mặn, món chay hoặc món ngọt trên Food Match."
+  },
+  "/suggest": {
+    "title": "Gợi ý món ăn theo khẩu vị, ngân sách | Food Match",
+    "description": "Chọn khẩu vị, mức giá và buổi ăn để tìm món phù hợp trên Food Match."
+  },
+  "/image-credits": {
+    "title": "Nguồn ảnh món ăn | Food Match",
+    "description": "Xem nguồn, chủ sở hữu và quyền sử dụng ảnh món ăn trong Food Match."
+  }
+}
