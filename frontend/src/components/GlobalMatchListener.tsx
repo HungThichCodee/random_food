@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Modal } from 'antd-mobile';
+import MobileModal from './Common/MobileModal';
 import { Toast } from '../stores/useToastStore';
 import { useSignalR } from '../hooks/useSignalR';
 import { matchApi } from '../api/matchApi';
@@ -109,7 +109,7 @@ export default function GlobalMatchListener() {
   };
 
   return (
-    <Modal
+    <MobileModal
       visible={modalVisible}
       title="Lời mời đi ăn"
       content={`${currentRequest?.fromUserName} muốn rủ bạn đi ăn! Bạn có đồng ý không?`}

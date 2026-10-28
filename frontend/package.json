@@ -15,7 +15,6 @@
     "@ant-design/icons": "^5.5.0",
     "@microsoft/signalr": "^9.0.19",
     "antd": "^5.22.0",
-    "antd-mobile": "^5.43.0",
     "axios": "^1.7.0",
     "i18next": "^24.0.0",
     "i18next-browser-languagedetector": "^8.0.0",

@@ -260,16 +260,55 @@ a.text-white { color: #fff; }
   box-shadow: var(--glass-shadow-active);
 }
 
-/* ── antd-mobile dark theme overrides ── */
-:root:root {
-  --adm-color-primary: var(--primary-container);
-  --adm-color-text: var(--on-surface);
-  --adm-color-text-secondary: var(--on-surface-variant);
-  --adm-color-background: transparent;
-  --adm-color-box: var(--surface-container);
-  --adm-font-family: var(--font-family);
-  --adm-color-border: rgba(255,255,255,0.08);
-  --adm-color-fill-content: var(--surface-container);
+/* Match and sharing dialogs use the same dark palette on narrow screens. */
+.foodmatch-mobile-modal .ant-modal-content {
+  background: var(--surface-container);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+  color: var(--on-surface);
+}
+
+.foodmatch-mobile-modal .ant-modal-header {
+  background: transparent;
+}
+
+.foodmatch-mobile-modal .ant-modal-title,
+.foodmatch-mobile-modal .ant-modal-body {
+  color: var(--on-surface);
+  font-family: var(--font-family);
+}
+
+.foodmatch-mobile-modal .ant-modal-body {
+  line-height: 1.6;
+}
+
+.foodmatch-mobile-modal .ant-modal-footer {
+  display: flex;
+  gap: 8px;
+}
+
+.foodmatch-mobile-modal .ant-modal-footer .ant-btn {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  margin: 0;
+}
+
+.foodmatch-mobile-modal .ant-modal-footer .ant-btn-default {
+  background: var(--surface-container-high);
+  border-color: var(--outline-variant);
+  color: var(--on-surface);
+}
+
+.foodmatch-mobile-modal .ant-modal-footer .ant-btn-primary {
+  background: var(--primary-container);
+  border-color: var(--primary-container);
+  color: white;
+}
+
+.foodmatch-mobile-modal .ant-modal-footer .ant-btn-dangerous {
+  color: var(--error);
 }
 
 /* ── Gradient Text (Stitch hero title style) ── */

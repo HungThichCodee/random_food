@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Modal } from 'antd-mobile';
+import MobileModal from '../components/Common/MobileModal';
 import { Toast } from '../stores/useToastStore';
 import { useSignalR } from '../hooks/useSignalR';
 import { useUserStore } from '../stores/useUserStore';
@@ -826,7 +826,7 @@ export default function ChatPage() {
         </div>
       </main>
 
-      <Modal
+      <MobileModal
         visible={showShareConfirm}
         title="Xác nhận chia sẻ"
         content="Người đã match sẽ thấy vị trí chính xác của bạn ngay khi bạn chia sẻ, tối đa 60 phút, dù họ chưa chia sẻ lại. Khi cả hai cùng chia sẻ, Google Maps sẽ tải quán quanh điểm giữa và nhận tọa độ điểm giữa. Nếu có nguồn OpenStreetMap bổ sung, máy chủ cũng gửi điểm giữa tới nguồn đó."
@@ -846,7 +846,7 @@ export default function ChatPage() {
           },
         ]}
       />
-      <Modal
+      <MobileModal
         visible={showReport}
         title="Báo cáo người dùng"
         content={

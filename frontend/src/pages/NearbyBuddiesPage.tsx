@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'antd-mobile';
 import { Toast } from '../stores/useToastStore';
 import { tempUserApi } from '../api/tempUserApi';
 import { matchApi } from '../api/matchApi';
@@ -93,9 +92,10 @@ export default function NearbyBuddiesPage() {
         <h2 className="text-on-surface text-xl text-center mb-4">
           Bạn cần tạo hồ sơ để dùng tính năng này
         </h2>
-        <Button color="primary" onClick={() => navigate('/profile')}>
+        <button type="button" onClick={() => navigate('/profile')}
+          className="rounded-xl bg-primary-container px-5 py-3 font-semibold text-white active:scale-95">
           Đến trang tạo hồ sơ
-        </Button>
+        </button>
       </div>
     );
   }
