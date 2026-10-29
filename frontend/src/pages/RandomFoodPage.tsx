@@ -216,7 +216,7 @@ export default function RandomFoodPage() {
                 <button key={item.key} type="button" disabled={spinning} onClick={() => setFilter(item.key)}
                   aria-pressed={filter === item.key}
                   className={`flex min-h-11 flex-col items-center justify-center rounded-full px-1 py-1 text-[11px] font-bold leading-tight transition-colors disabled:opacity-60 sm:flex-row sm:gap-1.5 sm:text-sm ${filter === item.key ? 'bg-primary-container text-white shadow-[0_5px_16px_rgba(255,107,53,0.3)]' : 'text-on-surface-variant hover:bg-white/5'}`}>
-                  <span className="material-symbols-outlined text-[17px]" aria-hidden="true">{item.icon}</span>
+                  <span className="material-symbols-outlined w-6 shrink-0 overflow-hidden whitespace-nowrap text-[17px]" aria-hidden="true">{item.icon}</span>
                   <span>{item.label}</span>
                 </button>
               ))}

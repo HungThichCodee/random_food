@@ -26,6 +26,22 @@ test('home logo loads and primary navigation works', async ({ page }) => {
   await expect(page).toHaveURL(/\/random$/);
 });
 
+test('random category icons render without overlapping the mobile filters', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/random');
+  const icons = page.locator('.random-page-filters .material-symbols-outlined');
+  await expect(icons).toHaveCount(4);
+  await page.waitForLoadState('networkidle');
+  await page.evaluate(() => document.fonts.ready);
+  const glyphWidths = await icons.evaluateAll(elements => {
+    const context = document.createElement('canvas').getContext('2d');
+    if (!context) throw new Error('Canvas is unavailable');
+    context.font = '24px "Material Symbols Outlined"';
+    return elements.map(element => context.measureText(element.textContent?.trim() ?? '').width);
+  });
+  for (const width of glyphWidths) expect(width).toBeLessThanOrEqual(26);
+});
+
 test('guest home does not load the match dialog bundle', async ({ page }) => {
   const requestedAssets: string[] = [];
   page.on('request', (request) => requestedAssets.push(request.url()));
