@@ -5,7 +5,7 @@ import MobileModal from '../components/Common/MobileModal';
 import { Toast } from '../stores/useToastStore';
 import { useSignalR } from '../hooks/useSignalR';
 import { useUserStore } from '../stores/useUserStore';
-import logoImg from '../assert/logo.png';
+import logoImg from '../assert/logo-256.webp';
 
 interface MessageItem {
   id: string | number;

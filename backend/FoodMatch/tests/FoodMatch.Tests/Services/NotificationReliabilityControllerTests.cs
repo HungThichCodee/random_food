@@ -9,13 +9,46 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Moq;
+using Npgsql;
 using Xunit;
 
 namespace FoodMatch.Tests.Services;
 
 public class NotificationReliabilityControllerTests
 {
+    [Fact]
+    public async Task DuplicatePendingInvitationReturnsConflictWithoutNotification()
+    {
+        var userId = Guid.NewGuid();
+        var dto = new CreateMatchRequestDto { ToTempUserId = Guid.NewGuid() };
+        var databaseError = new PostgresException(
+            "duplicate key", "ERROR", "ERROR", PostgresErrorCodes.UniqueViolation,
+            constraintName: "UX_match_requests_pending_pair");
+        var service = new Mock<IMatchService>();
+        service.Setup(value => value.SendMatchRequestAsync(userId, dto))
+            .ThrowsAsync(new DbUpdateException("Duplicate pending invitation", databaseError));
+        var hub = new Mock<IHubContext<MatchHub>>();
+        var controller = new MatchRequestsController(service.Object, hub.Object,
+            new Mock<ITempUserService>().Object, new Mock<IMeetingPlaceService>().Object)
+        {
+            ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(
+                        [new Claim(ClaimTypes.NameIdentifier, userId.ToString())], "test"))
+                }
+            }
+        };
+
+        var response = await controller.SendRequest(dto);
+
+        Assert.IsType<ConflictObjectResult>(response.Result);
+        hub.VerifyNoOtherCalls();
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

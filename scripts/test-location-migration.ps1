@@ -2,6 +2,12 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $dbName = 'foodmatch_test_location_' + [guid]::NewGuid().ToString('N').Substring(0, 12)
 $created = $false
+$environmentKeys = @('ConnectionStrings__DefaultConnection', 'FOODMATCH_TEST_CONNECTION',
+    'ASPNETCORE_ENVIRONMENT', 'DOTNET_ROOT', 'PATH')
+$originalEnvironment = @{}
+foreach ($key in $environmentKeys) {
+    $originalEnvironment[$key] = [Environment]::GetEnvironmentVariable($key, 'Process')
+}
 
 Push-Location $root
 try {
@@ -33,10 +39,20 @@ try {
     $env:DOTNET_ROOT = (Resolve-Path -LiteralPath (Join-Path $root '.dotnet')).Path
     $env:PATH = $env:DOTNET_ROOT + ';' + $env:PATH
     $dotnet = Join-Path $env:DOTNET_ROOT 'dotnet.exe'
+    $efToolDir = Join-Path ([IO.Path]::GetTempPath()) 'foodmatch-dotnet-tools'
+    $efTool = Join-Path $efToolDir 'dotnet-ef.exe'
+    if (-not (Test-Path -LiteralPath $efTool)) {
+        & $dotnet tool install dotnet-ef --version 10.0.0 --tool-path $efToolDir
+        if ($LASTEXITCODE -ne 0) { throw 'Could not install dotnet-ef 10.0.0 for the migration test' }
+    }
+    $efVersion = & $efTool --version
+    if ($LASTEXITCODE -ne 0 -or ($efVersion -join ' ') -notmatch '\b10\.0\.0\b') {
+        throw 'Migration test requires dotnet-ef 10.0.0 in the temporary tool directory'
+    }
     $project = Join-Path $root 'backend/FoodMatch/src/FoodMatch.Infrastructure'
     $startup = Join-Path $root 'backend/FoodMatch/src/FoodMatch.Api'
 
-    & $dotnet ef database update 20261020093729_AddGoogleMeetingPlaceLink `
+    & $efTool database update 20261020093729_AddGoogleMeetingPlaceLink `
         --project $project --startup-project $startup --configuration Release
     if ($LASTEXITCODE -ne 0) { throw 'Could not migrate to the previous schema' }
 
@@ -54,9 +70,9 @@ VALUES
     $seedSql | docker exec -i foodmatch-postgres psql -v ON_ERROR_STOP=1 -U $dbUser -d $dbName
     if ($LASTEXITCODE -ne 0) { throw 'Could not seed the previous schema' }
 
-    & $dotnet ef database update --project $project --startup-project $startup `
+    & $efTool database update --project $project --startup-project $startup `
         --configuration Release
-    if ($LASTEXITCODE -ne 0) { throw 'Could not apply the independent-consent migration' }
+    if ($LASTEXITCODE -ne 0) { throw 'Could not apply pending migrations' }
 
     $verifySql = @'
 SELECT CASE WHEN
@@ -89,6 +105,9 @@ SELECT CASE WHEN
 } finally {
     if ($created -and $dbName -match '^foodmatch_test_location_[0-9a-f]{12}$') {
         docker exec foodmatch-postgres dropdb -U $dbUser --if-exists $dbName
+    }
+    foreach ($key in $environmentKeys) {
+        [Environment]::SetEnvironmentVariable($key, $originalEnvironment[$key], 'Process')
     }
     Pop-Location
 }

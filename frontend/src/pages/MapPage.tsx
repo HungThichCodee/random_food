@@ -45,12 +45,13 @@ export default function MapPage() {
   }, [searchQuery, currentLat, currentLng]);
 
   return (
-    <div className="h-[100dvh] w-full bg-background relative flex flex-col">
+    <main className="h-[100dvh] w-full bg-background relative flex flex-col">
       {/* Header */}
       <div className="z-10 bg-surface-container pt-safe-top pb-4 px-4 shadow-sm shrink-0">
         <div className="flex items-center gap-3 max-w-[390px] mx-auto">
           <button 
             onClick={() => navigate(-1)} 
+            aria-label="Quay lại"
             className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface shadow-sm shrink-0 active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined">arrow_back</span>
@@ -71,6 +72,7 @@ export default function MapPage() {
             {inputValue && (
               <button 
                 type="button" 
+                aria-label="Xóa tìm kiếm"
                 onClick={() => {
                   setInputValue('');
                   searchParams.delete('search');
@@ -136,6 +138,6 @@ export default function MapPage() {
           )
         )}
       </div>
-    </div>
+    </main>
   );
 }

@@ -5,8 +5,18 @@ Push-Location $root
 $api = $null
 $created = $false
 $dbName = 'foodmatch_test_signalr_' + [guid]::NewGuid().ToString('N').Substring(0, 12)
-$logPath = Join-Path $root 'signalr-smoke-api.log'
-$errorPath = Join-Path $root 'signalr-smoke-api.err'
+$logId = [guid]::NewGuid().ToString('N').Substring(0, 12)
+$logPath = Join-Path ([IO.Path]::GetTempPath()) ('foodmatch-signalr-' + $logId + '.log')
+$errorPath = Join-Path ([IO.Path]::GetTempPath()) ('foodmatch-signalr-' + $logId + '.err')
+$environmentKeys = @('ConnectionStrings__DefaultConnection', 'ASPNETCORE_ENVIRONMENT',
+    'ASPNETCORE_URLS', 'FOODMATCH_SMOKE_URL', 'FOODMATCH_SMOKE_JWT_SECRET',
+    'FOODMATCH_SMOKE_JWT_ISSUER', 'FOODMATCH_SMOKE_JWT_AUDIENCE',
+    'FOODMATCH_SMOKE_DB_NAME', 'FOODMATCH_SMOKE_DB_USER',
+    'FOODMATCH_SMOKE_ALLOWED_ORIGIN', 'DOTNET_ROOT', 'PATH')
+$originalEnvironment = @{}
+foreach ($key in $environmentKeys) {
+    $originalEnvironment[$key] = [Environment]::GetEnvironmentVariable($key, 'Process')
+}
 
 try {
     $lines = Get-Content -LiteralPath (Join-Path $root '.env') -Encoding utf8
@@ -92,5 +102,8 @@ try {
         docker exec foodmatch-postgres dropdb -U $dbUser --if-exists $dbName
     }
     Remove-Item -LiteralPath $logPath, $errorPath -ErrorAction SilentlyContinue
+    foreach ($key in $environmentKeys) {
+        [Environment]::SetEnvironmentVariable($key, $originalEnvironment[$key], 'Process')
+    }
     Pop-Location
 }

@@ -1,12 +1,16 @@
+import { lazy, Suspense } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import GlobalMatchListener from '../GlobalMatchListener';
 import { CustomToast } from '../CustomToast';
+import { useUserStore } from '../../stores/useUserStore';
+
+const GlobalMatchListener = lazy(() => import('../GlobalMatchListener'));
 
 export default function AppLayout() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const token = useUserStore((state) => state.profile?.token);
 
   const tabs = [
     {
@@ -35,7 +39,7 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-[100dvh] bg-background text-on-surface font-body-md w-full relative overflow-x-hidden">
-      <GlobalMatchListener />
+      {token && <Suspense fallback={null}><GlobalMatchListener /></Suspense>}
       <CustomToast />
       
       {/* Main Content Area */}

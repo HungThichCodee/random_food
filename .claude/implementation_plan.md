@@ -1,5 +1,7 @@
 # Kế hoạch hoàn thiện trước deploy
 
+Kiểm toán local bổ sung ngày 29/10/2026: backend Release build trên SDK .NET 10.0.401 đạt 0 warning/0 error; migration cũ → mới bằng EF CLI 10.0.0 và 88/88 test PostgreSQL đạt trên database thử; smoke SignalR A/B/C, quyền GPS chính xác/thu hồi/hết hạn và Docker image/API health đều đạt local. Frontend sau tối ưu tải JS có 11/11 Playwright đạt, Lighthouse mobile local trung vị 95 điểm/LCP 2,84 giây qua ba lần (LCP chưa ổn định ≤2,5 giây). Bằng chứng chi tiết ở `../docs/audits/`. Các cổng Supabase backup/dữ liệu trùng, staging HTTPS/hai điện thoại, CI đúng SHA và production vẫn chưa chạy cho bản thay đổi này. Không commit, push hoặc Release trong lượt kiểm toán.
+
 Trạng thái: **preflight local đạt, có thể bắt đầu deploy staging sau khi duyệt diff; production chưa được xác nhận**. Mỗi ô [x] cần bằng chứng từ mã, test và chạy thực tế; không kế thừa tiến độ cũ.
 
 ## P0 — baseline và mô hình đe dọa

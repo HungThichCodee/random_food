@@ -226,9 +226,14 @@ namespace FoodMatch.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromTempUserId");
-
                     b.HasIndex("ToTempUserId");
+
+                    b.HasIndex("FromTempUserId", "ToTempUserId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_match_requests_pending_pair")
+                        .HasFilter("\"Status\" = 'Pending'");
+
+                    b.HasIndex(new[] { "FromTempUserId" }, "IX_match_requests_FromTempUserId");
 
                     b.ToTable("match_requests", (string)null);
                 });

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { tempUserApi } from '../api/tempUserApi';
 import { useUserStore } from '../stores/useUserStore';
 import type { CreateTempUserDto } from '../types/tempUser';
-import logoImg from '../assert/logo.png';
+import logoImg from '../assert/logo-256.webp';
 import TurnstileWidget from '../components/TurnstileWidget';
 
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';

@@ -10,6 +10,17 @@ namespace FoodMatch.Tests.Services;
 public class ClientIpRateLimiterTests
 {
     [Fact]
+    public void IgnoresCallerSuppliedForwardingHeadersOutsideRender()
+    {
+        Assert.NotEqual("true", Environment.GetEnvironmentVariable("RENDER"));
+        var context = Request(IPAddress.Parse("198.51.100.42"), Guid.Empty);
+        context.Request.Headers["CF-Connecting-IP"] = "203.0.113.77";
+        context.Request.Headers["X-Forwarded-For"] = "203.0.113.78";
+
+        Assert.Equal("ip:198.51.100.42", ClientIpRateLimiter.GetKey(context));
+    }
+
+    [Fact]
     public void SharesIpBudgetAcrossDifferentAuthenticatedProfiles()
     {
         using var limiter = ClientIpRateLimiter.Create();

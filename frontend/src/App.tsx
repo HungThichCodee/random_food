@@ -6,8 +6,8 @@ import { useUserStore } from './stores/useUserStore';
 import AppLayout from './components/Layout/AppLayout';
 import RequireActiveProfile from './components/RequireActiveProfile';
 import PageMetadata from './components/PageMetadata';
+import HomePage from './pages/HomePage';
 
-const HomePage = lazy(() => import('./pages/HomePage'));
 const RandomFoodPage = lazy(() => import('./pages/RandomFoodPage'));
 const SuggestFoodPage = lazy(() => import('./pages/SuggestFoodPage'));
 const MapPage = lazy(() => import('./pages/MapPage'));

@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 
 const dist = new URL('../dist/', import.meta.url);
 const pages = JSON.parse(await readFile(new URL('../seo/public-pages.json', import.meta.url), 'utf8'));
@@ -30,6 +30,9 @@ function publicOrigin() {
 
 if (indexable) {
   const origin = publicOrigin();
+  const logoAsset = (await readdir(new URL('assets/', dist)))
+    .find(file => /^logo-256-[A-Za-z0-9_-]+\.webp$/.test(file));
+  if (!logoAsset) throw new Error('The optimized home logo is missing from the build');
   if (!template.includes('  </head>') || !/<title>[^<]*<\/title>/.test(template) ||
       !/<meta name="description" content="[^"]*"\s*\/>/.test(template)) {
     throw new Error('The built HTML template is missing required metadata');
@@ -43,6 +46,8 @@ if (indexable) {
     const canonical = `${origin}${path}`;
     html = addToHead(html, `<link rel="canonical" href="${escapeHtml(canonical)}" />`);
     if (path === '/') {
+      html = addToHead(html,
+        `<link rel="preload" as="image" href="/assets/${logoAsset}" fetchpriority="high" />`);
       const website = {
         '@context': 'https://schema.org', '@type': 'WebSite',
         name: 'Food Match', alternateName: 'FoodMatchh', url: `${origin}/`,

@@ -21,6 +21,63 @@ public sealed class PostgresFactAttribute : FactAttribute
 public class PostgresIntegrityTests
 {
     [PostgresFact]
+    public async Task ConcurrentPendingInvitationsCannotCreateDuplicatePair()
+    {
+        var options = Options();
+        var from = NewUser();
+        var to = NewUser();
+        await using (var seed = new FoodMatchDbContext(options))
+        {
+            seed.TempUsers.AddRange(from, to);
+            await seed.SaveChangesAsync();
+        }
+
+        try
+        {
+            async Task<bool> InsertAsync()
+            {
+                await using var context = new FoodMatchDbContext(options);
+                context.MatchRequests.Add(new MatchRequest
+                {
+                    FromTempUserId = from.Id,
+                    ToTempUserId = to.Id,
+                    Status = MatchStatus.Pending
+                });
+                try
+                {
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg &&
+                    pg.SqlState == PostgresErrorCodes.UniqueViolation &&
+                    pg.ConstraintName == "UX_match_requests_pending_pair")
+                {
+                    return false;
+                }
+            }
+
+            var results = await Task.WhenAll(InsertAsync(), InsertAsync());
+            Assert.Single(results.Where(created => created));
+
+            await using var verify = new FoodMatchDbContext(options);
+            Assert.Equal(1, await verify.MatchRequests.CountAsync(match =>
+                match.FromTempUserId == from.Id && match.ToTempUserId == to.Id &&
+                match.Status == MatchStatus.Pending));
+        }
+        finally
+        {
+            await using var cleanup = new FoodMatchDbContext(options);
+            var matches = await cleanup.MatchRequests.Where(match =>
+                match.FromTempUserId == from.Id && match.ToTempUserId == to.Id).ToListAsync();
+            cleanup.MatchRequests.RemoveRange(matches);
+            var users = await cleanup.TempUsers.Where(user =>
+                user.Id == from.Id || user.Id == to.Id).ToListAsync();
+            cleanup.TempUsers.RemoveRange(users);
+            await cleanup.SaveChangesAsync();
+        }
+    }
+
+    [PostgresFact]
     public async Task SeederRecoversFromTagsWithoutFoodsAndRemainsIdempotent()
     {
         await using var context = new FoodMatchDbContext(Options());

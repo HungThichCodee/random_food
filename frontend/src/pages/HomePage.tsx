@@ -3,8 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Toast } from '../stores/useToastStore';
 import { useUserStore } from '../stores/useUserStore';
-import { matchApi } from '../api/matchApi';
-import logoImg from '../assert/logo.png';
+import logoImg from '../assert/logo-256.webp';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -63,6 +62,7 @@ export default function HomePage() {
             <button 
               onClick={async () => {
                 try {
+                  const { matchApi } = await import('../api/matchApi');
                   const pendingReqs = await matchApi.getPending();
                   if (pendingReqs && pendingReqs.length > 0) {
                     Toast.show({
@@ -115,7 +115,10 @@ export default function HomePage() {
                 <img 
                   alt="Food Match Neon Heart Emblem" 
                   className="w-full h-full object-cover rounded-full" 
-                  src={logoImg} 
+                  src={logoImg}
+                  width={112}
+                  height={112}
+                  fetchPriority="high"
                 />
               </div>
               <span className="absolute bottom-0 right-1 w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary shadow-md">

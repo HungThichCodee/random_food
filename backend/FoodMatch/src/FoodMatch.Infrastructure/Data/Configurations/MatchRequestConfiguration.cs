@@ -16,6 +16,11 @@ public class MatchRequestConfiguration : IEntityTypeConfiguration<MatchRequest>
         builder.Property(m => m.MeetingPlaceCategory).HasMaxLength(32);
         builder.Property(m => m.MeetingPlaceGoogleMapsUrl).HasMaxLength(2048);
         builder.Property(m => m.Version).IsRowVersion();
+        builder.HasIndex(m => m.FromTempUserId, "IX_match_requests_FromTempUserId");
+        builder.HasIndex(m => new { m.FromTempUserId, m.ToTempUserId })
+               .IsUnique()
+               .HasDatabaseName("UX_match_requests_pending_pair")
+               .HasFilter("\"Status\" = 'Pending'");
 
         builder.HasOne(m => m.FromTempUser)
                .WithMany(u => u.SentMatchRequests)

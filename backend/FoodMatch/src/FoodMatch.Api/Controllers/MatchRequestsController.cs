@@ -7,6 +7,7 @@ using FoodMatch.Application.DTOs.Match;
 using Microsoft.AspNetCore.SignalR;
 using FoodMatch.Api.Hubs;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace FoodMatch.Api.Controllers;
 
@@ -55,6 +56,12 @@ public class MatchRequestsController : ControllerBase
         catch (ArgumentException ex)
         {
             return BadRequest(new { Message = ex.Message });
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg &&
+            pg.SqlState == PostgresErrorCodes.UniqueViolation &&
+            pg.ConstraintName == "UX_match_requests_pending_pair")
+        {
+            return Conflict(new { Message = "A pending request already exists." });
         }
         catch (Exception)
         {
