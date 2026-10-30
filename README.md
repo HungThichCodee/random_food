@@ -11,7 +11,7 @@
 
 ## Mục lục
 
-- [Overview](#overview) · [Screenshots](#screenshots) · [Features](#features) · [Technology stack](#technology-stack)
+- [Overview](#overview) · [Live demo](#live-demo) · [Features](#features) · [Technology stack](#technology-stack)
 - [Architecture](#architecture) · [Quick start](#quick-start) · [Configuration](#configuration) · [Testing](#testing)
 - [Deployment](#deployment) · [Security and privacy](#security-and-privacy) · [Documentation](#documentation) · [Troubleshooting](#troubleshooting) · [License and author](#license-and-author)
 
@@ -21,17 +21,9 @@ Food Match giúp người chưa biết ăn gì chọn món bằng vòng quay ho�
 
 Khi hai người ghép cặp, họ có thể nhắn tin, tự quyết định có chia sẻ vị trí hay không và cùng chọn điểm hẹn. Bản đồ Google được nhúng để tìm quán và xem đường đi. Ứng dụng chưa có đặt món hoặc thanh toán.
 
-## Screenshots
+## Live demo
 
-Ảnh chụp từ bản local trên viewport điện thoại 390 × 844, ngày 23–24/10/2026. Đây là ảnh thật trong repository, không phải ảnh của mọi màn hình ở bản mới nhất.
-
-<p align="center">
-  <img src="docs/screenshots/mobile-random-photos-2026-10-24.png" width="230" alt="Vòng quay chọn món ăn" />
-  <img src="docs/screenshots/mobile-suggest-photos-2026-10-24.png" width="230" alt="Kết quả gợi ý món ăn" />
-  <img src="docs/screenshots/mobile-meeting-embed-2026-10-23.png" width="230" alt="Gợi ý điểm hẹn trong chat" />
-</p>
-
-Chưa có ảnh chụp trong repository cho giao diện `/map` mới và desktop. Xem trực tiếp [Bản đồ & đường đi](https://foodmatchh.vercel.app/map).
+Xem trực tiếp [Vòng quay món](https://foodmatchh.vercel.app/random), [Gợi ý món](https://foodmatchh.vercel.app/suggest), [Bản đồ & đường đi](https://foodmatchh.vercel.app/map) và [Nguồn ảnh món](https://foodmatchh.vercel.app/image-credits).
 
 ## Features
 
@@ -146,10 +138,10 @@ Chạy từ thư mục gốc, trừ khi cột lệnh ghi rõ `frontend`. Các l�
 | Kiểm tra ảnh món | `cd frontend; npm.cmd run check:food-images` |
 | Backend build/test | `dotnet build .\backend\FoodMatch\FoodMatch.sln -c Release`; `dotnet test .\backend\FoodMatch\FoodMatch.sln -c Release` |
 | Integration/smoke | [Hướng dẫn và điều kiện PostgreSQL thử](.claude/skills/deploy.md) |
-| Nghiệm thu thủ công | [Checklist hai điện thoại trên staging](docs/two-phone-acceptance.md) |
+| Nghiệm thu thủ công | Thử trên hai điện thoại thật: tạo hồ sơ, Turnstile, Maps, match/chat, GPS chính xác, chia sẻ và thu hồi vị trí, WSS/nối lại mạng |
 | CI | [Verify Food Match](.github/workflows/verify.yml): backend PostgreSQL 16, frontend lint/build/audit |
 
-Frontend hiện không khai báo script `npm test`. Lịch sử kiểm thử có ngày và giới hạn riêng nằm trong [báo cáo audit](docs/audits/FOODMATCH_POST_DEPLOY_AUDIT.md); xem badge CI ở đầu trang để biết trạng thái nhánh `main` hiện tại.
+Frontend hiện không khai báo script `npm test`. Xem badge CI ở đầu trang để biết trạng thái nhánh `main` hiện tại; các biên bản kiểm thử nội bộ được giữ trên máy của chủ dự án.
 
 ## Deployment
 
@@ -174,7 +166,7 @@ Hướng dẫn dưới đây đủ để cấu hình các dịch vụ bên ngoà
 
 Đăng nhập [repository GitHub](https://github.com/HungThichCodee/random_food). Khi triển khai mới, có thể clone bằng `git clone https://github.com/HungThichCodee/random_food.git`. Dùng nhánh review/PR để kiểm tra thay đổi, rồi đưa **đúng commit đã duyệt** lên `main`. Mở **Actions → [Verify Food Match](.github/workflows/verify.yml)** và xác nhận cả job `backend`, `frontend` xanh ở SHA đó. Workflow kiểm tra .NET 10/PostgreSQL 16 và frontend Node 22; [Release Food Match](.github/workflows/release.yml) sẽ chạy lại Verify trước khi deploy.
 
-Không đưa `.env`, database password, JWT secret hoặc token vào Git. Chủ dự án giữ các file mới trong `docs/` trên máy; khi stage, chọn rõ file cần commit và xem `git diff --cached --name-only` trước khi push. `.gitignore` **không ngăn** các file `docs/` đã được Git theo dõi từ trước bị stage bởi `git add -A`.
+Không đưa `.env`, database password, JWT secret hoặc token vào Git. Chủ dự án giữ `docs/` trên máy, không đưa thư mục này lên GitHub; khi stage, chọn rõ file cần commit và xem `git diff --cached --name-only` trước khi push.
 
 ### 2. Tạo PostgreSQL trong Supabase
 
@@ -290,16 +282,14 @@ Trong **mỗi** environment, thêm đúng hai **Secrets** và năm **Variables**
 - API giới hạn CORS theo origin, xác minh Cloudflare Turnstile khi tạo hồ sơ ở production và áp dụng rate limiting. Rate limiter hiện lưu trong bộ nhớ mỗi instance.
 - Danh sách người gần chỉ trả tín hiệu trong 3 km. Trong cặp đã match, mỗi người chia sẻ tọa độ chính xác độc lập tối đa 60 phút và có thể thu hồi; điểm hẹn cần cả hai còn chia sẻ.
 - Maps Embed key hiện trong trình duyệt nên phải giới hạn **Maps Embed API** và HTTP referrer. Google Maps iframe không cung cấp danh sách quán được bấm cho ứng dụng.
-- Các route riêng có `noindex`; cài đặt này không thay thế xác thực hoặc phân quyền. Xem [đánh giá bảo mật và SEO](docs/security-seo-review-2026-10-25.md).
-- Ảnh món có nguồn và quyền sử dụng riêng trong [food-image-credits.md](docs/food-image-credits.md); giấy phép MIT của mã nguồn không tự cấp quyền tái sử dụng mọi ảnh.
+- Các route riêng có `noindex`; cài đặt này không thay thế xác thực hoặc phân quyền.
+- Ảnh món có nguồn và quyền sử dụng riêng tại [trang Nguồn ảnh món](https://foodmatchh.vercel.app/image-credits); giấy phép MIT của mã nguồn không tự cấp quyền tái sử dụng mọi ảnh.
 
 ## Documentation
 
 - [Quy trình deploy Supabase → Render → Vercel](.claude/skills/deploy.md)
-- [Nghiệm thu trên hai điện thoại](docs/two-phone-acceptance.md)
-- [Phạm vi Google Maps Embed](docs/maps-embed-plan.md)
-- [Nguồn và quyền sử dụng ảnh món](docs/food-image-credits.md)
-- [Audit bảo mật, SEO](docs/security-seo-review-2026-10-25.md) và [audit sau deploy](docs/audits/FOODMATCH_POST_DEPLOY_AUDIT.md) — bằng chứng lịch sử theo ngày ghi trong từng tài liệu
+- [Nguồn ảnh món và giấy phép sử dụng](https://foodmatchh.vercel.app/image-credits)
+- [Verify Food Match](.github/workflows/verify.yml) và [Release Food Match](.github/workflows/release.yml)
 
 Khi thay ảnh seed, cập nhật `frontend/food-images.manifest.json`; ảnh do chủ dự án cung cấp phải là PNG đúng tên slug trong `frontend/public/food-images/` và có trường `provided`. Chạy `node frontend/scripts/sync-food-images.mjs --only "Tên món"` hoặc `--provided`, rồi `cd frontend; npm.cmd run check:food-images` để kiểm tra danh mục và nguồn ảnh.
 
@@ -315,4 +305,4 @@ Khi thay ảnh seed, cập nhật `frontend/food-images.manifest.json`; ảnh do
 
 ## License and author
 
-Mã nguồn dùng [MIT License](LICENSE), bản quyền 2026 [HungThichCodee](https://github.com/HungThichCodee). Ảnh món có quyền sử dụng riêng; xem [ghi nhận nguồn ảnh](docs/food-image-credits.md).
+Mã nguồn dùng [MIT License](LICENSE), bản quyền 2026 [HungThichCodee](https://github.com/HungThichCodee). Ảnh món có quyền sử dụng riêng; xem [ghi nhận nguồn ảnh](https://foodmatchh.vercel.app/image-credits).

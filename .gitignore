@@ -69,3 +69,4 @@ coverage/
 logs/
 *.log
 .dotnet/
+docs/
