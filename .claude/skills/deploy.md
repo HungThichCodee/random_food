@@ -74,13 +74,13 @@ Kết nối này chỉ đưa vào Render Environment. Backend hiện gọi `Data
 
 Tạo Web Service từ GitHub, runtime Docker:
 
-| Thiết lập | Giá trị |
-|---|---|
-| Root Directory | `backend/FoodMatch` |
-| Dockerfile Path | `src/FoodMatch.Api/Dockerfile` |
-| Docker Context | `.` |
-| Health Check Path | `/api/health` |
-| Auto-Deploy | `Off` sau lần tạo service đầu tiên, trước lần push tiếp theo |
+| Thiết lập         | Giá trị                                                      |
+| ----------------- | ------------------------------------------------------------ |
+| Root Directory    | `backend/FoodMatch`                                          |
+| Dockerfile Path   | `src/FoodMatch.Api/Dockerfile`                               |
+| Docker Context    | `.`                                                          |
+| Health Check Path | `/api/health`                                                |
+| Auto-Deploy       | `Off` sau lần tạo service đầu tiên, trước lần push tiếp theo |
 
 Docker context này bắt buộc vì Dockerfile `COPY src/...`. Đặt Environment:
 

@@ -1,236 +1,318 @@
 # Food Match
 
-**Quay chọn món, lọc gợi ý và tìm bạn ăn ở gần.**
+**Quay chọn món ăn, tìm bạn ăn gần mình và hẹn gặp trên bản đồ.**
 
-Website production: [foodmatchh.vercel.app](https://foodmatchh.vercel.app/).
+[![Verify Food Match](https://github.com/HungThichCodee/random_food/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/HungThichCodee/random_food/actions/workflows/verify.yml)
+![React 19](https://img.shields.io/badge/React-19-149eca)
+![.NET 10](https://img.shields.io/badge/.NET-10-512bd4)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-![React 19](https://img.shields.io/badge/React-19-149eca) ![Vite 6](https://img.shields.io/badge/Vite-6-646cff) ![.NET 10](https://img.shields.io/badge/.NET-10-512bd4) ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791)
+[Dùng thử](https://foodmatchh.vercel.app/) · [Bắt đầu nhanh](#quick-start) · [Tài liệu](#documentation) · [Mã nguồn](https://github.com/HungThichCodee/random_food)
 
-## Giới thiệu
+## Mục lục
 
-Food Match là ứng dụng web hỗ trợ quyết định ăn gì và kết nối với người muốn ăn cùng ở gần. Người dùng có thể quay ngẫu nhiên trong danh sách món ăn, lọc gợi ý theo loại món, ngân sách, buổi ăn và khẩu vị. Ứng dụng dùng vị trí do trình duyệt cung cấp để tìm bạn ăn gần đó, đồng thời hiển thị bản đồ và chỉ đường bằng Google Maps nhúng. Hồ sơ người dùng là hồ sơ tạm, hết hạn sau 3 giờ kể từ khi tạo; backend lưu dữ liệu món ăn, lời mời ghép cặp và tin nhắn trong PostgreSQL.
+- [Overview](#overview) · [Screenshots](#screenshots) · [Features](#features) · [Technology stack](#technology-stack)
+- [Architecture](#architecture) · [Quick start](#quick-start) · [Configuration](#configuration) · [Testing](#testing)
+- [Deployment](#deployment) · [Security and privacy](#security-and-privacy) · [Documentation](#documentation) · [Troubleshooting](#troubleshooting) · [License and author](#license-and-author)
 
-## Ảnh chụp màn hình
+## Overview
 
-Ảnh chụp từ Edge với viewport mô phỏng điện thoại 390×844 trên dữ liệu local ngày 21/10/2026; chưa thay cho kiểm thử trên điện thoại thật.
+Food Match giúp người chưa biết ăn gì chọn món bằng vòng quay hoặc bộ lọc, rồi tìm người muốn ăn cùng ở gần. Hồ sơ tạm giúp bắt đầu mà không cần tạo tài khoản mật khẩu.
 
-![Vòng quay món ăn ở viewport điện thoại](docs/screenshots/mobile-random.png)
+Khi hai người ghép cặp, họ có thể nhắn tin, tự quyết định có chia sẻ vị trí hay không và cùng chọn điểm hẹn. Bản đồ Google được nhúng để tìm quán và xem đường đi. Ứng dụng chưa có đặt món hoặc thanh toán.
 
-![Kết quả quay món ngọt ở viewport điện thoại](docs/screenshots/mobile-random-result.png)
+## Screenshots
 
-Ảnh món cục bộ trên viewport 390×844, chụp ngày 24/10/2026:
+Ảnh chụp từ bản local trên viewport điện thoại 390 × 844, ngày 23–24/10/2026. Đây là ảnh thật trong repository, không phải ảnh của mọi màn hình ở bản mới nhất.
 
-![Vòng quay với ảnh món](docs/screenshots/mobile-random-photos-2026-10-24.png)
+<p align="center">
+  <img src="docs/screenshots/mobile-random-photos-2026-10-24.png" width="230" alt="Vòng quay chọn món ăn" />
+  <img src="docs/screenshots/mobile-suggest-photos-2026-10-24.png" width="230" alt="Kết quả gợi ý món ăn" />
+  <img src="docs/screenshots/mobile-meeting-embed-2026-10-23.png" width="230" alt="Gợi ý điểm hẹn trong chat" />
+</p>
 
-![Popup kết quả với ảnh món](docs/screenshots/mobile-random-result-photos-2026-10-24.png)
+Chưa có ảnh chụp trong repository cho giao diện `/map` mới và desktop. Xem trực tiếp [Bản đồ & đường đi](https://foodmatchh.vercel.app/map).
 
-![Danh sách gợi ý món có ảnh](docs/screenshots/mobile-suggest-photos-2026-10-24.png)
+## Features
 
-![Gợi ý điểm hẹn trên Google Maps ở viewport điện thoại](docs/screenshots/mobile-meeting.png)
+- **Random món ăn:** vòng quay với bốn bộ lọc Tất cả, Món mặn, Chay, Ngọt; thẻ và kết quả dùng ảnh món.
+- **Gợi ý món:** lọc theo loại món, giá, buổi ăn và tag khẩu vị.
+- **Tìm bạn ăn chung:** hồ sơ tạm và danh sách người trong phạm vi 3 km. Danh sách chỉ hiển thị tín hiệu gần đúng, không trả tọa độ hoặc khoảng cách chi tiết.
+- **Ghép cặp:** gửi và chấp nhận lời mời trước khi vào chat riêng.
+- **Chat thời gian thực:** tin nhắn và cập nhật ghép cặp qua SignalR.
+- **Chia sẻ vị trí:** mỗi người trong cặp đã match tự bật hoặc thu hồi quyền chia sẻ tọa độ chính xác của mình; mỗi lần chia sẻ có hiệu lực tối đa 60 phút. Người kia không phải chia sẻ lại để xem vị trí đã được cho phép.
+- **Gợi ý điểm hẹn:** chỉ hiện khi cả hai còn chia sẻ. Google Maps tìm quán quanh điểm giữa; một người dán tên và liên kết quán để người kia kiểm tra, xác nhận. Danh sách OSM là tùy chọn khi có endpoint Overpass riêng.
+- **Google Maps:** màn `/map` có Tìm quán, Đường đi và Phố 360°; sử dụng Maps Embed API khi có key. Ứng dụng không đọc được quán người dùng bấm trong iframe; có nút mở Google Maps để xem thêm.
+- **Ngôn ngữ và giao diện:** có bản dịch Việt/Anh và nút đổi ngôn ngữ trên trang chủ; một số màn hình còn dùng tiếng Việt. Bố cục ưu tiên điện thoại.
 
-Maps Embed API với key thật ở localhost:5173, chụp ngày 23/10/2026:
+## Technology stack
 
-![Tìm món chay trên bản đồ nhúng ở viewport điện thoại](docs/screenshots/mobile-map-2026-10-23.png)
-
-![Chỉ đường lái xe trong bản đồ nhúng ở viewport điện thoại](docs/screenshots/mobile-route-2026-10-23.png)
-
-![Bộ lọc điểm hẹn Cà phê và bản đồ nhúng ở viewport điện thoại](docs/screenshots/mobile-meeting-embed-2026-10-23.png)
-
-Ảnh chụp desktop: chưa có.
-
-## Tính năng chính
-
-- Vòng quay món ăn với các bộ lọc Tất cả, Món mặn, Chay và Ngọt; thẻ món và popup kết quả hiện ảnh món.
-- Gợi ý món theo loại, khoảng giá, buổi ăn và tag khẩu vị; mỗi kết quả hiện ảnh món.
-- 62 món seed có ảnh cục bộ đặt tên theo món; ảnh biến thể được ghi nhãn, kèm [nguồn hoặc chủ sở hữu và quyền sử dụng](docs/food-image-credits.md). Chín ảnh do chủ dự án cung cấp được phép dùng trong Food Match; giấy phép MIT của mã nguồn không áp dụng cho ảnh. Món thêm ngoài seed dùng `ImageUrl` hợp lệ nếu có.
-- Tạo hồ sơ tạm, tìm người ăn trong 3 km và gửi lời mời ghép cặp; backend kiểm tra lại phạm vi khi gửi lời mời.
-- Chat và thông báo ghép cặp theo thời gian thực qua SignalR.
-- Trong cặp đã chấp nhận match, mỗi người có thể chia sẻ độc lập tọa độ chính xác của mình cho người kia, tối đa 60 phút mỗi lần bật. Người nhận thấy ngay tọa độ đó dù chưa chia sẻ lại; thu hồi của một người không tắt quyền chia sẻ của người còn lại. Tọa độ GPS từng người được giữ nguyên, không làm lệch. Khi **cả hai** còn chia sẻ, iframe Google Maps tìm quán quanh điểm giữa với mức zoom 15; nếu cấu hình Maps Embed API key, iframe dùng chế độ search chính thức của Google. Ứng dụng làm mới khoảng 30 giây một lần và có nút làm mới. Người dùng sao chép liên kết quán từ Google Maps để đề xuất, người kia xác nhận. Ứng dụng không đọc được danh sách hoặc quán được bấm trong iframe. Nút mở Google Maps cho phép xem danh sách kết quả trực tiếp trên Google. Nếu cấu hình Overpass riêng, ứng dụng còn hiển thị danh sách OSM để chọn nhanh. Đề xuất bị ẩn khi một bên thu hồi hoặc hết quyền chia sẻ.
-- Tìm địa điểm theo từ khóa món/quán, xem bản đồ và chỉ đường bằng Google Maps nhúng.
-- Giao diện tiếng Việt/tiếng Anh và bố cục dùng được trên điện thoại.
-
-## Công nghệ sử dụng
-
-Các phiên bản dưới đây lấy từ `frontend/package.json`, các file `.csproj` và `docker-compose.yml`; ký hiệu `^`/`~` là khoảng phiên bản khai báo.
-
-| Công nghệ | Phiên bản | Mục đích |
+| Layer | Technology | Purpose |
 | --- | --- | --- |
-| React, React Router | `^19.0.0`, `^7.0.0` | Giao diện và điều hướng |
-| TypeScript, Vite | `~5.7.0`, `^6.0.0` | Kiểm tra kiểu, dev server và đóng gói frontend |
-| Tailwind CSS, Ant Design / Ant Design Mobile | `^4.3.3`, `^5.22.0` / `^5.43.0` | Giao diện và thành phần UI |
-| Zustand, i18next | `^5.0.0`, `^24.0.0` | Trạng thái ứng dụng và đa ngôn ngữ |
-| ASP.NET Core, Entity Framework Core, Npgsql | `net10.0`, `10.0.0`, `10.0.0` | API, truy cập và migration dữ liệu |
-| SignalR | `@microsoft/signalr ^9.0.19`; hub trong ASP.NET Core 10 | Chat và thông báo ghép cặp thời gian thực |
-| PostgreSQL | `16-alpine` trong Docker Compose | Lưu trữ dữ liệu |
-| xUnit | `2.9.0` | Kiểm thử backend |
+| Frontend | React `^19.0.0`, Vite `^6.0.0`, TypeScript `~5.7.0`, Tailwind CSS `^4.3.3` | Giao diện web |
+| UI & state | Ant Design `^5.22.0`, Zustand `^5.0.0`, i18next `^24.0.0` | Thành phần UI, trạng thái, bản dịch |
+| Backend | ASP.NET Core `net10.0`, EF Core/Npgsql `10.0.0` | REST API và truy cập dữ liệu |
+| Database | PostgreSQL 16 trong Docker Compose; Supabase khi deploy | Hồ sơ, món ăn, match và chat |
+| Realtime | SignalR trong ASP.NET Core; client `@microsoft/signalr ^9.0.19` | Tin nhắn và thông báo |
+| Maps | Google Maps Embed API; Overpass tùy chọn | Bản đồ, chỉ đường và gợi ý điểm hẹn |
+| Hosting & CI/CD | Vercel, Render, Supabase; GitHub Actions | Triển khai và xác minh |
 
-## Yêu cầu hệ thống
+Phiên bản frontend lấy từ [package.json](frontend/package.json), backend từ các file `.csproj`; các dấu `^`/`~` là khoảng phiên bản khai báo.
 
-- Node.js và npm: đã kiểm chứng với Node.js `22.14.0`, npm `11.2.0`; dự án chưa khai báo phiên bản Node tối thiểu trong `package.json`.
-- .NET 10 SDK để chạy backend. Bản làm việc hiện tại có SDK Windows tại `.dotnet/dotnet.exe`; bản clone khác có thể cần cài SDK riêng.
-- PostgreSQL 16; có thể chạy bằng Docker Compose và Docker Desktop.
-- Trình duyệt có hỗ trợ quyền vị trí nếu dùng tính năng tìm bạn ở gần hoặc bản đồ theo vị trí.
+## Architecture
 
-## Cài đặt
+```mermaid
+flowchart LR
+    U[Trình duyệt người dùng]
+    FE[React trên Vercel]
+    API[ASP.NET Core API trên Render]
+    HUB[SignalR trên Render]
+    DB[(PostgreSQL trên Supabase)]
+    MAP[Google Maps Embed API]
+    CF[Cloudflare Turnstile]
 
-Thực hiện từ thư mục gốc của dự án. Chỉ tạo `.env` từ mẫu nếu file này chưa tồn tại, rồi cập nhật các giá trị cho máy của bạn, đặc biệt mật khẩu PostgreSQL và khóa JWT. Không đưa `.env` lên Git.
+    U -->|HTTPS: tải ứng dụng| FE
+    U -->|REST + JWT| API
+    U -->|WSS + JWT| HUB
+    U -->|iframe| MAP
+    U -->|widget CAPTCHA| CF
+    API -->|EF Core/Npgsql| DB
+    HUB -->|dịch vụ ứng dụng| DB
+    API -->|xác minh CAPTCHA| CF
+```
+
+Sơ đồ thể hiện môi trường đã triển khai; khi chạy local, frontend, API và PostgreSQL chạy trên máy của bạn. Trình duyệt không truy cập trực tiếp database.
+
+Mã giao diện ở `frontend/src/`, API ở `backend/FoodMatch/src/`, test .NET ở `backend/FoodMatch/tests/` và các script smoke ở `scripts/`.
+
+## Quick start
+
+Yêu cầu: Git, Node.js 22 + npm (phiên bản dùng trong CI), [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) và Docker Desktop. Các lệnh sau dành cho **Windows PowerShell**; dùng `dotnet` trong `PATH`, không phụ thuộc thư mục SDK riêng của máy tác giả.
+
+**1. Clone và cấu hình** trong terminal thứ nhất:
 
 ```powershell
+git clone https://github.com/HungThichCodee/random_food.git
+Set-Location .\random_food
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+notepad .env
+```
+
+Trong `.env`, đặt mật khẩu PostgreSQL của bạn ở cả `POSTGRES_PASSWORD` và `ConnectionStrings__DefaultConnection`; thay `JwtSettings__Secret` bằng chuỗi ngẫu nhiên dài ít nhất 32 byte. Không commit file này.
+
+**2. Khởi động PostgreSQL và backend** từ thư mục gốc:
+
+```powershell
 docker compose up -d postgres
-cd frontend
-npm install
+dotnet run --project .\backend\FoodMatch\src\FoodMatch.Api --no-launch-profile
 ```
 
-`npm install` dùng `frontend/package-lock.json`. Backend sẽ tự chạy migration và seed dữ liệu món ăn khi khởi động; hãy kiểm tra cấu hình PostgreSQL trước khi chạy API.
+API dùng cấu hình mẫu tại `http://localhost:5000`, tự chạy EF migrations và seed lúc khởi động. Kiểm tra `http://localhost:5000/api/health` trả `Healthy`.
 
-## Cấu hình môi trường
-
-Frontend đọc biến `VITE_*` từ `.env` ở thư mục gốc theo `vite.config.ts`. Backend cũng tìm và đọc file này khi chạy trong cây thư mục dự án. Cột “Mặc định” bên dưới là **giá trị mẫu trong `.env.example`**, không phải giá trị tự sinh nếu bạn chưa cấu hình.
-
-| Biến | Ý nghĩa | Mặc định | Bắt buộc |
-| --- | --- | --- | --- |
-| `POSTGRES_DB` | Tên database của container PostgreSQL | `foodmatch` | Có, khi dùng Docker Compose |
-| `POSTGRES_USER` | Người dùng PostgreSQL | `postgres` | Có, khi dùng Docker Compose |
-| `POSTGRES_PASSWORD` | Mật khẩu PostgreSQL | `postgres`; cần đổi khi triển khai | Có, khi dùng Docker Compose |
-| `ConnectionStrings__DefaultConnection` | Chuỗi kết nối backend tới PostgreSQL | `Host=localhost;Port=5432;Database=foodmatch;Username=postgres;Password=postgres` | Có |
-| `JwtSettings__Secret` | Khóa ký JWT, tối thiểu 32 byte UTF-8 | Giá trị giữ chỗ, phải thay | Có |
-| `JwtSettings__Issuer` | JWT issuer | `FoodMatchApi` | Có |
-| `JwtSettings__Audience` | JWT audience | `FoodMatchClient` | Có |
-| `Cors__Origins` | Origin frontend được phép, phân tách bằng dấu phẩy | `http://localhost:5173` | Có |
-| `ASPNETCORE_URLS` | Địa chỉ backend lắng nghe | `http://localhost:5000` | Không |
-| `ASPNETCORE_ENVIRONMENT` | Chế độ Development/Production | `Development` | Có khi chạy local không có Turnstile thật |
-| `Turnstile__SecretKey`, `Turnstile__Hostname` | Xác minh CAPTCHA ở backend; hostname Production/staging chính xác, phân tách bằng dấu phẩy, không có `https://`, port hoặc wildcard | Rỗng khi Development | Có, khóa thật khi Production |
-| `VITE_API_URL` | URL gốc backend, không thêm `/api` | `http://localhost:5000` | Có với frontend |
-| `VITE_SIGNALR_URL` | URL gốc backend cho các hub SignalR | `http://localhost:5000` | Có với frontend |
-| `VITE_FOOD_IMAGE_ORIGINS` | Origin HTTPS bổ sung cho `ImageUrl` của món thêm ngoài seed; dùng chung với CSP Vercel, phân tách bằng dấu phẩy | Rỗng; mặc định cho Unsplash/Wikimedia | Không |
-| `FOODMATCH_SEO_INDEXABLE` | Vercel: `0` cho staging; `1` chỉ cho project production đã có domain HTTPS cố định. Khi không đặt, mọi trang nhận `X-Robots-Tag: noindex` | Không đặt = `0` | Có khi muốn production được lập chỉ mục |
-| `VITE_PUBLIC_ORIGIN` | Origin HTTPS chính thức dùng cho canonical của các trang công khai; Vercel bắt buộc khi bật `FOODMATCH_SEO_INDEXABLE=1` | Không đặt khi local | Có nếu bật lập chỉ mục production |
-| `VITE_TURNSTILE_SITE_KEY` | Khóa công khai widget CAPTCHA | Rỗng khi Development | Có khi Production |
-| `GoogleMaps__EmbedApiKey` | Khóa công khai Maps Embed API cho cả backend và frontend, giới hạn theo API và HTTP referrer của site | Rỗng: iframe cũ; có khóa: `view`, `search`, `directions` chính thức | Có cho release; đặt ở cả Render và Vercel |
-| `MeetingPlaces__OverpassUrl` | Nguồn Overpass riêng cho danh sách OSM bổ sung | Bỏ trống: chỉ dùng Google Maps ở mọi môi trường | Không; chỉ đặt endpoint HTTPS riêng đã duyệt, endpoint công khai mặc định bị từ chối |
-| `STITCH_API_KEY`, `GITHUB_PERSONAL_ACCESS_TOKEN`, `VERCEL_API_TOKEN` | Có trong file mẫu nhưng mã nguồn hiện không đọc | Rỗng | Không |
-
-## Chạy dự án
-
-Mở các terminal riêng cho backend và frontend.
-
-**Backend** — từ thư mục gốc, sau khi PostgreSQL đã sẵn sàng:
+**3. Khởi động frontend** trong terminal PowerShell mới, từ thư mục gốc:
 
 ```powershell
-cd backend/FoodMatch
-& ..\..\.dotnet\dotnet.exe run --project .\src\FoodMatch.Api --no-launch-profile
+Set-Location .\frontend
+npm.cmd ci
+npm.cmd run dev
 ```
 
-Nếu máy đã cài .NET 10 SDK trong `PATH`, có thể dùng `dotnet` thay cho `& ..\..\.dotnet\dotnet.exe`. API theo cấu hình mẫu ở `http://localhost:5000/api`; kiểm tra database tại `http://localhost:5000/api/health`. Swagger chỉ được bật khi backend chạy trong môi trường Development.
+Mở `http://localhost:5173`. Nếu muốn dùng bản đồ theo GPS, cho phép trình duyệt truy cập vị trí. Xem [hướng dẫn triển khai](.claude/skills/deploy.md) trước khi dùng dịch vụ thật.
 
-**Frontend** — mở terminal khác từ thư mục gốc:
+## Configuration
 
-```powershell
-cd frontend
-npm run dev
+Mẫu cấu hình nằm trong [.env.example](.env.example). Vite đọc `.env` ở **thư mục gốc** qua [vite.config.ts](frontend/vite.config.ts); backend cũng đọc file gốc khi chạy trong repository. Với hosting, đặt biến ở đúng dịch vụ.
+
+| Nhóm | Biến chính | Nơi dùng |
+| --- | --- | --- |
+| Frontend công khai | `VITE_API_URL`, `VITE_SIGNALR_URL` | Vite/Vercel; origin API HTTPS khi deploy |
+| Database | `POSTGRES_*`, `ConnectionStrings__DefaultConnection` | Docker Compose và backend/Render |
+| Backend secrets | `JwtSettings__Secret`, `JwtSettings__Issuer`, `JwtSettings__Audience`, `Cors__Origins` | Backend/Render |
+| Maps | `GoogleMaps__EmbedApiKey` | Render và Vercel; key xuất hiện trong iframe, phải giới hạn API/referrer |
+| CAPTCHA | `Turnstile__SecretKey`, `Turnstile__Hostname`, `VITE_TURNSTILE_SITE_KEY` | Secret/hostname ở backend; site key ở frontend |
+| SEO | `FOODMATCH_SEO_INDEXABLE`, `VITE_PUBLIC_ORIGIN`, `FOODMATCH_GOOGLE_SITE_VERIFICATION` | Vercel; chỉ bật lập chỉ mục với origin production chính thức |
+| Tùy chọn | `MeetingPlaces__OverpassUrl`, `VITE_FOOD_IMAGE_ORIGINS` | Danh sách OSM riêng và nguồn ảnh bổ sung |
+
+`GoogleMaps__EmbedApiKey` là key công khai có giới hạn; không đưa JWT secret, mật khẩu database hay Turnstile secret vào biến frontend. Xem [cấu hình deploy](.claude/skills/deploy.md) để biết biến bắt buộc của từng môi trường.
+
+## Testing
+
+Chạy từ thư mục gốc, trừ khi cột lệnh ghi rõ `frontend`. Các lệnh dưới đây là cách kiểm tra, không phải khẳng định chúng vừa được chạy trên máy của bạn.
+
+| Phạm vi | Lệnh hoặc hướng dẫn |
+| --- | --- |
+| Frontend lint | `cd frontend; npm.cmd run lint` |
+| Frontend production build | `cd frontend; npm.cmd run build` |
+| Kiểm tra ảnh món | `cd frontend; npm.cmd run check:food-images` |
+| Backend build/test | `dotnet build .\backend\FoodMatch\FoodMatch.sln -c Release`; `dotnet test .\backend\FoodMatch\FoodMatch.sln -c Release` |
+| Integration/smoke | [Hướng dẫn và điều kiện PostgreSQL thử](.claude/skills/deploy.md) |
+| Nghiệm thu thủ công | [Checklist hai điện thoại trên staging](docs/two-phone-acceptance.md) |
+| CI | [Verify Food Match](.github/workflows/verify.yml): backend PostgreSQL 16, frontend lint/build/audit |
+
+Frontend hiện không khai báo script `npm test`. Lịch sử kiểm thử có ngày và giới hạn riêng nằm trong [báo cáo audit](docs/audits/FOODMATCH_POST_DEPLOY_AUDIT.md); xem badge CI ở đầu trang để biết trạng thái nhánh `main` hiện tại.
+
+## Deployment
+
+```mermaid
+flowchart LR
+    GH[GitHub main + Verify] --> REL[Release workflow]
+    REL --> API[Render: ASP.NET Core API]
+    REL --> WEB[Vercel: React/Vite]
+    API --> DB[(Supabase PostgreSQL)]
+    USER[Trình duyệt] --> WEB
+    USER --> API
+    USER --> MAP[Google Maps Embed]
+    USER --> CF[Cloudflare Turnstile]
+    API --> CF
 ```
 
-Mở `http://localhost:5173`. Các lệnh frontend khác được khai báo trong `frontend/package.json`:
+Hướng dẫn dưới đây đủ để cấu hình các dịch vụ bên ngoài từ đầu. Dự án đã có repository và website production; nếu bạn đang cập nhật bản hiện có, **dùng lại đúng project/service đang chạy**. Tạo riêng một bộ **Supabase database + Render Web Service + Vercel project + GitHub Environment** cho `staging` và một bộ cho `production`; không dùng database production để thử staging. Các tên miền bên dưới là ví dụ đã dùng trong dự án, cần đối chiếu lại trong dashboard trước khi điền.
 
-```bash
-npm run build
-npm run preview
-npm run lint
-npm run check:food-images
-```
+[Supabase](https://supabase.com/docs/guides/platform/billing-on-supabase), [Render](https://render.com/docs/free), [Vercel](https://vercel.com/docs/plans/hobby) và [Turnstile](https://developers.cloudflare.com/turnstile/plans/) có gói dùng miễn phí với giới hạn riêng; kiểm tra gói, quota và backup thực tế trước khi chọn cho production. [Maps Embed API](https://developers.google.com/maps/documentation/embed/usage-and-billing) hiện không tính phí theo lượt nhưng yêu cầu Google Cloud billing account. Các gói, giới hạn và chính sách có thể thay đổi.
 
-`npm run build` tạo `frontend/dist/`; `npm run preview` phục vụ bản build để kiểm tra. `npm run lint` kiểm tra mã bằng ESLint. `npm run check:food-images` kiểm tra đủ ảnh, tên file và ghi nhận nguồn hoặc chủ sở hữu cho 62 món seed. Frontend **không có** script `npm test` hoặc `npm run test`.
+### 1. Chuẩn bị GitHub và mã nguồn
 
-## Cấu trúc thư mục
+Đăng nhập [repository GitHub](https://github.com/HungThichCodee/random_food). Khi triển khai mới, có thể clone bằng `git clone https://github.com/HungThichCodee/random_food.git`. Dùng nhánh review/PR để kiểm tra thay đổi, rồi đưa **đúng commit đã duyệt** lên `main`. Mở **Actions → [Verify Food Match](.github/workflows/verify.yml)** và xác nhận cả job `backend`, `frontend` xanh ở SHA đó. Workflow kiểm tra .NET 10/PostgreSQL 16 và frontend Node 22; [Release Food Match](.github/workflows/release.yml) sẽ chạy lại Verify trước khi deploy.
 
-```text
-random_food/
-├── .env.example              # Mẫu biến môi trường chung
-├── docker-compose.yml         # PostgreSQL cho môi trường cục bộ
-├── docs/screenshots/          # Ảnh kiểm tra vòng quay trên viewport điện thoại
-├── scripts/                   # Smoke test API/SignalR và ảnh giao diện mobile
-├── frontend/
-│   ├── src/
-│   │   ├── api/              # HTTP client và lời gọi API
-│   │   ├── assert/           # Logo và ảnh nền của giao diện
-│   │   ├── components/       # Thành phần giao diện dùng lại
-│   │   ├── hooks/            # Vị trí và kết nối SignalR
-│   │   ├── i18n/             # Bản dịch tiếng Việt và tiếng Anh
-│   │   ├── pages/            # Các màn hình theo route
-│   │   ├── stores/           # Trạng thái Zustand
-│   │   ├── styles/           # CSS chung
-│   │   ├── types/            # Kiểu dữ liệu TypeScript
-│   │   └── utils/            # Hàm hỗ trợ và danh mục ảnh món
-│   ├── public/food-images/   # Ảnh món cục bộ theo tên món
-│   ├── food-images.manifest.json # Danh sách ảnh nguồn để đồng bộ
-│   ├── package.json          # Script và phụ thuộc frontend
-│   └── vite.config.ts        # Cấu hình Vite, dev port 5173
-└── backend/FoodMatch/
-    ├── src/
-    │   ├── FoodMatch.Api/            # Controller, hub và cấu hình API
-    │   ├── FoodMatch.Application/    # DTO, interface và dịch vụ
-    │   ├── FoodMatch.Domain/         # Entity và enum
-    │   └── FoodMatch.Infrastructure/ # EF Core, migration và seed
-    ├── tests/FoodMatch.Tests/        # Unit test backend
-    └── FoodMatch.sln                 # Solution .NET
-```
+Không đưa `.env`, database password, JWT secret hoặc token vào Git. Chủ dự án giữ các file mới trong `docs/` trên máy; khi stage, chọn rõ file cần commit và xem `git diff --cached --name-only` trước khi push. `.gitignore` **không ngăn** các file `docs/` đã được Git theo dõi từ trước bị stage bởi `git add -A`.
 
-Ảnh món cục bộ trong `frontend/public/food-images/`; trang `/image-credits` hiển thị nguồn hoặc chủ sở hữu cùng quyền sử dụng. Khi đổi ảnh từ Commons/Flickr, cập nhật manifest rồi chạy `node frontend/scripts/sync-food-images.mjs --only "Tên món"`. Với ảnh do chủ dự án cung cấp, đặt PNG theo tên slug trong thư mục ảnh, khai báo `provided` trong manifest rồi chạy `node frontend/scripts/sync-food-images.mjs --provided`. Bỏ các tùy chọn để đồng bộ toàn bộ; kiểm tra lại bằng `npm run check:food-images` trong `frontend`.
+### 2. Tạo PostgreSQL trong Supabase
 
-## Kiểm thử
+1. Vào [Supabase Dashboard](https://supabase.com/dashboard) → **New project**. Chọn organization, region phù hợp và tạo project riêng cho từng môi trường. Đặt database password mạnh, lưu trong trình quản lý mật khẩu.
+2. Mở project → **Connect → Session pooler** nếu Render cần IPv4. Sao chép **host, port, database và username đúng từ dashboard**, không tự đoán host theo region. [Session pooler](https://supabase.com/docs/guides/database/connecting-to-postgres) dùng port `5432`; Transaction pooler dùng port `6543` và có giới hạn khác. Với API ASP.NET Core/Npgsql chạy liên tục, dùng session mode là lựa chọn thực tế khi cần IPv4.
+3. Chuyển thông tin sang chuỗi Npgsql và dán **chỉ vào Render** ở bước 5:
 
-Frontend chưa có lệnh `npm test`; bài kiểm thử Edge nằm trong `scripts/capture-random-mobile.ps1`. Từ thư mục gốc, chạy bộ unit test xUnit của backend:
+   ```text
+   Host=<pooler-host>;Port=5432;Database=postgres;Username=postgres.<project-ref>;Password=<database-password>;SSL Mode=Require
+   ```
 
-```powershell
-cd backend/FoodMatch
-& ..\..\.dotnet\dotnet.exe test FoodMatch.sln
-```
+4. Xác nhận bạn có backup và đã thử cách khôi phục **đúng project** trước production. [Supabase Backups](https://supabase.com/docs/guides/platform/backups) nêu rõ khác biệt theo gói; gói Free cần chủ động xuất dữ liệu. Backend tự chạy EF migration và seed khi khởi động, nên không chạy lại migration bằng SQL Editor. Sau deploy, xem Render log và bảng `__EFMigrationsHistory` trong Supabase để xác nhận.
 
-Trên Windows có Edge, đặt `$env:FOODMATCH_VISUAL_PORT='5173'` rồi chạy `& .\scripts\capture-random-mobile.ps1` từ thư mục gốc để chụp vòng quay, popup kết quả, gợi ý món, bản đồ, đường đi và điểm hẹn ở viewport 390×844 với key giới hạn cho localhost:5173. Script xác nhận ảnh cục bộ đã tải, GPS chính xác, điểm giữa thay đổi, thu hồi quyền chia sẻ và SignalR nối lại. Script mặc định dùng cổng 5174 nếu không đặt biến trên, dùng PostgreSQL thử riêng và không ghi đè các ảnh `*-mobile-preview.png` đã có ở thư mục gốc.
+### 3. Tạo Cloudflare Turnstile
 
-Trước deploy, thực hiện [quy trình kiểm tra trên hai điện thoại thật](docs/two-phone-acceptance.md) với bản staging HTTPS để xác nhận GPS, quyền chia sẻ độc lập, Google Maps, thu hồi và SignalR trên thiết bị thực.
+1. Vào [Cloudflare Dashboard](https://dash.cloudflare.com/) → **Turnstile → Add widget**. Tạo widget riêng cho staging và production nếu muốn tách khóa. Trong **Hostname management**, khai báo hostname frontend chính xác, ví dụ `foodmatch-staging.vercel.app` hoặc `foodmatchh.vercel.app`; không ghi `https://`, port, path hay `*`. Xem [hướng dẫn tạo widget](https://developers.cloudflare.com/turnstile/get-started/widget-management/dashboard/) nếu giao diện thay đổi.
+2. Sau khi tạo, lấy **Site Key** đưa vào Vercel `VITE_TURNSTILE_SITE_KEY`, còn **Secret Key** đưa vào Render `Turnstile__SecretKey`. Trên Render, đặt `Turnstile__Hostname` bằng đúng hostname của widget. Không đưa Secret Key vào Vercel hoặc GitHub Variables.
+3. Sau khi frontend chạy, tạo hồ sơ tạm trên domain thật để thử CAPTCHA. Nếu lỗi, đối chiếu hostname trong widget, site key của đúng Vercel project và secret key của đúng Render service. Backend ở `ASPNETCORE_ENVIRONMENT=Production` yêu cầu key/hostname thật. [Cloudflare mô tả việc cấp hai key và xác minh token trên server](https://developers.cloudflare.com/turnstile/get-started/).
 
-Để kiểm tra nâng cấp database có dữ liệu chia sẻ cũ, chạy `& .\scripts\test-location-migration.ps1` từ thư mục gốc. Script tạo PostgreSQL thử riêng, nâng từ migration trước đó, xác nhận mốc 60 phút được giữ cho cặp đã đồng ý và trạng thái một phía cũ không rõ thời điểm bị đặt lại, rồi chạy toàn bộ test backend. Database thử được xóa sau khi chạy.
+### 4. Tạo Google Maps Embed API key
 
-Kiểm chứng mới nhất ngày 23/10/2026: backend Release và migration nâng cấp trên PostgreSQL thử đạt **85/85 test, 0 skip**. Smoke SignalR độc lập đạt, Docker image build và health check trên database thử đạt. Edge 390×844 với key thật ở localhost:5173 đạt kiểm tra URL iframe chính thức, GPS chính xác, quyền chia sẻ và reconnect; ảnh Bản đồ, Đường đi và điểm hẹn được tạo. `npm ci`, lint, release build yêu cầu key, `check:vercel` với origin HTTPS mẫu và hai lệnh audit đều đạt. Bài thử hai điện thoại HTTPS, Turnstile thật và GitHub Actions vẫn cần thực hiện trước production.
+Vào [Google Cloud Console](https://console.cloud.google.com/) → chọn/tạo project và bật billing → **APIs & Services → Library → Maps Embed API → Enable** → **Credentials → Create credentials → API key**. Trong key, chọn **Application restrictions: Websites (HTTP referrers)** và thêm cả origin lẫn đường dẫn cho mỗi domain, ví dụ `https://foodmatchh.vercel.app` và `https://foodmatchh.vercel.app/*` (làm tương tự cho staging). Chọn **API restrictions: Restrict key → Maps Embed API**. Nếu dùng key riêng cho mỗi môi trường, chỉ cho phép domain của môi trường đó. Dán key đã hạn chế vào `GoogleMaps__EmbedApiKey` ở **cả Render lẫn Vercel**. Release build yêu cầu key này; key xuất hiện trong URL iframe nên không phải server secret. Dự án không cần bật Places/Routes API cho chức năng iframe hiện tại. Xem [hướng dẫn key](https://developers.google.com/maps/documentation/embed/get-api-key) và [billing Maps Embed](https://developers.google.com/maps/documentation/embed/usage-and-billing).
 
-Ngày 24/10/2026: kiểm tra danh mục 62 ảnh seed, frontend lint/build và backend Release build đạt; migration đổi tên “Gà Nướng Muối Ớt” nâng cấp và rollback trên PostgreSQL thử đạt, sau đó **85/85 backend test, 0 skip** trên database thử. Bài Edge 390×844 xác nhận ảnh thực sự hiện trong vòng quay, popup và kết quả Gợi ý; các kiểm tra vị trí chính xác, chia sẻ/thu hồi và kết nối lại vẫn đạt. Ảnh mẫu ở đầu README. [Verify CI của commit ảnh `8e37b0a`](https://github.com/HungThichCodee/random_food/actions/runs/40084816509) đạt cả frontend/backend trên draft PR.
+### 5. Tạo Backend Web Service trên Render
 
-Riêng verifier Turnstile đã đạt **15/15** trường hợp Production/Preview, domain ngoài danh sách và cấu hình sai; chưa dùng khóa Cloudflare thật. Frontend `npm ci`, lint, build và audit đã đạt ở lần kiểm tra ngày 22/10/2026. API dùng hạn mức 240 request/phút cho mỗi IP trên một instance, cộng với policy theo hồ sơ/endpoint; trên Render, IP lấy từ header `CF-Connecting-IP` do edge ghi đè. Cần xác nhận hai IP mạng thật và hành vi qua proxy trên staging.
+Vào [Render Dashboard](https://dashboard.render.com/) → **New → Web Service → Connect GitHub** → chọn repository này, branch `main`, runtime **Docker**. Dùng đúng cấu hình:
 
-Ngày 22/10/2026, frontend đã nâng lên Tailwind 4.3.3: cài sạch `npm ci`, lint, build và bài Edge 390×844 đều đạt; `npm audit --audit-level=high` và `npm audit --omit=dev` đều báo **0** lỗ hổng. Tailwind 4 cần Safari 16.4+, Chrome 111+ hoặc Firefox 128+; vẫn cần kiểm tra trên điện thoại mục tiêu. NuGet không báo gói dễ tổn thương ở lần kiểm tra trước. Xem [bản review trước phát hành](docs/release-review.md) để đối chiếu toàn bộ diff và các cổng còn thiếu.
+| Trường Render | Giá trị |
+| --- | --- |
+| Root Directory | `backend/FoodMatch` |
+| Dockerfile Path | `src/FoodMatch.Api/Dockerfile` (tính từ Root Directory) |
+| Docker Context | `.` (tính từ Root Directory) |
+| Health Check Path | `/api/health` |
+| Auto-Deploy | `Off` trước các push tiếp theo; Release workflow sẽ gọi deploy |
 
-## Triển khai
+[`Dockerfile`](backend/FoodMatch/src/FoodMatch.Api/Dockerfile) dùng SDK/runtime .NET **10.0**, publish API và có entrypoint sẵn; không cần tự nhập lệnh build/start cho Docker. Tạo service có thể kích hoạt **lần deploy đầu tiên**. Trong service → **Environment**, thêm:
 
-Maps Embed API hiện được dùng cho ba màn hình: Bản đồ (`view` và `search` với nút Quán ăn/Cà phê/Món chay), Đường đi (`directions` với Đi bộ/Lái xe) và gợi ý điểm hẹn trong Chat (`search` với Quán ăn/Cà phê/Món chay/Đồ ngọt). Tọa độ GPS không bị làm lệch. `GoogleMaps__EmbedApiKey` cần được cấu hình ở **cả Render và Vercel**; Vite chỉ đưa key này vào bundle công khai. Giới hạn key theo Maps Embed API và HTTP referrer chính xác của các domain frontend. Xem [phạm vi và cổng kiểm tra Maps Embed](docs/maps-embed-plan.md).
+| Key Render | Giá trị và nguồn |
+| --- | --- |
+| `ASPNETCORE_ENVIRONMENT` | `Production` ở cả staging và production để bật kiểm tra production |
+| `ASPNETCORE_URLS` | `http://0.0.0.0:8080` để container nhận request |
+| `PORT` | `8080` nếu Render yêu cầu khai báo cổng rõ ràng; mã API đọc `ASPNETCORE_URLS` |
+| `ConnectionStrings__DefaultConnection` | Chuỗi Npgsql của **đúng Supabase project** ở bước 2 |
+| `JwtSettings__Secret` | Chuỗi ngẫu nhiên **ít nhất 32 byte**, khác giá trị mẫu và được giữ kín |
+| `JwtSettings__Issuer` / `JwtSettings__Audience` | Ví dụ `FoodMatchApi` / `FoodMatchClient`; giữ nhất quán trong từng service |
+| `Cors__Origins` | Origin Vercel chính xác, ví dụ `https://foodmatchh.vercel.app`; không có path, wildcard, dấu `/` cuối. Nhiều origin thì ngăn bằng dấu phẩy |
+| `Turnstile__SecretKey` / `Turnstile__Hostname` | Secret Key / hostname Cloudflare ở bước 3 |
+| `GoogleMaps__EmbedApiKey` | Maps Embed key đã giới hạn ở bước 4; dùng cho iframe trong Chat |
 
-CI ở [Verify Food Match](.github/workflows/verify.yml) chạy khi push/PR; [run đầu của nhánh review](https://github.com/HungThichCodee/random_food/actions/runs/39984638973) đã đạt cả hai job. [Release Food Match](.github/workflows/release.yml) là CD thủ công: chọn staging hoặc production, chạy lại CI, chờ GitHub Environment duyệt rồi triển khai cùng commit lên Render và Vercel. Thiết lập biến và từng bước trong [hướng dẫn deploy](.claude/skills/deploy.md). Chỉ kết luận sẵn sàng production sau khi CI commit cuối và kiểm thử staging trên hai điện thoại thật đạt.
+`MeetingPlaces__OverpassUrl` chỉ dùng nếu bạn có endpoint HTTPS riêng cho danh sách OSM; **để trống khi dùng Google Maps iframe**. `POSTGRES_*` trong `docker-compose.yml` chỉ dành cho PostgreSQL local. Render nhận HTTPS công khai và chuyển tiếp HTTP đến container.
 
-Build frontend trong thư mục `frontend` bằng `npm run build` và phục vụ các file trong `frontend/dist/` bằng máy chủ tĩnh có chuyển các route ứng dụng về `index.html`. Các biến `VITE_*` cần đúng **trước lúc build** vì Vite đưa chúng vào bundle. Backend có `backend/FoodMatch/src/FoodMatch.Api/Dockerfile` để build image ASP.NET Core 10; `docker-compose.yml` hiện chỉ khai báo PostgreSQL, chưa có service frontend/backend. Có thể kiểm tra image local bằng `docker build -f src/FoodMatch.Api/Dockerfile -t foodmatch-api:preflight .` từ `backend/FoodMatch`, rồi chạy `& .\scripts\smoke-docker-api.ps1` từ thư mục gốc khi PostgreSQL Docker đang hoạt động. Script tạo và xóa database thử riêng. Cấu hình PostgreSQL, JWT, CORS và địa chỉ lắng nghe cho môi trường triển khai; lưu secret ngoài Git. API chạy migration và seed lúc khởi động, nên cần quyền truy cập database phù hợp.
+Sau lần deploy, xem **Render → service → Events/Logs**: Docker build và startup thành công, log migration/seed thành công. Mở `https://<api-domain>/api/health`; JSON cần có `status: Healthy` và dependency PostgreSQL `Healthy`. Ghi **URL API** và **Service ID** (`srv-...`, ở Settings) cho bước GitHub. CORS và SignalR/WSS cần thử tiếp trên frontend thật.
 
-Quy trình cụ thể Supabase → Render → Vercel nằm trong [.claude/skills/deploy.md](.claude/skills/deploy.md). Verify chạy khi push/PR và được Release gọi lại. Release là CD thủ công cho staging/production, triển khai cùng SHA lên Render/Vercel sau GitHub Environment gate. [Release staging đã đạt](https://github.com/HungThichCodee/random_food/actions/runs/40346066866); chủ dự án xác nhận staging đạt kiểm thử trên hai điện thoại và production đã triển khai ngày 27/10/2026. Mỗi bản cập nhật production tiếp theo vẫn cần Verify, nghiệm thu staging phần bị ảnh hưởng và cổng phê duyệt Release.
+### 6. Tạo Frontend project trên Vercel
 
-Trước khi cấu hình Vercel, xem [báo cáo bảo mật và SEO](docs/security-seo-review-2026-10-25.md). Project staging đặt `FOODMATCH_SEO_INDEXABLE=0`; project production chỉ đặt `1` cùng `VITE_PUBLIC_ORIGIN` là domain HTTPS chính thức. Các trang chat/hồ sơ/vị trí luôn có `noindex`; đây không phải cơ chế phân quyền.
+Vào [Vercel Dashboard](https://vercel.com/dashboard) → **Add New → Project → Import Git Repository** → chọn repository này. Tạo project riêng cho staging và production, hoặc dùng lại project hiện có. Cấu hình:
 
-Để đăng ký với Google Search Console, tạo **URL-prefix property** `https://foodmatchh.vercel.app/` và chọn xác minh bằng **HTML tag**. Lấy riêng phần `content` của thẻ `google-site-verification`, đặt vào biến Vercel Production loại Config `FOODMATCH_GOOGLE_SITE_VERIFICATION`, rồi chạy Release production để thẻ xuất hiện trong HTML trang chủ. Sau khi xác minh, gửi `sitemap.xml` trong Search Console và dùng URL Inspection cho `/` cùng `/random`. Build production tạo `robots.txt`, `sitemap.xml`, canonical và HTML có title/description riêng cho các trang công khai; Google quyết định thời điểm lập chỉ mục, thứ hạng và gợi ý khi đang gõ.
+| Trường Vercel | Giá trị |
+| --- | --- |
+| Root Directory | `frontend` |
+| Framework Preset | Vite |
+| Node.js Version | 22.x nếu project cho chọn; khớp Verify workflow |
+| Install Command | `npm ci` |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
 
-## Xử lý sự cố thường gặp
+Project dùng [`frontend/vercel.mjs`](frontend/vercel.mjs) để tạo SPA rewrites, CSP/security headers và tắt Git auto deployment. **Không thêm `vercel.json` thứ hai.** Vào **Project → Settings → Environment Variables**, chọn scope **Production** cho cả Vercel project staging lẫn production: [Release workflow](.github/workflows/release.yml) dùng `vercel pull --environment=production`, `vercel build --prod`, `vercel deploy --prebuilt --prod` cho cả hai.
 
-- **`npm run lint` thất bại sau khi thêm mã mới:** sửa lỗi được ESLint báo trong frontend rồi chạy lại `npm run lint` và `npm run build`.
-- **Trang báo thiếu `VITE_API_URL` hoặc `VITE_SIGNALR_URL`:** kiểm tra `.env` ở thư mục gốc và khởi động lại Vite sau khi sửa biến.
-- **Backend báo lỗi kết nối PostgreSQL hoặc health check không đạt:** kiểm tra container `postgres`, các biến `POSTGRES_*` và `ConnectionStrings__DefaultConnection` có cùng thông tin đăng nhập.
-- **Backend báo khóa JWT không hợp lệ:** đặt `JwtSettings__Secret` thành chuỗi ngẫu nhiên dài ít nhất 32 byte UTF-8.
-- **Build có cảnh báo Rollup về `@microsoft/signalr` hoặc bundle trên 500 kB:** đó là cảnh báo đã quan sát; lần kiểm chứng này `npm run build` vẫn hoàn tất thành công.
+| Key Vercel | Staging | Production |
+| --- | --- | --- |
+| `VITE_API_URL` | Origin Render staging HTTPS | Origin Render production HTTPS |
+| `VITE_SIGNALR_URL` | Origin Render staging HTTPS | Origin Render production HTTPS |
+| `VITE_TURNSTILE_SITE_KEY` | Site Key Cloudflare staging | Site Key Cloudflare production |
+| `GoogleMaps__EmbedApiKey` | Key Maps Embed giới hạn staging | Key Maps Embed giới hạn production |
+| `FOODMATCH_SEO_INDEXABLE` | `0` | `1` |
+| `VITE_PUBLIC_ORIGIN` | Để trống | Origin production chính thức, ví dụ `https://foodmatchh.vercel.app` |
+| `FOODMATCH_GOOGLE_SITE_VERIFICATION` | Để trống | Tùy chọn: chỉ chuỗi `content` của thẻ xác minh Search Console |
 
-## Đóng góp
+Hai biến `VITE_*_URL` phải là **origin HTTPS**, không thêm `/api`, `/hubs`, path hoặc dấu `/` cuối; mã tự nối đường dẫn API/hub. Nếu giao diện Vercel hỏi **Config hay Secret**, các biến frontend trong bảng phải là giá trị đọc được để Release CLI build; JWT/DB/Turnstile Secret tuyệt đối không đặt ở Vercel. `VITE_FOOD_IMAGE_ORIGINS` tùy chọn nếu dùng CDN ảnh bổ sung. Thay biến build-time phải chạy **deployment mới**, chỉ Save không cập nhật bundle đã phát hành.
 
-Kho mã hiện chưa có `CONTRIBUTING.md`. Trước khi gửi thay đổi, hãy chạy `npm run lint` và `npm run build` ở frontend, cùng `dotnet test FoodMatch.sln` ở backend. TODO: cần xác nhận quy trình review và đóng góp của dự án.
+Trong **Project → Settings → Domains**, lấy domain cố định. Đưa origin đó vào Render `Cors__Origins`, hostname vào Render `Turnstile__Hostname` và Cloudflare widget; xác nhận Render đã chạy với cấu hình mới. Lấy **Project ID** (`prj_...`) ở Vercel Project Settings → General và **Team/Org ID** ở Vercel Team/Account Settings → General. Thử HTTPS, tải lại trực tiếp `/random`, `/map`, `/route`; các route không được trả 404.
 
-## Giấy phép
+### 7. Cấu hình GitHub Environments và chạy Release
 
-Dự án dùng [giấy phép MIT](LICENSE), với dòng bản quyền năm 2026 theo tài khoản chủ kho mã `HungThichCodee`.
+Trong repository GitHub → **Settings → Environments**, tạo `staging` và `production`; giới hạn branch triển khai là `main`. Bật **Required reviewers** cho production nếu gói/quyền repository hỗ trợ, rồi kiểm tra bảo vệ thực sự có hiệu lực. [GitHub Environments](https://docs.github.com/en/actions/concepts/workflows-and-actions/deployment-environments) giữ secrets/variables riêng cho từng target; workflow không tự tạo người duyệt.
 
-## Tác giả / Liên hệ
+Trong **mỗi** environment, thêm đúng hai **Secrets** và năm **Variables** mà [release.yml](.github/workflows/release.yml) đọc:
 
-Kho mã và tài khoản chủ dự án: [HungThichCodee/random_food](https://github.com/HungThichCodee/random_food). Kênh liên hệ chính thức chưa được công bố trong README.
+| Loại | Tên | Lấy ở đâu, dán giá trị nào |
+| --- | --- | --- |
+| Secret | `RENDER_API_KEY` | Render Account Settings → API Keys; token có quyền deploy service |
+| Secret | `VERCEL_TOKEN` | Vercel Account Settings → Tokens; token có quyền deploy project |
+| Variable | `RENDER_SERVICE_ID` | Render service → Settings; ID dạng `srv-...` |
+| Variable | `API_ORIGIN` | URL Render cố định, ví dụ `https://foodmatch-api-staging.onrender.com` |
+| Variable | `VERCEL_ORG_ID` | Vercel Team/Account Settings → General |
+| Variable | `VERCEL_PROJECT_ID` | Vercel Project Settings → General; ID dạng `prj_...` |
+| Variable | `WEB_ORIGIN` | URL Vercel cố định, ví dụ `https://foodmatchh.vercel.app` |
+
+`API_ORIGIN` và `WEB_ORIGIN` không có path hoặc dấu `/` cuối. Không dán Render/Vercel token vào Variables hay Vercel frontend. Đối chiếu mọi ID với **đúng môi trường** trước khi chạy. GitHub Release chỉ deploy từ `main` và dùng cùng commit SHA cho Render/Vercel.
+
+1. Mở **Actions → Verify Food Match** và xác nhận hai job xanh trên commit `main` dự định triển khai.
+2. Mở **Actions → Release Food Match → Run workflow** → branch `main`, target `staging`. Workflow chạy lại Verify, deploy Render đúng SHA, đợi API Healthy, build/deploy Vercel và kiểm tra hash HTML trên domain cố định.
+3. Nghiệm thu staging trên hai điện thoại: Turnstile, Maps, GPS, match/chat, chia sẻ/thu hồi vị trí độc lập và WSS/nối mạng. Staging phải có header `X-Robots-Tag: noindex, nofollow`.
+4. Sau khi staging đạt và đã xác nhận backup, chạy **cùng commit** với target `production`; chờ phê duyệt GitHub Environment nếu đã bật. Mở Render/Vercel logs và kiểm tra lại toàn bộ chức năng trên production.
+
+**Kiểm tra sau production:** `/api/health` Healthy; trang chủ, `/random`, `/map` tải HTTPS; Maps không báo 403, Turnstile tạo hồ sơ được, SignalR kết nối WSS, hai điện thoại match/chat và thu hồi vị trí đúng. Kiểm tra `robots.txt`, `sitemap.xml`, canonical ở đúng domain; staging không được index. Không đưa secret server vào bundle hoặc log công khai.
+
+**Cập nhật:** review diff → Verify → đưa commit đã duyệt lên `main` → Release staging → nghiệm thu → Release production cùng SHA. **Sự cố:** dừng phát hành, đối chiếu Render/Vercel deployment cũ và backup trước khi rollback; Vercel có [rollback deployment](https://vercel.com/docs/deployments/rollback-production-deployment), Render có [lịch sử deploy](https://render.com/docs/deploys). Rollback mã **không tự rollback EF migration** hoặc dữ liệu phát sinh sau backup. Xem [quy trình release nội bộ](.claude/skills/deploy.md) để biết thêm cổng kiểm thử.
+
+## Security and privacy
+
+- Hồ sơ tạm dùng JWT; `JwtSettings__Secret` và chuỗi kết nối chỉ ở backend. Hồ sơ hết hạn sau 3 giờ kể từ khi tạo; tác vụ dọn dữ liệu hết hạn chạy định kỳ 10 phút.
+- API giới hạn CORS theo origin, xác minh Cloudflare Turnstile khi tạo hồ sơ ở production và áp dụng rate limiting. Rate limiter hiện lưu trong bộ nhớ mỗi instance.
+- Danh sách người gần chỉ trả tín hiệu trong 3 km. Trong cặp đã match, mỗi người chia sẻ tọa độ chính xác độc lập tối đa 60 phút và có thể thu hồi; điểm hẹn cần cả hai còn chia sẻ.
+- Maps Embed key hiện trong trình duyệt nên phải giới hạn **Maps Embed API** và HTTP referrer. Google Maps iframe không cung cấp danh sách quán được bấm cho ứng dụng.
+- Các route riêng có `noindex`; cài đặt này không thay thế xác thực hoặc phân quyền. Xem [đánh giá bảo mật và SEO](docs/security-seo-review-2026-10-25.md).
+- Ảnh món có nguồn và quyền sử dụng riêng trong [food-image-credits.md](docs/food-image-credits.md); giấy phép MIT của mã nguồn không tự cấp quyền tái sử dụng mọi ảnh.
+
+## Documentation
+
+- [Quy trình deploy Supabase → Render → Vercel](.claude/skills/deploy.md)
+- [Nghiệm thu trên hai điện thoại](docs/two-phone-acceptance.md)
+- [Phạm vi Google Maps Embed](docs/maps-embed-plan.md)
+- [Nguồn và quyền sử dụng ảnh món](docs/food-image-credits.md)
+- [Audit bảo mật, SEO](docs/security-seo-review-2026-10-25.md) và [audit sau deploy](docs/audits/FOODMATCH_POST_DEPLOY_AUDIT.md) — bằng chứng lịch sử theo ngày ghi trong từng tài liệu
+
+Khi thay ảnh seed, cập nhật `frontend/food-images.manifest.json`; ảnh do chủ dự án cung cấp phải là PNG đúng tên slug trong `frontend/public/food-images/` và có trường `provided`. Chạy `node frontend/scripts/sync-food-images.mjs --only "Tên món"` hoặc `--provided`, rồi `cd frontend; npm.cmd run check:food-images` để kiểm tra danh mục và nguồn ảnh.
+
+## Troubleshooting
+
+- **Database không kết nối:** kiểm tra `docker compose ps`, `POSTGRES_*` và chuỗi kết nối có cùng mật khẩu. Docker volume cũ có thể vẫn giữ mật khẩu của lần khởi tạo trước.
+- **Frontend không gọi được API:** đối chiếu `VITE_API_URL`/`VITE_SIGNALR_URL` với API đang chạy; khởi động lại Vite sau khi sửa `.env`.
+- **Lỗi CORS:** thêm đúng origin frontend vào `Cors__Origins` của backend; không thêm path hay dấu `/` cuối.
+- **Maps iframe trống hoặc báo 403:** kiểm tra key Maps Embed, API restriction và website referrer của đúng domain; xem Console/Network để phân biệt lỗi key với lỗi quyền GPS.
+- **Chat/SignalR không kết nối:** kiểm tra API, `VITE_SIGNALR_URL`, kết nối WebSocket và hạn dùng hồ sơ/JWT.
+- **Thiếu biến môi trường:** đối chiếu tên biến với [.env.example](.env.example); production còn yêu cầu Turnstile, URL HTTPS và key Maps Embed theo [deploy guide](.claude/skills/deploy.md).
+- **Build thất bại:** chạy lại lệnh lint/build/test ở trên và đọc lỗi đầu tiên; sửa cấu hình hoặc mã theo đúng lỗi được báo.
+
+## License and author
+
+Mã nguồn dùng [MIT License](LICENSE), bản quyền 2026 [HungThichCodee](https://github.com/HungThichCodee). Ảnh món có quyền sử dụng riêng; xem [ghi nhận nguồn ảnh](docs/food-image-credits.md).
