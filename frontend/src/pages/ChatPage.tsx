@@ -609,6 +609,17 @@ export default function ChatPage() {
                         Xem đường đi
                       </button>
                     )}
+                    {activeMatch.meetingPlace.googleMapsUrl && (
+                      <button type="button"
+                        onClick={() => navigate('/route', { state: {
+                          privateMatchId: activeMatch.id,
+                          meetingPlace: true,
+                          name: activeMatch.meetingPlace!.name,
+                        } })}
+                        className="min-h-10 px-4 rounded-full bg-primary text-on-primary">
+                        Xem đường theo tên quán
+                      </button>
+                    )}
                   </div>
                 </div>
               </section>

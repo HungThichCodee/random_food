@@ -19,7 +19,7 @@ export default function DirectionRoutePage() {
       ? locationState.state.privateMatchId as number
       : null;
   const showMeetingPlace = locationState.state?.meetingPlace === true;
-  const [buddyDestination, setBuddyDestination] = useState<{ lat: number; lng: number } | null>(null);
+  const [buddyDestination, setBuddyDestination] = useState<MapPoint | string | null>(null);
   const [accessChecked, setAccessChecked] = useState(false);
   const [travelMode, setTravelMode] = useState<TravelMode>('walking');
 
@@ -46,10 +46,17 @@ export default function DirectionRoutePage() {
       const destination = showMeetingPlace
         ? match.meetingPlace
         : { lat: match.buddyLat, lng: match.buddyLng };
-      setBuddyDestination(allowed &&
-        typeof destination?.lat === 'number' && Number.isFinite(destination.lat) &&
-        typeof destination?.lng === 'number' && Number.isFinite(destination.lng)
-        ? { lat: destination.lat, lng: destination.lng } : null);
+      const coordinatesAvailable = typeof destination?.lat === 'number' &&
+        Number.isFinite(destination.lat) && typeof destination?.lng === 'number' &&
+        Number.isFinite(destination.lng);
+      // Google Maps links have no verified coordinates in our database. Route by
+      // the place name only after the private match has passed the sharing check.
+      setBuddyDestination(allowed
+        ? coordinatesAvailable
+          ? { lat: destination.lat!, lng: destination.lng! }
+          : showMeetingPlace && match.meetingPlace?.googleMapsUrl && match.meetingPlace.name
+            ? match.meetingPlace.name : null
+        : null);
       setAccessChecked(true);
     };
     const refresh = async () => {
@@ -75,10 +82,13 @@ export default function DirectionRoutePage() {
 
   // For routing to a buddy or a restaurant
   // Could be coordinates (destLat, destLng) or a place name
-  const destLat = privateMatchId === null ? locationState.state?.lat : buddyDestination?.lat;
-  const destLng = privateMatchId === null ? locationState.state?.lng : buddyDestination?.lng;
+  const destLat = privateMatchId === null ? locationState.state?.lat
+    : typeof buddyDestination === 'object' ? buddyDestination?.lat : null;
+  const destLng = privateMatchId === null ? locationState.state?.lng
+    : typeof buddyDestination === 'object' ? buddyDestination?.lng : null;
   const destName = locationState.state?.name || 'Điểm đến';
-  const destQuery = locationState.state?.query;
+  const destQuery = privateMatchId === null ? locationState.state?.query
+    : typeof buddyDestination === 'string' ? buddyDestination : null;
 
   const mapSrc = useMemo(() => {
     const origin: MapPoint | null = currentLat != null && currentLng != null
@@ -86,7 +96,7 @@ export default function DirectionRoutePage() {
     const destination: MapPoint | string | null =
       typeof destLat === 'number' && typeof destLng === 'number'
         ? { lat: destLat, lng: destLng }
-        : privateMatchId === null && typeof destQuery === 'string' ? destQuery : null;
+        : typeof destQuery === 'string' ? destQuery : null;
     return directionsMapUrl(origin, destination, travelMode);
   }, [currentLat, currentLng, destLat, destLng, destQuery, privateMatchId, travelMode]);
 
@@ -109,11 +119,11 @@ export default function DirectionRoutePage() {
           </div>
         </div>
         {hasMapsEmbedKey && (
-          <div className="mx-auto mt-3 flex max-w-[390px] gap-2" role="group" aria-label="Phương tiện di chuyển">
-            {([['walking', 'Đi bộ'], ['driving', 'Lái xe']] as const).map(([mode, label]) => (
+          <div className="mx-auto mt-3 flex max-w-[390px] gap-2 overflow-x-auto pb-1" role="group" aria-label="Phương tiện di chuyển">
+            {([['walking', 'Đi bộ'], ['driving', 'Lái xe'], ['bicycling', 'Xe đạp'], ['transit', 'Công cộng']] as const).map(([mode, label]) => (
               <button key={mode} type="button" onClick={() => setTravelMode(mode)}
                 aria-pressed={travelMode === mode}
-                className={`min-h-10 flex-1 rounded-full px-3 text-sm font-semibold ${travelMode === mode
+                className={`min-h-10 shrink-0 rounded-full px-3 text-sm font-semibold ${travelMode === mode
                   ? 'bg-primary-container text-white' : 'bg-surface-container-high text-on-surface-variant'}`}>
                 {label}
               </button>
@@ -123,9 +133,19 @@ export default function DirectionRoutePage() {
         <p className="mx-auto mt-2 max-w-[390px] text-xs text-on-surface-variant">
           Google Maps nhận điểm xuất phát và điểm đến để hiển thị đường.
         </p>
+        {showMeetingPlace && typeof buddyDestination === 'string' && (
+          <p role="status" className="mx-auto mt-1 max-w-[390px] text-xs text-on-surface-variant">
+            Tuyến đường dựa trên tên quán; hãy đối chiếu địa chỉ với liên kết Google Maps trong Chat.
+          </p>
+        )}
       </div>
 
       <div className="flex-1 w-full relative">
+        {mapSrc && location.error && livePosition && (
+          <p role="status" className="absolute top-3 inset-x-3 z-20 rounded-xl bg-surface-container-high/95 px-3 py-2 text-body-sm text-on-surface shadow-lg">
+            GPS tạm mất tín hiệu. Đường đi đang dùng tọa độ đo gần nhất.
+          </p>
+        )}
         {mapSrc && !location.isLoading && !livePosition && savedPosition && (
           <p role="status" className="absolute top-3 inset-x-3 z-20 rounded-xl bg-surface-container-high/95 px-3 py-2 text-body-sm text-on-surface shadow-lg">
             GPS chưa khả dụng. Đường đi đang xuất phát từ vị trí đã lưu, có thể không còn chính xác.

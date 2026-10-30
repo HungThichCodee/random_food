@@ -37,12 +37,14 @@ export function useGeolocation() {
     };
 
     const handleError = (error: GeolocationPositionError) => {
-      setState({
-        lat: null,
-        lng: null,
+      setState(previous => ({
+        // A one-off timeout must not discard a successful watchPosition fix.
+        // Clear it only when the browser revokes geolocation permission.
+        lat: error.code === 1 ? null : previous.lat,
+        lng: error.code === 1 ? null : previous.lng,
         error: error.message,
         isLoading: false,
-      });
+      }));
     };
 
     // Get initial position

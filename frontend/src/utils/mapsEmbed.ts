@@ -1,5 +1,5 @@
 export type MapPoint = { lat: number; lng: number };
-export type TravelMode = 'walking' | 'driving';
+export type TravelMode = 'walking' | 'driving' | 'bicycling' | 'transit';
 
 const apiKey = __GOOGLE_MAPS_EMBED_API_KEY__.trim();
 
@@ -12,7 +12,7 @@ function coordinates(point: MapPoint | null): string | null {
   return `${point.lat},${point.lng}`;
 }
 
-function officialUrl(mode: 'search' | 'view' | 'directions'): URL {
+function officialUrl(mode: 'search' | 'view' | 'directions' | 'place' | 'streetview'): URL {
   const url = new URL(`https://www.google.com/maps/embed/v1/${mode}`);
   url.searchParams.set('key', apiKey);
   url.searchParams.set('language', 'vi');
@@ -48,9 +48,33 @@ export function viewMapUrl(center: MapPoint | null): string {
   return `https://maps.google.com/maps?q=${centerText}&z=15&output=embed`;
 }
 
-export function directionsMapUrl(origin: MapPoint | null, destination: MapPoint | string | null,
+export function placeMapUrl(query: string, center: MapPoint | null): string {
+  const term = query.trim();
+  if (!term) return '';
+  if (hasMapsEmbedKey) {
+    const url = officialUrl('place');
+    url.searchParams.set('q', term);
+    const centerText = coordinates(center);
+    if (centerText) {
+      url.searchParams.set('center', centerText);
+      url.searchParams.set('zoom', '15');
+    }
+    return url.toString();
+  }
+  return searchMapUrl(term, center);
+}
+
+export function streetViewMapUrl(center: MapPoint | null): string {
+  const location = coordinates(center);
+  if (!hasMapsEmbedKey || !location) return '';
+  const url = officialUrl('streetview');
+  url.searchParams.set('location', location);
+  return url.toString();
+}
+
+export function directionsMapUrl(origin: MapPoint | string | null, destination: MapPoint | string | null,
   travelMode: TravelMode): string {
-  const originText = coordinates(origin);
+  const originText = typeof origin === 'string' ? origin.trim() : coordinates(origin);
   const destinationText = typeof destination === 'string'
     ? destination.trim() : coordinates(destination);
   if (!originText || !destinationText) return '';
