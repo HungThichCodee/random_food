@@ -13,14 +13,18 @@ test('map search shows nearby cafes and keeps the measured position', async ({ p
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/map');
   const frame = page.locator('main iframe');
-  await expect(frame).toHaveAttribute('src', /\/embed\/v1\/view/);
+  await expect(frame).toHaveAttribute('src', /\/embed\/v1\/place/);
+  const myPlace = new URL((await frame.getAttribute('src'))!);
+  expect(myPlace.searchParams.get('q')).toBe('10.776889,106.700806');
+  expect(myPlace.searchParams.get('center')).toBe('10.776889,106.700806');
 
   await page.getByLabel('Tên quán hoặc món ăn').fill('Cà phê');
   await page.getByRole('button', { name: 'Tìm', exact: true }).click();
   await expect(frame).toHaveAttribute('src', /maps\.google\.com\/maps/);
   const cafeSearch = new URL((await frame.getAttribute('src'))!);
-  expect(cafeSearch.searchParams.get('q')).toBe('quán cà phê gần 10.776889,106.700806');
-  expect(cafeSearch.searchParams.has('ll')).toBe(false);
+  expect(cafeSearch.searchParams.get('q')).toBe('quán cà phê');
+  expect(cafeSearch.searchParams.get('ll')).toBe('10.776889,106.700806');
+  expect(cafeSearch.searchParams.get('z')).toBe('15');
   await page.getByRole('button', { name: 'Phố 360°' }).click();
   await expect(frame).toHaveAttribute('src', /\/embed\/v1\/streetview/);
   const panorama = new URL((await frame.getAttribute('src'))!);
@@ -45,7 +49,7 @@ test('GPS movement does not reset the map until visitor refreshes it', async ({ 
 test('directions appear inside the map and change travel mode', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/map');
-  await expect(page.locator('main iframe')).toHaveAttribute('src', /\/embed\/v1\/view/);
+  await expect(page.locator('main iframe')).toHaveAttribute('src', /\/embed\/v1\/place/);
   await page.getByRole('button', { name: 'Đường đi' }).click();
   await page.getByRole('textbox', { name: 'Điểm đến' }).fill('Bún bò Huế');
   const frame = page.locator('main iframe');
@@ -75,4 +79,11 @@ test('a visitor without GPS can enter both route endpoints', async ({ context, p
   const route = new URL((await frame.getAttribute('src'))!);
   expect(route.searchParams.get('origin')).toBe('Chợ Bến Thành');
   expect(route.searchParams.get('destination')).toBe('Dinh Độc Lập');
+});
+
+test('search without a position does not jump to distant results', async ({ context, page }) => {
+  await context.clearPermissions();
+  await page.goto('/map?search=C%C3%A0%20ph%C3%AA');
+  await expect(page.locator('main iframe')).toHaveCount(0);
+  await expect(page.getByText('Cho phép vị trí để tìm quán quanh bạn.')).toBeVisible();
 });

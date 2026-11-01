@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useUserStore } from '../stores/useUserStore';
@@ -49,9 +49,10 @@ function externalMapUrl(mode: MapTab, center: MapPoint | null, query: string,
     return url.toString();
   }
   if (mode === 'search' && query) {
+    if (!center) return '';
     const url = new URL('https://www.google.com/maps/search/');
     url.searchParams.set('api', '1');
-    url.searchParams.set('query', center ? `${query} gần ${endpointText(center)}` : query);
+    url.searchParams.set('query', `${query} gần ${endpointText(center)}`);
     return url.toString();
   }
   const url = new URL('https://www.google.com/maps/@');
@@ -80,6 +81,7 @@ export default function MapExplorePage() {
   const [gpsBadgeDismissed, setGpsBadgeDismissed] = useState(false);
   const [loadedSrc, setLoadedSrc] = useState('');
   const [mapCenter, setMapCenter] = useState<MapPoint | null>(null);
+  const hasLiveMapCenter = useRef(false);
 
   useEffect(() => {
     if (!searchQuery) return;
@@ -103,11 +105,15 @@ export default function MapExplorePage() {
     ? { lat: location.lat!, lng: location.lng! }
     : savedPosition ? { lat: profile.currentLat!, lng: profile.currentLng! } : null;
 
-  // A GPS watch can report tiny movements many times per minute. Keep the
-  // iframe URL stable while the visitor pans, zooms or selects a place.
+  // Replace a saved location with the first live GPS fix. Later GPS watch
+  // updates must not reset an iframe the visitor is panning or inspecting.
   useEffect(() => {
-    if (mapCenter || !center || (location.isLoading && !livePosition)) return;
-    setMapCenter(center);
+    if (livePosition && !hasLiveMapCenter.current) {
+      hasLiveMapCenter.current = true;
+      setMapCenter(center);
+    } else if (!mapCenter && center && !location.isLoading) {
+      setMapCenter(center);
+    }
   }, [mapCenter, center, location.isLoading, livePosition]);
 
   const routeStart = endpoint(routeOrigin, mapCenter);
@@ -155,7 +161,8 @@ export default function MapExplorePage() {
         : !routeStart || !routeEnd ? 'Cho phép vị trí hoặc nhập điểm đi.'
           : 'Không thể hiển thị tuyến đường.'
       : location.isLoading && !mapCenter ? 'Đang lấy vị trí của bạn...'
-        : 'Cho phép vị trí hoặc nhập tên quán để tìm.';
+        : !mapCenter ? 'Cho phép vị trí để tìm quán quanh bạn.'
+          : 'Không thể hiển thị bản đồ.';
 
   return (
     <main className="flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-on-surface">

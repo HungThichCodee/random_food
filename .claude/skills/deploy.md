@@ -107,7 +107,7 @@ API hiện dùng `CF-Connecting-IP` cho hạn mức IP chung 240 request/phút/i
 
 Nếu endpoint riêng trả HTTP 406/429, ứng dụng tạm ngừng gọi 30 giây rồi mới thử lại.
 
-Liên kết quán do A dán chỉ được kiểm tra là URL Google Maps hợp lệ; ứng dụng không xác minh quán đó nằm gần điểm giữa hoặc còn hoạt động. B cần xem liên kết trước khi xác nhận. Iframe tìm quán hiện dùng `maps.google.com/maps?q=...&output=embed` vì lần kiểm tra production với `/embed/v1/search` chỉ hiển thị bản đồ nền. Đây không phải Maps Embed API search chính thức; sau mỗi deploy, thử ghim quán trên hai điện thoại. Nếu cần danh sách quán thành dữ liệu riêng trong ứng dụng thì phải dùng [Places API Nearby Search](https://developers.google.com/maps/documentation/places/web-service/nearby-search), không thể đọc danh sách từ iframe.
+Liên kết quán do A dán chỉ được kiểm tra là URL Google Maps hợp lệ; ứng dụng không xác minh quán đó nằm gần điểm giữa hoặc còn hoạt động. B cần xem liên kết trước khi xác nhận. Iframe tìm quán hiện dùng `maps.google.com/maps?q=...&ll=<tọa độ>&z=15&output=embed` để giữ vùng hiển thị quanh GPS vì lần kiểm tra production với `/embed/v1/search` chỉ hiển thị bản đồ nền. Đây không phải Maps Embed API search chính thức và không bảo đảm giới hạn bán kính hay danh sách kết quả; sau mỗi deploy, thử quán quanh vị trí trên hai điện thoại. Nếu cần danh sách quán thành dữ liệu riêng trong ứng dụng thì phải dùng [Places API Nearby Search](https://developers.google.com/maps/documentation/places/web-service/nearby-search), không thể đọc danh sách từ iframe.
 
 ## 4. Vercel frontend
 

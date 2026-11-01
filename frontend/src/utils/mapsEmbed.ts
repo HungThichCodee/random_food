@@ -23,12 +23,13 @@ export function searchMapUrl(query: string, center: MapPoint | null): string {
   const term = query.trim();
   if (!term) return '';
   const centerText = coordinates(center);
-  // In production, Google's /embed/v1/search rendered only the base map for
-  // generic restaurant queries. This iframe URL renders actual search pins.
-  const nearbyQuery = centerText ? `${term} gần ${centerText}` : term;
+  if (!centerText) return '';
+  // Embed search currently shows only the base map for these generic queries.
+  // The Maps iframe keeps the visible search region around the measured GPS.
   const url = new URL('https://maps.google.com/maps');
-  url.searchParams.set('q', nearbyQuery);
-  // ll/z suppress the search pins in this iframe; the exact position is in q.
+  url.searchParams.set('q', term);
+  url.searchParams.set('ll', centerText);
+  url.searchParams.set('z', '15');
   url.searchParams.set('output', 'embed');
   return url.toString();
 }
@@ -37,7 +38,8 @@ export function viewMapUrl(center: MapPoint | null): string {
   const centerText = coordinates(center);
   if (!centerText) return '';
   if (hasMapsEmbedKey) {
-    const url = officialUrl('view');
+    const url = officialUrl('place');
+    url.searchParams.set('q', centerText);
     url.searchParams.set('center', centerText);
     url.searchParams.set('zoom', '15');
     return url.toString();
