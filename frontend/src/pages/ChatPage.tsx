@@ -20,6 +20,7 @@ import { reportApi } from '../api/reportApi';
 import { tempUserApi } from '../api/tempUserApi';
 import type { MatchRequestDto, MeetingPlaceDto, MeetingSearchKind } from '../types/match';
 import type { ChatMessageDto } from '../types/chat';
+import { viewMapUrl } from '../utils/mapsEmbed';
 
 const toMessageItems = (data: ChatMessageDto[], profileId?: string): MessageItem[] =>
   data.filter(msg => !msg.message.startsWith('[SYS_MATCH]')).map(msg => ({
@@ -70,6 +71,9 @@ export default function ChatPage() {
   const [meetingPlacesError, setMeetingPlacesError] = useState(false);
   const [meetingSearchUrl, setMeetingSearchUrl] = useState('');
   const [meetingEmbedUrl, setMeetingEmbedUrl] = useState('');
+  const [meetingPinUrl, setMeetingPinUrl] = useState('');
+  const [meetingMapMode, setMeetingMapMode] = useState<'midpoint' | 'search'>('midpoint');
+  const [chatViewportHeight, setChatViewportHeight] = useState<number | null>(null);
   const [googlePlaceName, setGooglePlaceName] = useState('');
   const [googlePlaceUrl, setGooglePlaceUrl] = useState('');
   const [meetingProviderAvailable, setMeetingProviderAvailable] = useState(true);
@@ -77,7 +81,22 @@ export default function ChatPage() {
   const [meetingRefreshKey, setMeetingRefreshKey] = useState(0);
   const [meetingSearchKind, setMeetingSearchKind] = useState<MeetingSearchKind>('restaurant');
 
-  // Auto-scroll to bottom of stream
+  // The visual viewport shrinks when the phone keyboard opens. Keep the
+  // composer inside it instead of anchoring it to the layout viewport.
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const updateHeight = () => setChatViewportHeight(viewport.height);
+    updateHeight();
+    viewport.addEventListener('resize', updateHeight);
+    window.addEventListener('resize', updateHeight);
+    return () => {
+      viewport.removeEventListener('resize', updateHeight);
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, []);
+
+  // Auto-scroll to the latest message in the shared content scroller.
   useEffect(() => {
     if (streamRef.current) {
       streamRef.current.scrollTop = streamRef.current.scrollHeight;
@@ -209,17 +228,22 @@ export default function ChatPage() {
       setMeetingPlacesError(false);
       setMeetingSearchUrl('');
       setMeetingEmbedUrl('');
+      setMeetingPinUrl('');
       return;
     }
     if (!showMeetingTools) return;
     let cancelled = false;
     setMeetingPlacesLoading(true);
     setMeetingPlacesError(false);
+    setMeetingSearchUrl('');
+    setMeetingEmbedUrl('');
+    setMeetingPinUrl('');
     matchApi.getMeetingSuggestions(match.id, meetingSearchKind).then((result) => {
       if (!cancelled) {
         setMeetingPlaces(result.places);
         setMeetingSearchUrl(result.searchUrl);
         setMeetingEmbedUrl(result.embedUrl);
+        setMeetingPinUrl(viewMapUrl({ lat: result.centerLat, lng: result.centerLng }));
         setMeetingProviderAvailable(result.providerAvailable);
       }
     }).catch(() => {
@@ -228,6 +252,7 @@ export default function ChatPage() {
         setMeetingPlacesError(true);
         setMeetingSearchUrl('');
         setMeetingEmbedUrl('');
+        setMeetingPinUrl('');
       }
     }).finally(() => {
       if (!cancelled) setMeetingPlacesLoading(false);
@@ -402,17 +427,20 @@ export default function ChatPage() {
     }
   };
 
+  const meetingMapUrl = meetingMapMode === 'midpoint' ? meetingPinUrl : meetingEmbedUrl;
+
   return (
-    <div className="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen relative overflow-x-hidden selection:bg-primary-container selection:text-white">
+    <div className="bg-surface font-body-md text-body-md text-on-surface flex h-[100dvh] min-h-0 flex-col overflow-hidden selection:bg-primary-container selection:text-white"
+      style={chatViewportHeight == null ? undefined : { height: chatViewportHeight }}>
       {/* Background Ambient Glow */}
       <div className="fixed -top-24 -right-24 w-80 h-80 rounded-full bg-primary-container/10 blur-[100px] pointer-events-none z-0"></div>
 
       {/* Top Header */}
-      <header className="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_16px_rgba(0,0,0,0.35)]">
+      <header className="relative z-50 w-full shrink-0 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_16px_rgba(0,0,0,0.35)]">
         <div className="h-16 px-margin flex items-center justify-between gap-space-sm">
-          <div className="flex items-center gap-space-sm">
+          <div className="flex min-w-0 flex-1 items-center gap-space-sm">
             <button
-              className="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container/60 text-on-surface hover:bg-surface-container transition-colors"
+              className="w-11 h-11 shrink-0 flex items-center justify-center rounded-full bg-surface-container/60 text-on-surface hover:bg-surface-container transition-colors"
               onClick={() => navigate(-1)}
               title="Quay lại"
             >
@@ -420,15 +448,15 @@ export default function ChatPage() {
             </button>
             <img
               alt="Food Match Brand Icon"
-              className="h-7 w-auto object-contain cursor-pointer"
+              className="h-7 w-auto shrink-0 object-contain cursor-pointer"
               src={logoImg}
               onClick={() => navigate('/')}
             />
-            <h1 className="font-title-md text-title-md text-on-surface tracking-tight truncate max-w-[170px]">
+            <h1 className="min-w-0 font-title-md text-title-md text-on-surface tracking-tight truncate max-w-[170px]">
               Trò chuyện
             </h1>
           </div>
-          <div className="relative flex items-center gap-space-xs">
+          <div className="relative flex shrink-0 items-center gap-space-xs">
             <button type="button"
               onClick={() => setShowOptions(value => !value)}
               aria-expanded={showOptions}
@@ -467,13 +495,13 @@ export default function ChatPage() {
       </header>
 
       {/* Main Viewport */}
-      <main className="flex flex-col relative w-full pt-[calc(4rem+env(safe-area-inset-top,0px))] pb-[calc(6rem+env(safe-area-inset-bottom,0px))] bg-surface z-10 min-h-screen">
-        <div className="flex flex-col w-full relative">
-          <div className="relative w-full flex flex-col rounded-t-xl bg-surface-container-low/95 backdrop-blur-2xl shadow-[0_-12px_44px_rgba(0,0,0,0.8)]">
+      <main ref={streamRef} className="relative z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-contain bg-surface">
+        <div className="relative flex min-h-full w-full flex-col">
+          <div className="relative flex min-h-full w-full flex-col rounded-t-xl bg-surface-container-low/95 backdrop-blur-2xl shadow-[0_-12px_44px_rgba(0,0,0,0.8)]">
 
             {/* Match Chat Header */}
             <div className="px-margin pb-3 pt-1 flex items-center justify-between gap-space-sm">
-              <div className="flex items-center gap-space-sm min-w-0">
+              <div className="flex min-w-0 flex-1 items-center gap-space-sm">
                 <div className="relative flex-shrink-0">
                   <div className="w-11 h-11 rounded-full object-cover shadow-md bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg">
                     {partnerName.charAt(0).toUpperCase()}
@@ -481,14 +509,14 @@ export default function ChatPage() {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <h2 className="font-title-md text-title-md text-on-surface truncate">
+                    <h2 className="min-w-0 truncate font-title-md text-title-md text-on-surface">
                       {partnerName}
                     </h2>
                   </div>
                 </div>
               </div>
 
-              <span className="text-xs text-on-surface-variant">{isConnected ? 'Đã kết nối' : 'Đang kết nối'}</span>
+              <span className="shrink-0 text-xs text-on-surface-variant">{isConnected ? 'Đã kết nối' : 'Đang kết nối'}</span>
             </div>
 
             {/* Location Sharing Card */}
@@ -623,7 +651,10 @@ export default function ChatPage() {
                   </p>
                   <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Loại địa điểm hẹn">
                     {meetingSearchOptions.map((option) => (
-                      <button key={option.kind} type="button" onClick={() => setMeetingSearchKind(option.kind)}
+                      <button key={option.kind} type="button" onClick={() => {
+                        setMeetingSearchKind(option.kind);
+                        setMeetingMapMode('search');
+                      }}
                         aria-pressed={meetingSearchKind === option.kind}
                         className={`min-h-10 shrink-0 rounded-full px-3 text-body-sm font-semibold ${meetingSearchKind === option.kind
                           ? 'bg-primary-container text-white' : 'bg-surface-container-high text-on-surface-variant'}`}>
@@ -631,13 +662,29 @@ export default function ChatPage() {
                       </button>
                     ))}
                   </div>
+                  <div className="flex gap-2" role="group" aria-label="Chế độ bản đồ điểm hẹn">
+                    <button type="button" onClick={() => setMeetingMapMode('midpoint')}
+                      aria-pressed={meetingMapMode === 'midpoint'}
+                      className={`min-h-11 min-w-0 flex-1 rounded-full px-3 text-body-sm font-semibold ${meetingMapMode === 'midpoint'
+                        ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface-variant'}`}>
+                      Điểm giữa
+                    </button>
+                    <button type="button" onClick={() => setMeetingMapMode('search')}
+                      aria-pressed={meetingMapMode === 'search'}
+                      className={`min-h-11 min-w-0 flex-1 rounded-full px-3 text-body-sm font-semibold ${meetingMapMode === 'search'
+                        ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface-variant'}`}>
+                      Tìm quán
+                    </button>
+                  </div>
                   <button type="button" onClick={() => setMeetingRefreshKey(value => value + 1)}
                     disabled={meetingPlacesLoading}
                     className="text-body-sm text-primary underline disabled:opacity-50 self-start">
                     Làm mới quán theo vị trí hiện tại
                   </button>
-                  {meetingEmbedUrl && (
-                    <iframe src={meetingEmbedUrl} title="Quán quanh điểm giữa trên Google Maps"
+                  {meetingMapUrl && (
+                    <iframe src={meetingMapUrl} title={meetingMapMode === 'midpoint'
+                      ? 'Ghim điểm giữa của hai bạn trên Google Maps'
+                      : 'Quán quanh điểm giữa trên Google Maps'}
                       loading="lazy" referrerPolicy="strict-origin-when-cross-origin"
                       className="w-full h-72 rounded-xl border-0" />
                   )}
@@ -720,21 +767,20 @@ export default function ChatPage() {
 
             {/* Chat Message Stream */}
             <div
-              ref={streamRef}
-              className="flex flex-col px-margin gap-3 overflow-y-auto max-h-[380px] pb-2"
+              className="flex flex-1 flex-col gap-3 px-margin pb-3"
               id="chat-stream"
             >
               {/* Messages */}
               {messages.map((item) => {
                 if (item.sender === 'partner') {
                   return (
-                    <div key={item.id} className="flex items-end gap-2 max-w-[84%] self-start">
+                    <div key={item.id} className="flex min-w-0 max-w-[84%] items-end gap-2 self-start">
                       <div className="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-[10px] font-bold flex-shrink-0 mb-1">
                         {partnerName.charAt(0).toUpperCase()}
                       </div>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex min-w-0 flex-col gap-1">
                         <div className="px-3.5 py-2.5 rounded-2xl rounded-bl-xs bg-surface-container-high text-on-surface shadow-sm">
-                          <p className="font-body-md text-body-md">{item.text}</p>
+                          <p className="break-words [overflow-wrap:anywhere] font-body-md text-body-md">{item.text}</p>
                         </div>
                         <span className="font-label-sm text-label-sm text-on-surface-variant ml-1">
                           {item.timestamp}
@@ -745,10 +791,10 @@ export default function ChatPage() {
                 }
 
                 return (
-                  <div key={item.id} className="flex items-end justify-end gap-1.5 max-w-[84%] self-end">
-                    <div className="flex flex-col items-end gap-1">
+                  <div key={item.id} className="flex min-w-0 max-w-[84%] items-end justify-end gap-1.5 self-end">
+                    <div className="flex min-w-0 flex-col items-end gap-1">
                       <div className="px-3.5 py-2.5 rounded-2xl rounded-br-xs bg-primary-container text-white shadow-[0_4px_16px_rgba(255,107,53,0.35)]">
-                        <p className="font-body-md text-body-md">{item.text}</p>
+                        <p className="break-words [overflow-wrap:anywhere] font-body-md text-body-md">{item.text}</p>
                       </div>
                       <div className="flex items-center gap-1 mr-1">
                         <span className="font-label-sm text-label-sm text-on-surface-variant">
@@ -765,38 +811,26 @@ export default function ChatPage() {
 
             </div>
 
-            {/* Floating Dynamic Input Bar */}
-            <div className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[640px] p-margin pt-2 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] bg-surface-container-lowest/95 backdrop-blur-xl">
-              <form className="flex items-center gap-2" id="chat-form" onSubmit={handleSendMessage}>
-                {/* Text Input Field Container */}
-                <div className="flex-1 min-w-0 h-11 px-3.5 rounded-full bg-surface-container flex items-center gap-2 shadow-inner focus-within:ring-1 focus-within:ring-primary-container">
-                  <input
-                    autoComplete="off"
-                    className="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none"
-                    id="message-input"
-                    placeholder={`Nhập tin nhắn với ${partnerName.split(' ')[0]}...`}
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                  />
-                </div>
-
-                {/* Send Button */}
-                <button
-                  id="send-button"
-                  type="submit"
-                  disabled={!inputValue.trim()}
-                  className="w-11 h-11 rounded-full bg-primary-container text-white flex items-center justify-center flex-shrink-0 shadow-[0_4px_18px_rgba(255,107,53,0.45)] active:scale-90 hover:brightness-110 transition-all duration-150 disabled:opacity-40 disabled:scale-100"
-                >
-                  <span className="material-symbols-outlined text-[20px] translate-x-0.5">send</span>
-                </button>
-              </form>
-            </div>
-
           </div>
 
         </div>
       </main>
+
+      <div className="relative z-40 w-full shrink-0 bg-surface-container-lowest/95 px-margin pt-2 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] backdrop-blur-xl">
+        <form className="mx-auto flex w-full max-w-[608px] items-center gap-2" id="chat-form" onSubmit={handleSendMessage}>
+          <div className="flex h-11 min-w-0 flex-1 items-center rounded-full bg-surface-container px-3.5 shadow-inner focus-within:ring-1 focus-within:ring-primary-container">
+            <input autoComplete="off" id="message-input" type="text"
+              className="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none"
+              placeholder={`Nhập tin nhắn với ${partnerName.split(' ')[0]}...`}
+              value={inputValue} onChange={event => setInputValue(event.target.value)}
+              onFocus={() => { if (streamRef.current) streamRef.current.scrollTop = streamRef.current.scrollHeight; }} />
+          </div>
+          <button id="send-button" type="submit" disabled={!inputValue.trim()}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-white shadow-[0_4px_18px_rgba(255,107,53,0.45)] transition-all duration-150 active:scale-90 hover:brightness-110 disabled:scale-100 disabled:opacity-40">
+            <span className="material-symbols-outlined translate-x-0.5 text-[20px]">send</span>
+          </button>
+        </form>
+      </div>
 
       <MobileModal
         visible={showShareConfirm}

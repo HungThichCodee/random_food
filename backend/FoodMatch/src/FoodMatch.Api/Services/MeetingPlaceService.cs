@@ -8,7 +8,7 @@ namespace FoodMatch.Api.Services;
 public record MeetingPlaceDto(string Id, string Name, string Category, double Lat, double Lng,
     int DistanceFromMiddleMeters);
 public record MeetingSuggestionsDto(IReadOnlyList<MeetingPlaceDto> Places, string SearchUrl,
-    bool ProviderAvailable, string EmbedUrl = "");
+    bool ProviderAvailable, string EmbedUrl, double CenterLat, double CenterLng);
 
 public interface IMeetingPlaceService
 {

@@ -66,6 +66,8 @@ public class MeetingSuggestionsControllerTests
         Assert.Empty(body.Places);
         Assert.StartsWith("https://www.google.com/maps/search/?api=1&query=", body.SearchUrl);
         Assert.StartsWith("https://maps.google.com/maps?q=", body.EmbedUrl);
+        Assert.Equal(10.2, body.CenterLat, 10);
+        Assert.Equal(106.2, body.CenterLng, 10);
     }
 
     [Theory]
@@ -99,11 +101,15 @@ public class MeetingSuggestionsControllerTests
         var body = Assert.IsType<MeetingSuggestionsDto>(Assert.IsType<OkObjectResult>(response.Result).Value);
         Assert.Contains("q=" + Uri.EscapeDataString(expectedQuery), body.EmbedUrl);
         var query = Uri.UnescapeDataString(body.EmbedUrl.Split("q=")[1].Split('&')[0]);
-        var center = query.Split(" gần ")[1]
+        Assert.Equal(expectedQuery, query);
+        var center = Uri.UnescapeDataString(body.EmbedUrl.Split("ll=")[1].Split('&')[0])
             .Split(',').Select(value => double.Parse(value,
                 System.Globalization.CultureInfo.InvariantCulture)).ToArray();
         Assert.Equal((10.7761234567 + 10.7768765432) / 2, center[0]);
         Assert.Equal((106.7001234567 + 106.7008765432) / 2, center[1]);
+        Assert.Equal(center[0], body.CenterLat);
+        Assert.Equal(center[1], body.CenterLng);
+        Assert.Contains("&z=15&output=embed", body.EmbedUrl);
         Assert.Empty(body.Places);
         Assert.False(body.ProviderAvailable);
         provider.Verify(service => service.SuggestAsync(
@@ -184,8 +190,10 @@ public class MeetingSuggestionsControllerTests
         var response = await controller.GetMeetingSuggestions(7);
 
         var body = Assert.IsType<MeetingSuggestionsDto>(Assert.IsType<OkObjectResult>(response.Result).Value);
-        Assert.Contains("%20g%E1%BA%A7n%2012%2C108", body.EmbedUrl);
+        Assert.Contains("&ll=12%2C108&z=15", body.EmbedUrl);
         Assert.Contains("12%2C108", body.SearchUrl);
+        Assert.Equal(12, body.CenterLat);
+        Assert.Equal(108, body.CenterLng);
         Assert.Empty(body.Places);
         Assert.False(body.ProviderAvailable);
     }

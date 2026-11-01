@@ -43,6 +43,8 @@ export interface MeetingSuggestionsDto {
   searchUrl: string;
   providerAvailable: boolean;
   embedUrl: string;
+  centerLat: number;
+  centerLng: number;
 }
 
 export type MeetingSearchKind = 'restaurant' | 'cafe' | 'vegetarian' | 'dessert';
