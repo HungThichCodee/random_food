@@ -34,7 +34,7 @@ Xem trực tiếp [Vòng quay món](https://foodmatchh.vercel.app/random), [Gợ
 - **Chat thời gian thực:** tin nhắn và cập nhật ghép cặp qua SignalR.
 - **Chia sẻ vị trí:** mỗi người trong cặp đã match tự bật hoặc thu hồi quyền chia sẻ tọa độ chính xác của mình; mỗi lần chia sẻ có hiệu lực tối đa 60 phút. Người kia không phải chia sẻ lại để xem vị trí đã được cho phép.
 - **Gợi ý điểm hẹn:** chỉ hiện khi cả hai còn chia sẻ. Google Maps tìm quán quanh điểm giữa; một người dán tên và liên kết quán để người kia kiểm tra, xác nhận. Danh sách OSM là tùy chọn khi có endpoint Overpass riêng.
-- **Google Maps:** màn `/map` có Tìm quán, Đường đi và Phố 360°; sử dụng Maps Embed API khi có key. Ứng dụng không đọc được quán người dùng bấm trong iframe; có nút mở Google Maps để xem thêm.
+- **Google Maps:** màn `/map` có Tìm quán, Đường đi và Phố 360°. Tìm quán dùng iframe Google Maps dạng truy vấn để hiện ghim quán; Xem bản đồ, Đường đi và Phố 360° dùng Maps Embed API khi có key. Ứng dụng không đọc được quán người dùng bấm trong iframe; có nút mở Google Maps để xem thêm.
 - **Ngôn ngữ và giao diện:** có bản dịch Việt/Anh và nút đổi ngôn ngữ trên trang chủ; một số màn hình còn dùng tiếng Việt. Bố cục ưu tiên điện thoại.
 
 ## Technology stack
@@ -46,7 +46,7 @@ Xem trực tiếp [Vòng quay món](https://foodmatchh.vercel.app/random), [Gợ
 | Backend | ASP.NET Core `net10.0`, EF Core/Npgsql `10.0.0` | REST API và truy cập dữ liệu |
 | Database | PostgreSQL 16 trong Docker Compose; Supabase khi deploy | Hồ sơ, món ăn, match và chat |
 | Realtime | SignalR trong ASP.NET Core; client `@microsoft/signalr ^9.0.19` | Tin nhắn và thông báo |
-| Maps | Google Maps Embed API; Overpass tùy chọn | Bản đồ, chỉ đường và gợi ý điểm hẹn |
+| Maps | Google Maps iframe và Maps Embed API; Overpass tùy chọn | Tìm quán, bản đồ, chỉ đường và gợi ý điểm hẹn |
 | Hosting & CI/CD | Vercel, Render, Supabase; GitHub Actions | Triển khai và xác minh |
 
 Phiên bản frontend lấy từ [package.json](frontend/package.json), backend từ các file `.csproj`; các dấu `^`/`~` là khoảng phiên bản khai báo.
@@ -120,7 +120,7 @@ Mẫu cấu hình nằm trong [.env.example](.env.example). Vite đọc `.env` �
 | Frontend công khai | `VITE_API_URL`, `VITE_SIGNALR_URL` | Vite/Vercel; origin API HTTPS khi deploy |
 | Database | `POSTGRES_*`, `ConnectionStrings__DefaultConnection` | Docker Compose và backend/Render |
 | Backend secrets | `JwtSettings__Secret`, `JwtSettings__Issuer`, `JwtSettings__Audience`, `Cors__Origins` | Backend/Render |
-| Maps | `GoogleMaps__EmbedApiKey` | Render và Vercel; key xuất hiện trong iframe, phải giới hạn API/referrer |
+| Maps | `GoogleMaps__EmbedApiKey` | Vercel; dùng cho bản đồ, đường đi và Phố 360°, phải giới hạn API/referrer |
 | CAPTCHA | `Turnstile__SecretKey`, `Turnstile__Hostname`, `VITE_TURNSTILE_SITE_KEY` | Secret/hostname ở backend; site key ở frontend |
 | SEO | `FOODMATCH_SEO_INDEXABLE`, `VITE_PUBLIC_ORIGIN`, `FOODMATCH_GOOGLE_SITE_VERIFICATION` | Vercel; chỉ bật lập chỉ mục với origin production chính thức |
 | Tùy chọn | `MeetingPlaces__OverpassUrl`, `VITE_FOOD_IMAGE_ORIGINS` | Danh sách OSM riêng và nguồn ảnh bổ sung |
@@ -188,7 +188,7 @@ Không đưa `.env`, database password, JWT secret hoặc token vào Git. Chủ 
 
 ### 4. Tạo Google Maps Embed API key
 
-Vào [Google Cloud Console](https://console.cloud.google.com/) → chọn/tạo project và bật billing → **APIs & Services → Library → Maps Embed API → Enable** → **Credentials → Create credentials → API key**. Trong key, chọn **Application restrictions: Websites (HTTP referrers)** và thêm cả origin lẫn đường dẫn cho mỗi domain, ví dụ `https://foodmatchh.vercel.app` và `https://foodmatchh.vercel.app/*` (làm tương tự cho staging). Chọn **API restrictions: Restrict key → Maps Embed API**. Nếu dùng key riêng cho mỗi môi trường, chỉ cho phép domain của môi trường đó. Dán key đã hạn chế vào `GoogleMaps__EmbedApiKey` ở **cả Render lẫn Vercel**. Release build yêu cầu key này; key xuất hiện trong URL iframe nên không phải server secret. Dự án không cần bật Places/Routes API cho chức năng iframe hiện tại. Xem [hướng dẫn key](https://developers.google.com/maps/documentation/embed/get-api-key) và [billing Maps Embed](https://developers.google.com/maps/documentation/embed/usage-and-billing).
+Vào [Google Cloud Console](https://console.cloud.google.com/) → chọn/tạo project và bật billing → **APIs & Services → Library → Maps Embed API → Enable** → **Credentials → Create credentials → API key**. Trong key, chọn **Application restrictions: Websites (HTTP referrers)** và thêm cả origin lẫn đường dẫn cho mỗi domain, ví dụ `https://foodmatchh.vercel.app` và `https://foodmatchh.vercel.app/*` (làm tương tự cho staging). Chọn **API restrictions: Restrict key → Maps Embed API**. Nếu dùng key riêng cho mỗi môi trường, chỉ cho phép domain của môi trường đó. Dán key đã hạn chế vào `GoogleMaps__EmbedApiKey` ở **Vercel**. Release build yêu cầu key này cho bản đồ, đường đi và Phố 360°; key xuất hiện trong URL iframe nên không phải server secret. Tìm quán dùng URL iframe Google Maps dạng truy vấn vì `/embed/v1/search` chỉ trả bản đồ nền trong lần kiểm tra production; cần thử ghim quán sau mỗi lần deploy vì dạng URL truy vấn này không phải Maps Embed API chính thức. Dự án không cần bật Places/Routes API cho chức năng iframe hiện tại. Xem [hướng dẫn key](https://developers.google.com/maps/documentation/embed/get-api-key) và [billing Maps Embed](https://developers.google.com/maps/documentation/embed/usage-and-billing).
 
 ### 5. Tạo Backend Web Service trên Render
 
@@ -214,7 +214,6 @@ Vào [Render Dashboard](https://dashboard.render.com/) → **New → Web Service
 | `JwtSettings__Issuer` / `JwtSettings__Audience` | Ví dụ `FoodMatchApi` / `FoodMatchClient`; giữ nhất quán trong từng service |
 | `Cors__Origins` | Origin Vercel chính xác, ví dụ `https://foodmatchh.vercel.app`; không có path, wildcard, dấu `/` cuối. Nhiều origin thì ngăn bằng dấu phẩy |
 | `Turnstile__SecretKey` / `Turnstile__Hostname` | Secret Key / hostname Cloudflare ở bước 3 |
-| `GoogleMaps__EmbedApiKey` | Maps Embed key đã giới hạn ở bước 4; dùng cho iframe trong Chat |
 
 `MeetingPlaces__OverpassUrl` chỉ dùng nếu bạn có endpoint HTTPS riêng cho danh sách OSM; **để trống khi dùng Google Maps iframe**. `POSTGRES_*` trong `docker-compose.yml` chỉ dành cho PostgreSQL local. Render nhận HTTPS công khai và chuyển tiếp HTTP đến container.
 

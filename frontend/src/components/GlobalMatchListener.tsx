@@ -54,7 +54,7 @@ export default function GlobalMatchListener() {
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
-    const fetchPending = async () => {
+    const fetchPending = async (notifyWhenEmpty = false) => {
       if (responding.current) return;
       const startedAtVersion = noticeVersion.current;
       const fetchId = ++pendingFetchId.current;
@@ -64,15 +64,22 @@ export default function GlobalMatchListener() {
           pendingFetchId.current !== fetchId) return;
         setCurrentRequest(pendingReqs[0] ?? null);
         setModalVisible(pendingReqs.length > 0);
+        if (notifyWhenEmpty && pendingReqs.length === 0) Toast.show('Không có lời mời mới');
       } catch {
-        if (!cancelled) console.error('Could not fetch pending requests');
+        if (!cancelled) {
+          console.error('Could not fetch pending requests');
+          if (notifyWhenEmpty) Toast.show('Không tải được lời mời. Hãy thử lại.');
+        }
       }
     };
+    const onManualCheck = () => { void fetchPending(true); };
+    window.addEventListener('foodmatch:check-invitations', onManualCheck);
     void fetchPending();
     const interval = window.setInterval(() => { void fetchPending(); }, 10000);
     return () => {
       cancelled = true;
       window.clearInterval(interval);
+      window.removeEventListener('foodmatch:check-invitations', onManualCheck);
     };
   }, [token, isConnected]);
 

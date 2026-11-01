@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Toast } from '../stores/useToastStore';
 import { useUserStore } from '../stores/useUserStore';
 import logoImg from '../assert/logo-256.webp';
 
@@ -60,20 +59,12 @@ export default function HomePage() {
               {i18n.language === 'en' ? 'EN' : 'VN'}
             </button>
             <button 
-              onClick={async () => {
-                try {
-                  const { matchApi } = await import('../api/matchApi');
-                  const pendingReqs = await matchApi.getPending();
-                  if (pendingReqs && pendingReqs.length > 0) {
-                    Toast.show({
-                      content: `Bạn có ${pendingReqs.length} lời rủ đi ăn đang chờ!`,
-                    });
-                  } else {
-                    Toast.show({ content: 'Không có thông báo mới' });
-                  }
-                } catch {
-                  Toast.show({ content: 'Không tải được thông báo. Vui lòng thử lại.' });
+              onClick={() => {
+                if (!profile?.token) {
+                  navigate('/profile');
+                  return;
                 }
+                window.dispatchEvent(new Event('foodmatch:check-invitations'));
               }}
               className="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container/60 text-on-surface-variant hover:text-on-surface transition-colors relative"
               aria-label="Thông báo"

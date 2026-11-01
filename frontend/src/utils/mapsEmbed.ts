@@ -23,17 +23,14 @@ export function searchMapUrl(query: string, center: MapPoint | null): string {
   const term = query.trim();
   if (!term) return '';
   const centerText = coordinates(center);
-  if (hasMapsEmbedKey) {
-    const url = officialUrl('search');
-    url.searchParams.set('q', term);
-    if (centerText) {
-      url.searchParams.set('center', centerText);
-      url.searchParams.set('zoom', '15');
-    }
-    return url.toString();
-  }
-  return `https://maps.google.com/maps?q=${encodeURIComponent(term)}` +
-    (centerText ? `&ll=${centerText}&z=15` : '') + '&output=embed';
+  // In production, Google's /embed/v1/search rendered only the base map for
+  // generic restaurant queries. This iframe URL renders actual search pins.
+  const nearbyQuery = centerText ? `${term} gần ${centerText}` : term;
+  const url = new URL('https://maps.google.com/maps');
+  url.searchParams.set('q', nearbyQuery);
+  // ll/z suppress the search pins in this iframe; the exact position is in q.
+  url.searchParams.set('output', 'embed');
+  return url.toString();
 }
 
 export function viewMapUrl(center: MapPoint | null): string {

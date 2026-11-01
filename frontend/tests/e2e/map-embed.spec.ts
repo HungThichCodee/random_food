@@ -5,9 +5,11 @@ test.beforeEach(async ({ context, page }) => {
   await context.setGeolocation({ latitude: 10.776889, longitude: 106.700806 });
   await page.route('https://www.google.com/maps/embed/**', route =>
     route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Map test</title>' }));
+  await page.route('https://maps.google.com/maps**', route =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Search map test</title>' }));
 });
 
-test('map offers all Embed modes and keeps the measured position', async ({ page }) => {
+test('map search shows nearby cafes and keeps the measured position', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/map');
   const frame = page.locator('main iframe');
@@ -15,14 +17,29 @@ test('map offers all Embed modes and keeps the measured position', async ({ page
 
   await page.getByLabel('Tên quán hoặc món ăn').fill('Cà phê');
   await page.getByRole('button', { name: 'Tìm', exact: true }).click();
-  await expect(frame).toHaveAttribute('src', /\/embed\/v1\/search/);
-
-  await page.getByRole('button', { name: 'Địa điểm' }).click();
-  await expect(frame).toHaveAttribute('src', /\/embed\/v1\/place/);
+  await expect(frame).toHaveAttribute('src', /maps\.google\.com\/maps/);
+  const cafeSearch = new URL((await frame.getAttribute('src'))!);
+  expect(cafeSearch.searchParams.get('q')).toBe('quán cà phê gần 10.776889,106.700806');
+  expect(cafeSearch.searchParams.has('ll')).toBe(false);
   await page.getByRole('button', { name: 'Phố 360°' }).click();
   await expect(frame).toHaveAttribute('src', /\/embed\/v1\/streetview/);
   const panorama = new URL((await frame.getAttribute('src'))!);
   expect(panorama.searchParams.get('location')).toBe('10.776889,106.700806');
+});
+
+test('GPS movement does not reset the map until visitor refreshes it', async ({ context, page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/map');
+  const frame = page.locator('main iframe');
+  await expect(frame).toHaveAttribute('src', /10\.776889%2C106\.700806/);
+  const originalSrc = await frame.getAttribute('src');
+  await context.setGeolocation({ latitude: 10.7771, longitude: 106.7012 });
+  await page.waitForTimeout(300);
+  await expect(frame).toHaveAttribute('src', originalSrc!);
+  await page.getByRole('button', { name: 'Cập nhật vị trí trên bản đồ' }).click();
+  await expect(frame).toHaveAttribute('src', /10\.7771%2C106\.7012/);
+  await page.getByRole('button', { name: 'Về trang chủ' }).click();
+  await expect(page).toHaveURL(/\/$/);
 });
 
 test('directions appear inside the map and change travel mode', async ({ page }) => {
@@ -30,8 +47,7 @@ test('directions appear inside the map and change travel mode', async ({ page })
   await page.goto('/map');
   await expect(page.locator('main iframe')).toHaveAttribute('src', /\/embed\/v1\/view/);
   await page.getByRole('button', { name: 'Đường đi' }).click();
-  await page.getByLabel('Điểm đến').fill('Bún bò Huế');
-  await page.getByRole('button', { name: 'Xem đường' }).click();
+  await page.getByRole('textbox', { name: 'Điểm đến' }).fill('Bún bò Huế');
   const frame = page.locator('main iframe');
   await expect(frame).toHaveAttribute('src', /\/embed\/v1\/directions/);
   const walking = new URL((await frame.getAttribute('src'))!);
@@ -53,8 +69,7 @@ test('a visitor without GPS can enter both route endpoints', async ({ context, p
   await page.goto('/map');
   await page.getByRole('button', { name: 'Đường đi' }).click();
   await page.getByLabel('Điểm xuất phát').fill('Chợ Bến Thành');
-  await page.getByLabel('Điểm đến').fill('Dinh Độc Lập');
-  await page.getByRole('button', { name: 'Xem đường' }).click();
+  await page.getByRole('textbox', { name: 'Điểm đến' }).fill('Dinh Độc Lập');
   const frame = page.locator('main iframe');
   await expect(frame).toHaveAttribute('src', /\/embed\/v1\/directions/);
   const route = new URL((await frame.getAttribute('src'))!);

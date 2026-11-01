@@ -74,14 +74,8 @@ test('active profile still receives a pending match dialog', async ({ page }) =>
   await expect(page.getByText('Bạn thử nghiệm muốn rủ bạn đi ăn!')).toBeVisible();
 });
 
-test('notification button loads pending requests on demand', async ({ page }) => {
-  await page.route('**/api/**', (route) => {
-    if (new URL(route.request().url()).pathname.endsWith('/MatchRequests/pending')) {
-      return route.fulfill({ json: [] });
-    }
-    return route.abort();
-  });
+test('notification button sends a guest to profile setup', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Thông báo' }).click();
-  await expect(page.getByText('Không có thông báo mới')).toBeVisible();
+  await expect(page).toHaveURL(/\/profile$/);
 });

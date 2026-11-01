@@ -20,6 +20,8 @@ export default function DirectionRoutePage() {
       : null;
   const showMeetingPlace = locationState.state?.meetingPlace === true;
   const [buddyDestination, setBuddyDestination] = useState<MapPoint | string | null>(null);
+  const [latestBuddyDestination, setLatestBuddyDestination] = useState<MapPoint | string | null>(null);
+  const [routePosition, setRoutePosition] = useState<MapPoint | null>(null);
   const [accessChecked, setAccessChecked] = useState(false);
   const [travelMode, setTravelMode] = useState<TravelMode>('walking');
 
@@ -29,6 +31,12 @@ export default function DirectionRoutePage() {
     Number.isFinite(profile.currentLat) && Number.isFinite(profile.currentLng);
   const currentLat = livePosition ? location.lat : savedPosition ? profile.currentLat : null;
   const currentLng = livePosition ? location.lng : savedPosition ? profile.currentLng : null;
+
+  useEffect(() => {
+    if (routePosition || currentLat == null || currentLng == null ||
+        (location.isLoading && !livePosition)) return;
+    setRoutePosition({ lat: currentLat, lng: currentLng });
+  }, [routePosition, currentLat, currentLng, location.isLoading, livePosition]);
 
   useEffect(() => {
     if (privateMatchId === null) return;
@@ -51,12 +59,16 @@ export default function DirectionRoutePage() {
         Number.isFinite(destination.lng);
       // Google Maps links have no verified coordinates in our database. Route by
       // the place name only after the private match has passed the sharing check.
-      setBuddyDestination(allowed
+      const nextDestination: MapPoint | string | null = allowed
         ? coordinatesAvailable
           ? { lat: destination.lat!, lng: destination.lng! }
           : showMeetingPlace && match.meetingPlace?.googleMapsUrl && match.meetingPlace.name
             ? match.meetingPlace.name : null
-        : null);
+        : null;
+      setLatestBuddyDestination(nextDestination);
+      // A fresh location update must not interrupt a route being inspected.
+      // Revoking consent still removes the route immediately.
+      setBuddyDestination(previous => nextDestination ? previous ?? nextDestination : null);
       setAccessChecked(true);
     };
     const refresh = async () => {
@@ -65,6 +77,7 @@ export default function DirectionRoutePage() {
       } catch {
         if (mounted) {
           setBuddyDestination(null);
+          setLatestBuddyDestination(null);
           setAccessChecked(true);
         }
       }
@@ -91,14 +104,13 @@ export default function DirectionRoutePage() {
     : typeof buddyDestination === 'string' ? buddyDestination : null;
 
   const mapSrc = useMemo(() => {
-    const origin: MapPoint | null = currentLat != null && currentLng != null
-      ? { lat: currentLat, lng: currentLng } : null;
+    const origin = routePosition;
     const destination: MapPoint | string | null =
       typeof destLat === 'number' && typeof destLng === 'number'
         ? { lat: destLat, lng: destLng }
         : typeof destQuery === 'string' ? destQuery : null;
     return directionsMapUrl(origin, destination, travelMode);
-  }, [currentLat, currentLng, destLat, destLng, destQuery, privateMatchId, travelMode]);
+  }, [routePosition, destLat, destLng, destQuery, privateMatchId, travelMode]);
 
   return (
     <div className="h-[100dvh] w-full bg-background relative flex flex-col">
@@ -106,6 +118,7 @@ export default function DirectionRoutePage() {
         <div className="flex items-center gap-3 max-w-[390px] mx-auto pointer-events-auto">
           <button 
             onClick={() => navigate(-1)} 
+            aria-label="Quay lại"
             className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface shadow-sm shrink-0 active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-[20px]">arrow_back</span>
@@ -117,6 +130,18 @@ export default function DirectionRoutePage() {
               Đường tới {destName}
             </span>
           </div>
+          <button type="button" onClick={() => {
+            if (currentLat != null && currentLng != null) setRoutePosition({ lat: currentLat, lng: currentLng });
+            if (privateMatchId !== null) setBuddyDestination(latestBuddyDestination);
+          }} disabled={!livePosition && !latestBuddyDestination}
+            aria-label="Cập nhật tuyến đường theo vị trí mới" title="Cập nhật tuyến đường"
+            className="h-11 w-11 shrink-0 rounded-full bg-surface-container-high text-on-surface disabled:opacity-50">
+            <span className="material-symbols-outlined">refresh</span>
+          </button>
+          <button type="button" onClick={() => navigate('/')} aria-label="Về trang chủ"
+            className="h-11 w-11 shrink-0 rounded-full bg-surface-container-high text-on-surface">
+            <span className="material-symbols-outlined">explore</span>
+          </button>
         </div>
         {hasMapsEmbedKey && (
           <div className="mx-auto mt-3 flex max-w-[390px] gap-2 overflow-x-auto pb-1" role="group" aria-label="Phương tiện di chuyển">

@@ -3,12 +3,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useUserStore } from '../stores/useUserStore';
 import {
-  directionsMapUrl, hasMapsEmbedKey, placeMapUrl, searchMapUrl, streetViewMapUrl,
+  directionsMapUrl, hasMapsEmbedKey, searchMapUrl, streetViewMapUrl,
   viewMapUrl, type MapPoint, type TravelMode,
 } from '../utils/mapsEmbed';
 
 type MapTab = 'search' | 'directions' | 'streetview';
-type SearchView = 'results' | 'place';
 const myLocation = 'Vị trí của tôi';
 const mapTabs: { mode: MapTab; label: string }[] = [
   { mode: 'search', label: 'Tìm quán' },
@@ -22,6 +21,11 @@ const travelModes: { mode: TravelMode; label: string }[] = [
   { mode: 'transit', label: 'Công cộng' },
 ];
 const quickSearches = ['Quán ăn', 'Cà phê', 'Món chay'];
+const quickQueries: Record<string, string> = {
+  'Quán ăn': 'quán ăn',
+  'Cà phê': 'quán cà phê',
+  'Món chay': 'quán chay',
+};
 
 function endpoint(value: string, center: MapPoint | null): MapPoint | string | null {
   const term = value.trim();
@@ -47,7 +51,7 @@ function externalMapUrl(mode: MapTab, center: MapPoint | null, query: string,
   if (mode === 'search' && query) {
     const url = new URL('https://www.google.com/maps/search/');
     url.searchParams.set('api', '1');
-    url.searchParams.set('query', query);
+    url.searchParams.set('query', center ? `${query} gần ${endpointText(center)}` : query);
     return url.toString();
   }
   const url = new URL('https://www.google.com/maps/@');
@@ -67,9 +71,7 @@ export default function MapExplorePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get('search')?.trim() ?? '';
   const [mode, setMode] = useState<MapTab>('search');
-  const [searchView, setSearchView] = useState<SearchView>('results');
   const [inputValue, setInputValue] = useState(searchQuery);
-  const [placeTerm, setPlaceTerm] = useState('');
   const [originInput, setOriginInput] = useState(myLocation);
   const [routeOrigin, setRouteOrigin] = useState(myLocation);
   const [destinationInput, setDestinationInput] = useState('');
@@ -77,11 +79,11 @@ export default function MapExplorePage() {
   const [travelMode, setTravelMode] = useState<TravelMode>('walking');
   const [gpsBadgeDismissed, setGpsBadgeDismissed] = useState(false);
   const [loadedSrc, setLoadedSrc] = useState('');
+  const [mapCenter, setMapCenter] = useState<MapPoint | null>(null);
 
   useEffect(() => {
     if (!searchQuery) return;
     setInputValue(searchQuery);
-    setSearchView('results');
     setMode('search');
   }, [searchQuery]);
 
@@ -101,20 +103,24 @@ export default function MapExplorePage() {
     ? { lat: location.lat!, lng: location.lng! }
     : savedPosition ? { lat: profile.currentLat!, lng: profile.currentLng! } : null;
 
-  const routeStart = endpoint(routeOrigin, center);
-  const routeEnd = endpoint(routeDestination, center);
+  // A GPS watch can report tiny movements many times per minute. Keep the
+  // iframe URL stable while the visitor pans, zooms or selects a place.
+  useEffect(() => {
+    if (mapCenter || !center || (location.isLoading && !livePosition)) return;
+    setMapCenter(center);
+  }, [mapCenter, center, location.isLoading, livePosition]);
+
+  const routeStart = endpoint(routeOrigin, mapCenter);
+  const routeEnd = endpoint(routeDestination, mapCenter);
+  const mapQuery = quickQueries[searchQuery] ?? searchQuery;
   const mapSrc = mode === 'search'
-    ? searchView === 'place' && placeTerm
-      ? placeMapUrl(placeTerm, center)
-      : searchQuery ? searchMapUrl(searchQuery, center) : viewMapUrl(center)
-    : mode === 'streetview' ? streetViewMapUrl(center)
+    ? searchQuery ? searchMapUrl(mapQuery, mapCenter) : viewMapUrl(mapCenter)
+    : mode === 'streetview' ? streetViewMapUrl(mapCenter)
       : directionsMapUrl(routeStart, routeEnd, travelMode);
-  const displayedQuery = mode === 'search'
-    ? searchView === 'place' ? placeTerm : searchQuery
-    : '';
-  const externalUrl = externalMapUrl(mode, center, displayedQuery,
-    mode === 'directions' ? endpoint(originInput, center) : null,
-    mode === 'directions' ? endpoint(destinationInput, center) : null, travelMode);
+  const displayedQuery = mode === 'search' ? mapQuery : '';
+  const externalUrl = externalMapUrl(mode, mapCenter, displayedQuery,
+    mode === 'directions' ? endpoint(originInput, mapCenter) : null,
+    mode === 'directions' ? endpoint(destinationInput, mapCenter) : null, travelMode);
   const gpsLabel = livePosition
     ? location.error ? 'GPS gần nhất' : 'GPS hiện tại'
     : savedPosition ? 'Vị trí đã lưu'
@@ -124,15 +130,7 @@ export default function MapExplorePage() {
   const handleSearch = (event: FormEvent) => {
     event.preventDefault();
     const term = inputValue.trim();
-    setSearchView('results');
     setSearchParams(term ? { search: term } : {});
-  };
-
-  const handlePlace = () => {
-    const term = inputValue.trim();
-    if (!term) return;
-    setPlaceTerm(term);
-    setSearchView('place');
   };
 
   const handleRoute = (event: FormEvent) => {
@@ -150,13 +148,13 @@ export default function MapExplorePage() {
 
   const missingMessage = mode === 'streetview'
     ? !hasMapsEmbedKey ? 'Phố 360° cần Maps Embed API key.'
-      : location.isLoading && !center ? 'Đang lấy vị trí của bạn...'
+      : location.isLoading && !mapCenter ? 'Đang lấy vị trí của bạn...'
         : 'Cho phép vị trí để xem đường phố quanh bạn.'
     : mode === 'directions'
       ? !routeDestination ? 'Nhập điểm đến để xem tuyến đường.'
         : !routeStart || !routeEnd ? 'Cho phép vị trí hoặc nhập điểm đi.'
           : 'Không thể hiển thị tuyến đường.'
-      : location.isLoading && !center ? 'Đang lấy vị trí của bạn...'
+      : location.isLoading && !mapCenter ? 'Đang lấy vị trí của bạn...'
         : 'Cho phép vị trí hoặc nhập tên quán để tìm.';
 
   return (
@@ -168,16 +166,26 @@ export default function MapExplorePage() {
             className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface">
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
-          <div className="flex min-w-0 flex-1 gap-1" role="group" aria-label="Chế độ bản đồ">
+          <strong className="min-w-0 flex-1 truncate px-1 text-sm">Bản đồ & đường đi</strong>
+          <button type="button" onClick={() => { if (center) setMapCenter(center); }}
+            disabled={!center} aria-label="Cập nhật vị trí trên bản đồ" title="Cập nhật vị trí"
+            className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface disabled:opacity-50">
+            <span className="material-symbols-outlined">my_location</span>
+          </button>
+          <button type="button" onClick={() => navigate('/')} aria-label="Về trang chủ"
+            className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface">
+            <span className="material-symbols-outlined">explore</span>
+          </button>
+        </div>
+        <div className="mx-auto mt-1.5 flex max-w-[430px] gap-1.5" role="group" aria-label="Chế độ bản đồ">
             {mapTabs.map(item => (
               <button key={item.mode} type="button" onClick={() => setMode(item.mode)}
                 aria-pressed={mode === item.mode}
-                className={'min-h-[44px] min-w-0 flex-1 rounded-full px-1 text-xs font-semibold sm:text-sm ' +
+                className={'min-h-[44px] min-w-0 flex-1 rounded-full px-2 text-xs font-semibold sm:text-sm ' +
                   (mode === item.mode ? 'bg-primary-container text-white' : 'bg-surface-container-high text-on-surface-variant')}>
                 {item.label}
               </button>
             ))}
-          </div>
         </div>
 
         {mode === 'search' && (
@@ -188,18 +196,15 @@ export default function MapExplorePage() {
                 onChange={event => setInputValue(event.target.value)} placeholder="Tên quán hoặc món..."
                 className="h-[44px] min-w-0 flex-1 rounded-full bg-surface-container-high px-3 text-sm text-on-surface outline-none focus-visible:ring-2 focus-visible:ring-primary-container" />
               <button type="submit" className="min-h-[44px] min-w-[44px] shrink-0 rounded-full bg-primary-container px-3 text-sm font-semibold text-white">Tìm</button>
-              <button type="button" onClick={handlePlace} disabled={!inputValue.trim()}
-                aria-label="Xem địa điểm" className="min-h-[44px] min-w-[44px] shrink-0 rounded-full bg-surface-container-high px-3 text-sm font-semibold text-on-surface disabled:opacity-50">Xem</button>
             </form>
             <div className="mx-auto mt-1.5 flex max-w-[430px] gap-1.5 overflow-x-auto" role="group" aria-label="Tìm nhanh trên bản đồ">
               {quickSearches.map(term => (
                 <button key={term} type="button" onClick={() => {
                   setInputValue(term);
-                  setSearchView('results');
                   setSearchParams({ search: term });
-                }} aria-pressed={searchView === 'results' && searchQuery === term}
+                }} aria-pressed={searchQuery === term}
                   className={'min-h-[44px] shrink-0 rounded-full px-3 text-sm font-semibold ' +
-                    (searchView === 'results' && searchQuery === term ? 'bg-primary-container text-white' : 'bg-surface-container-high text-on-surface-variant')}>
+                    (searchQuery === term ? 'bg-primary-container text-white' : 'bg-surface-container-high text-on-surface-variant')}>
                   {term}
                 </button>
               ))}
@@ -275,18 +280,14 @@ export default function MapExplorePage() {
           </div>
         )}
 
-        <div className="absolute bottom-3 left-3 right-3 z-20 mx-auto max-w-[430px]">
-          {externalUrl ? (
+        {externalUrl && (
+          <div className="absolute bottom-3 right-3 z-20">
             <a href={externalUrl} target="_blank" rel="noopener noreferrer"
-              className="flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary-container px-4 text-center text-sm font-semibold text-white shadow-lg">
-              {mode === 'directions' ? 'Mở chỉ đường trong Google Maps' : 'Mở trong Google Maps'}
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-primary-container px-4 text-center text-sm font-semibold text-white shadow-lg">
+              {mode === 'directions' ? 'Mở chỉ đường' : 'Mở Maps'}
             </a>
-          ) : (
-            <button type="button" disabled className="min-h-[44px] w-full rounded-full bg-surface-container-high px-4 text-sm font-semibold text-on-surface-variant opacity-70">
-              Mở chỉ đường trong Google Maps
-            </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div aria-hidden="true" className="shrink-0 bg-background"

@@ -8,7 +8,6 @@ using FoodMatch.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 
@@ -69,44 +68,6 @@ public class MeetingSuggestionsControllerTests
         Assert.StartsWith("https://maps.google.com/maps?q=", body.EmbedUrl);
     }
 
-    [Fact]
-    public async Task UsesOfficialGoogleEmbedSearchWhenKeyIsConfigured()
-    {
-        var userId = Guid.NewGuid();
-        var matchService = new Mock<IMatchService>();
-        matchService.Setup(service => service.GetMatchForUserAsync(7, userId))
-            .ReturnsAsync(new MatchRequestDto
-            {
-                Id = 7, Status = "Accepted", HasSharedLocation = true,
-                BuddyHasSharedLocation = true, BuddyLat = 10.3, BuddyLng = 106.3
-            });
-        var tempUsers = new Mock<ITempUserService>();
-        tempUsers.Setup(service => service.GetByIdAsync(userId))
-            .ReturnsAsync(new TempUserDto { Id = userId, CurrentLat = 10.1, CurrentLng = 106.1 });
-        var provider = new Mock<IMeetingPlaceService>();
-        provider.Setup(service => service.SuggestAsync(
-                10.1, 106.1, 10.3, 106.3, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new HttpRequestException("Provider unavailable"));
-        var configuration = new ConfigurationBuilder().AddInMemoryCollection(
-            new Dictionary<string, string?> { ["GoogleMaps:EmbedApiKey"] = "test-key" }).Build();
-        var controller = CreateController(userId, matchService, tempUsers, provider, configuration);
-
-        var response = await controller.GetMeetingSuggestions(7);
-
-        var body = Assert.IsType<MeetingSuggestionsDto>(Assert.IsType<OkObjectResult>(response.Result).Value);
-        Assert.StartsWith("https://www.google.com/maps/embed/v1/search?", body.EmbedUrl);
-        Assert.Contains("key=test-key", body.EmbedUrl);
-        Assert.Contains("q=qu%C3%A1n%20%C4%83n", body.EmbedUrl);
-        var center = Uri.UnescapeDataString(body.EmbedUrl.Split("center=")[1].Split('&')[0])
-            .Split(',').Select(value => double.Parse(value,
-                System.Globalization.CultureInfo.InvariantCulture)).ToArray();
-        Assert.Equal(2, center.Length);
-        Assert.InRange(Math.Abs(center[0] - 10.2), 0, 1e-12);
-        Assert.InRange(Math.Abs(center[1] - 106.2), 0, 1e-12);
-        Assert.Contains("zoom=15", body.EmbedUrl);
-        Assert.StartsWith("https://www.google.com/maps/search/?api=1&query=", body.SearchUrl);
-    }
-
     [Theory]
     [InlineData("cafe", "quán cà phê")]
     [InlineData("vegetarian", "quán chay")]
@@ -131,15 +92,14 @@ public class MeetingSuggestionsControllerTests
                 CurrentLng = 106.7001234567
             });
         var provider = new Mock<IMeetingPlaceService>();
-        var configuration = new ConfigurationBuilder().AddInMemoryCollection(
-            new Dictionary<string, string?> { ["GoogleMaps:EmbedApiKey"] = "test-key" }).Build();
-        var controller = CreateController(userId, matchService, tempUsers, provider, configuration);
+        var controller = CreateController(userId, matchService, tempUsers, provider);
 
         var response = await controller.GetMeetingSuggestions(7, kind);
 
         var body = Assert.IsType<MeetingSuggestionsDto>(Assert.IsType<OkObjectResult>(response.Result).Value);
         Assert.Contains("q=" + Uri.EscapeDataString(expectedQuery), body.EmbedUrl);
-        var center = Uri.UnescapeDataString(body.EmbedUrl.Split("center=")[1].Split('&')[0])
+        var query = Uri.UnescapeDataString(body.EmbedUrl.Split("q=")[1].Split('&')[0]);
+        var center = query.Split(" gần ")[1]
             .Split(',').Select(value => double.Parse(value,
                 System.Globalization.CultureInfo.InvariantCulture)).ToArray();
         Assert.Equal((10.7761234567 + 10.7768765432) / 2, center[0]);
@@ -224,7 +184,7 @@ public class MeetingSuggestionsControllerTests
         var response = await controller.GetMeetingSuggestions(7);
 
         var body = Assert.IsType<MeetingSuggestionsDto>(Assert.IsType<OkObjectResult>(response.Result).Value);
-        Assert.Contains("&ll=12,108", body.EmbedUrl);
+        Assert.Contains("%20g%E1%BA%A7n%2012%2C108", body.EmbedUrl);
         Assert.Contains("12%2C108", body.SearchUrl);
         Assert.Empty(body.Places);
         Assert.False(body.ProviderAvailable);
@@ -259,11 +219,10 @@ public class MeetingSuggestionsControllerTests
 
     private static MatchRequestsController CreateController(Guid userId,
         Mock<IMatchService> matchService, Mock<ITempUserService> tempUsers,
-        Mock<IMeetingPlaceService> provider, IConfiguration? configuration = null)
+        Mock<IMeetingPlaceService> provider)
     {
         var controller = new MatchRequestsController(matchService.Object,
-            new Mock<IHubContext<MatchHub>>().Object, tempUsers.Object, provider.Object,
-            configuration);
+            new Mock<IHubContext<MatchHub>>().Object, tempUsers.Object, provider.Object);
         var context = new DefaultHttpContext
         {
             User = new ClaimsPrincipal(new ClaimsIdentity(

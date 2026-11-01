@@ -21,17 +21,14 @@ public class MatchRequestsController : ControllerBase
     private readonly IHubContext<MatchHub> _matchHubContext;
     private readonly ITempUserService _tempUserService;
     private readonly FoodMatch.Api.Services.IMeetingPlaceService _meetingPlaceService;
-    private readonly string? _googleMapsEmbedApiKey;
 
     public MatchRequestsController(IMatchService matchService, IHubContext<MatchHub> matchHubContext,
-        ITempUserService tempUserService, FoodMatch.Api.Services.IMeetingPlaceService meetingPlaceService,
-        IConfiguration? configuration = null)
+        ITempUserService tempUserService, FoodMatch.Api.Services.IMeetingPlaceService meetingPlaceService)
     {
         _matchService = matchService;
         _matchHubContext = matchHubContext;
         _tempUserService = tempUserService;
         _meetingPlaceService = meetingPlaceService;
-        _googleMapsEmbedApiKey = configuration?["GoogleMaps:EmbedApiKey"]?.Trim();
     }
 
     [HttpPost]
@@ -236,13 +233,10 @@ public class MatchRequestsController : ControllerBase
             var searchTerm = $"{googleQuery} gần {centerText}";
             var searchUrl = "https://www.google.com/maps/search/?api=1&query=" +
                 Uri.EscapeDataString(searchTerm);
-            var embedUrl = string.IsNullOrWhiteSpace(_googleMapsEmbedApiKey)
-                ? "https://maps.google.com/maps?q=" +
-                    Uri.EscapeDataString(searchTerm) + "&ll=" + centerText + "&z=15&output=embed"
-                : "https://www.google.com/maps/embed/v1/search?key=" +
-                    Uri.EscapeDataString(_googleMapsEmbedApiKey) + "&q=" +
-                    Uri.EscapeDataString(googleQuery) + "&center=" +
-                    Uri.EscapeDataString(centerText) + "&zoom=15&language=vi";
+            // Embed v1 search currently renders only the base map for these
+            // broad categories. The Google Maps iframe query shows the pins.
+            var embedUrl = "https://maps.google.com/maps?q=" +
+                Uri.EscapeDataString(searchTerm) + "&output=embed";
             return Ok(new FoodMatch.Api.Services.MeetingSuggestionsDto(
                 places, searchUrl, providerAvailable, embedUrl));
         }

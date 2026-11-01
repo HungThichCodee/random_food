@@ -60,6 +60,9 @@ export default function ChatPage() {
   const lastLocationSentAt = useRef(0);
   const [showShareConfirm, setShowShareConfirm] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showLocationTools, setShowLocationTools] = useState(false);
+  const [showMeetingTools, setShowMeetingTools] = useState(false);
   const [reportReason, setReportReason] = useState('Hành vi không phù hợp');
   const [reporting, setReporting] = useState(false);
   const [meetingPlaces, setMeetingPlaces] = useState<MeetingPlaceDto[]>([]);
@@ -73,10 +76,6 @@ export default function ChatPage() {
   const [meetingDecisionBusy, setMeetingDecisionBusy] = useState(false);
   const [meetingRefreshKey, setMeetingRefreshKey] = useState(0);
   const [meetingSearchKind, setMeetingSearchKind] = useState<MeetingSearchKind>('restaurant');
-  const canSuggestMeeting = activeMatch?.status === 'Accepted' &&
-    activeMatch.hasSharedLocation && activeMatch.buddyHasSharedLocation &&
-    typeof activeMatch.buddyLat === 'number' &&
-    typeof activeMatch.buddyLng === 'number';
 
   // Auto-scroll to bottom of stream
   useEffect(() => {
@@ -212,6 +211,7 @@ export default function ChatPage() {
       setMeetingEmbedUrl('');
       return;
     }
+    if (!showMeetingTools) return;
     let cancelled = false;
     setMeetingPlacesLoading(true);
     setMeetingPlacesError(false);
@@ -234,15 +234,7 @@ export default function ChatPage() {
     });
     return () => { cancelled = true; };
   }, [activeMatch?.id, activeMatch?.hasSharedLocation,
-      activeMatch?.buddyHasSharedLocation, meetingRefreshKey, meetingSearchKind]);
-
-  // Refresh the midpoint as either phone moves. Keep requests below the
-  // MeetingSuggestions rate limit and stop immediately when consent ends.
-  useEffect(() => {
-    if (!canSuggestMeeting) return;
-    const interval = window.setInterval(() => setMeetingRefreshKey(value => value + 1), 30000);
-    return () => window.clearInterval(interval);
-  }, [activeMatch?.id, canSuggestMeeting]);
+      activeMatch?.buddyHasSharedLocation, meetingRefreshKey, meetingSearchKind, showMeetingTools]);
 
   // Listen to SignalR real-time messages
   useEffect(() => {
@@ -433,18 +425,33 @@ export default function ChatPage() {
               onClick={() => navigate('/')}
             />
             <h1 className="font-title-md text-title-md text-on-surface tracking-tight truncate max-w-[170px]">
-              Real Time Chat
+              Trò chuyện
             </h1>
           </div>
-          <div className="flex items-center gap-space-xs">
-            <button 
+          <div className="relative flex items-center gap-space-xs">
+            <button type="button"
+              onClick={() => setShowOptions(value => !value)}
+              aria-expanded={showOptions}
+              aria-label="Mở tùy chọn trò chuyện"
               className="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container/60 text-on-surface-variant hover:text-on-surface transition-colors"
               title="Tùy chọn"
             >
               <span className="material-symbols-outlined text-[20px]">more_vert</span>
             </button>
-            <div 
-              onClick={() => navigate('/profile')}
+            {showOptions && (
+              <div className="absolute right-0 top-12 z-50 w-48 rounded-xl border border-outline-variant bg-surface-container-high p-1 shadow-xl">
+                <button type="button" onClick={() => { setShowLocationTools(true); setShowOptions(false); }}
+                  className="min-h-11 w-full rounded-lg px-3 text-left text-sm hover:bg-surface-container-highest">Chia sẻ vị trí</button>
+                <button type="button" onClick={() => { setShowMeetingTools(true); setShowOptions(false); }}
+                  disabled={!activeMatch?.hasSharedLocation || !activeMatch?.buddyHasSharedLocation}
+                  className="min-h-11 w-full rounded-lg px-3 text-left text-sm hover:bg-surface-container-highest disabled:opacity-50">Gợi ý điểm hẹn</button>
+                <button type="button" onClick={() => { setShowReport(true); setShowOptions(false); }}
+                  disabled={!activeMatch}
+                  className="min-h-11 w-full rounded-lg px-3 text-left text-sm hover:bg-surface-container-highest disabled:opacity-50">Báo cáo</button>
+              </div>
+            )}
+            <button type="button" onClick={() => navigate('/profile')}
+              aria-label="Mở hồ sơ cá nhân"
               className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/40 overflow-hidden cursor-pointer"
             >
               {profile?.displayName ? (
@@ -454,45 +461,15 @@ export default function ChatPage() {
               ) : (
                 <span className="w-full h-full bg-surface-container-high flex items-center justify-center material-symbols-outlined" aria-hidden="true">person</span>
               )}
-            </div>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Viewport */}
-      <main className="flex flex-col relative w-full pt-16 pb-safe bg-surface z-10 min-h-screen">
-        <div className="flex flex-col w-full relative select-none">
-          
-          {/* Top Background: Dimmed Map Glimpse with Pulsing Match Markers */}
-          <div className="relative w-full h-44 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-surface-container-high to-surface"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-surface"></div>
-            
-            {/* Pulsing Radar Map Marker for Meetup Location */}
-            {activeMatch?.hasSharedLocation && activeMatch.buddyHasSharedLocation &&
-              activeMatch.meetingPlace && <div className="absolute top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-              <div className="relative flex items-center justify-center">
-                <span className="absolute w-12 h-12 rounded-full bg-primary-container/30 animate-ping"></span>
-                <span className="absolute w-8 h-8 rounded-full bg-primary-container/50 animate-pulse"></span>
-                <div className="w-7 h-7 rounded-full bg-primary-container shadow-[0_0_16px_rgba(255,107,53,0.8)] flex items-center justify-center text-white text-[14px]">
-                  <span className="material-symbols-outlined text-[16px]">soup_kitchen</span>
-                </div>
-              </div>
-              <div className="mt-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-highest/90 backdrop-blur-md shadow-lg">
-                <span className="font-label-sm text-label-sm text-primary tracking-wide uppercase truncate max-w-[200px] block">
-                  {activeMatch.meetingPlace.name}
-                </span>
-              </div>
-            </div>}
-          </div>
-
-          {/* Bottom Drawer Overlay Shell: Chat Room Deck */}
-          <div className="relative w-full -mt-8 flex flex-col rounded-t-xl bg-surface-container-low/95 backdrop-blur-2xl shadow-[0_-12px_44px_rgba(0,0,0,0.8)]">
-            
-            {/* Drag Handle Indicator */}
-            <div className="w-full pt-3 pb-2 flex justify-center items-center">
-              <div className="w-10 h-1 rounded-full bg-outline-variant/60"></div>
-            </div>
+      <main className="flex flex-col relative w-full pt-[calc(4rem+env(safe-area-inset-top,0px))] pb-[calc(6rem+env(safe-area-inset-bottom,0px))] bg-surface z-10 min-h-screen">
+        <div className="flex flex-col w-full relative">
+          <div className="relative w-full flex flex-col rounded-t-xl bg-surface-container-low/95 backdrop-blur-2xl shadow-[0_-12px_44px_rgba(0,0,0,0.8)]">
 
             {/* Match Chat Header */}
             <div className="px-margin pb-3 pt-1 flex items-center justify-between gap-space-sm">
@@ -511,20 +488,21 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              <button type="button" onClick={() => setShowReport(true)} disabled={!activeMatch}
-                className="flex-shrink-0 px-3 py-2 rounded-full bg-surface-container-high text-on-surface-variant disabled:opacity-50">
-                Báo cáo
-              </button>
+              <span className="text-xs text-on-surface-variant">{isConnected ? 'Đã kết nối' : 'Đang kết nối'}</span>
             </div>
 
             {/* Location Sharing Card */}
             {activeMatch && activeMatch.status === 'Accepted' && (
               <div className="px-margin mb-3">
                 <div className="w-full p-3 rounded-DEFAULT bg-surface-container/90 backdrop-blur-lg flex flex-col gap-2 shadow-sm border border-primary/20">
-                  <div className="flex items-center gap-2">
+                  <button type="button" onClick={() => setShowLocationTools(value => !value)}
+                    aria-expanded={showLocationTools}
+                    className="flex min-h-11 items-center gap-2 text-left">
                     <span className="material-symbols-outlined text-primary text-[20px]">my_location</span>
-                    <span className="font-title-sm text-on-surface">Chia sẻ vị trí</span>
-                  </div>
+                    <span className="font-title-sm flex-1 text-on-surface">Vị trí: {activeMatch.hasSharedLocation ? 'đang chia sẻ' : 'chưa chia sẻ'}</span>
+                    <span aria-hidden="true">{showLocationTools ? '−' : '+'}</span>
+                  </button>
+                  {showLocationTools && <>
                   <p className="text-body-sm text-on-surface-variant">
                     {activeMatch.hasSharedLocation
                       ? `${partnerName} có thể xem vị trí chính xác của bạn.`
@@ -559,6 +537,7 @@ export default function ChatPage() {
                     </button>
                   )}
                   <p className="text-body-sm text-on-surface-variant">Gợi ý điểm hẹn xuất hiện khi cả hai cùng chia sẻ.</p>
+                  </>}
                 </div>
               </div>
             )}
@@ -631,12 +610,16 @@ export default function ChatPage() {
               typeof activeMatch.buddyLng === 'number' && (
               <section className="px-margin mb-3" aria-label="Gợi ý điểm hẹn">
                 <div className="p-3 rounded-DEFAULT bg-surface-container/90 border border-secondary/25 space-y-2">
-                  <div className="flex items-center gap-2 text-on-surface font-title-sm">
+                  <button type="button" onClick={() => setShowMeetingTools(value => !value)}
+                    aria-expanded={showMeetingTools}
+                    className="flex min-h-11 w-full items-center gap-2 text-left text-on-surface font-title-sm">
                     <span className="material-symbols-outlined text-secondary">restaurant</span>
-                    Gợi ý điểm hẹn ở khoảng giữa
-                  </div>
+                    <span className="flex-1">Gợi ý điểm hẹn</span>
+                    <span aria-hidden="true">{showMeetingTools ? '−' : '+'}</span>
+                  </button>
+                  {showMeetingTools && <>
                   <p className="text-body-sm text-on-surface-variant">
-                    Google Maps nhận tọa độ điểm giữa hai bạn để hiển thị quán. Bản đồ cập nhật khoảng 30 giây một lần khi vị trí thay đổi. Chọn quán, sao chép liên kết chia sẻ rồi gửi cho người kia xác nhận.
+                    Chọn loại quán, rồi làm mới khi muốn cập nhật vị trí. Bạn có thể sao chép liên kết quán từ Google Maps để gửi cho người kia.
                   </p>
                   <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Loại địa điểm hẹn">
                     {meetingSearchOptions.map((option) => (
@@ -730,6 +713,7 @@ export default function ChatPage() {
                       © OpenStreetMap contributors · ODbL
                     </a>
                   )}
+                  </>}
                 </div>
               </section>
             )}
@@ -740,13 +724,6 @@ export default function ChatPage() {
               className="flex flex-col px-margin gap-3 overflow-y-auto max-h-[380px] pb-2"
               id="chat-stream"
             >
-              {/* Timestamp pill */}
-              <div className="flex justify-center my-1">
-                <span className="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm tracking-wider">
-                  HÔM NAY • 19:15
-                </span>
-              </div>
-
               {/* Messages */}
               {messages.map((item) => {
                 if (item.sender === 'partner') {
@@ -789,17 +766,8 @@ export default function ChatPage() {
             </div>
 
             {/* Floating Dynamic Input Bar */}
-            <div className="p-margin pt-2 pb-5 w-full bg-surface-container-lowest/90 backdrop-blur-xl">
+            <div className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[640px] p-margin pt-2 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] bg-surface-container-lowest/95 backdrop-blur-xl">
               <form className="flex items-center gap-2" id="chat-form" onSubmit={handleSendMessage}>
-                {/* Media Attach Button */}
-                <button
-                  onClick={() => Toast.show('Tính năng đính kèm tệp đang được phát triển')}
-                  className="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant hover:text-primary flex items-center justify-center flex-shrink-0 active:scale-95 transition-all"
-                  type="button"
-                >
-                  <span className="material-symbols-outlined text-[20px]">add_circle</span>
-                </button>
-
                 {/* Text Input Field Container */}
                 <div className="flex-1 min-w-0 h-11 px-3.5 rounded-full bg-surface-container flex items-center gap-2 shadow-inner focus-within:ring-1 focus-within:ring-primary-container">
                   <input
@@ -811,13 +779,6 @@ export default function ChatPage() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                   />
-                  <button
-                    onClick={() => Toast.show('Tính năng gửi icon đang được phát triển')}
-                    className="text-on-surface-variant hover:text-tertiary flex items-center justify-center flex-shrink-0 transition-colors"
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">sentiment_satisfied</span>
-                  </button>
                 </div>
 
                 {/* Send Button */}
